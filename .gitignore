@@ -1,0 +1,18 @@
+# Build directories
+build/
+bin/
+obj/
+
+# Local database directories
+pgdata/
+logfile
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
