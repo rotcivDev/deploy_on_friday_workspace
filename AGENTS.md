@@ -134,6 +134,25 @@ When agents generate documents, specs, examples, or templates, they must be regi
 *   **[walkthrough/git/git_workflow_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/git/git_workflow_refinement_guide.html)**: Git workflow and repository hygiene refinement guide for HTML walkthrough migration and v0.1 delivery.
 *   **[walkthrough/testing/systems_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/testing/systems_refinement_guide.html)**: Systems architecture compile, run and tests guide for v0.1.
 *   **[walkthrough/xp/v0_1_first_development_cycle_task_list.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/v0_1_first_development_cycle_task_list.html)**: XP task list for completing the proposed v0.1 development cycle, including TDD slices, pairing prompts, and release gates.
+*   **[walkthrough/xp/t02_layered_build_skeleton_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t02_layered_build_skeleton_plan.html)**: Multi-mentor handoff plan for the human implementing T02, including CMake, Make, C17 smoke tests, and boundary review examples.
+*   **[walkthrough/xp/t03_local_workflow_docker_bootstrap_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t03_local_workflow_docker_bootstrap_plan.html)**: XP T03 Local Workflow and Docker Bootstrap.
+*   **[walkthrough/xp/t04_validate_seeded_content_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t04_validate_seeded_content_plan.html)**: XP T04 Validate Seeded Content.
+*   **[walkthrough/xp/t05_deck_membership_seed_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t05_deck_membership_seed_plan.html)**: XP T05 Deck Membership Seed.
+*   **[walkthrough/xp/t06_deterministic_rng_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t06_deterministic_rng_plan.html)**: XP T06 Deterministic RNG.
+*   **[walkthrough/xp/t07_encounter_deck_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t07_encounter_deck_plan.html)**: XP T07 Encounter Deck.
+*   **[walkthrough/xp/t08_treasure_deck_equipment_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t08_treasure_deck_equipment_plan.html)**: XP T08 Treasure Deck and Equipment.
+*   **[walkthrough/xp/t09_match_starting_state_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t09_match_starting_state_plan.html)**: XP T09 Match Starting State.
+*   **[walkthrough/xp/t10_power_level_invariants_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t10_power_level_invariants_plan.html)**: XP T10 Power and Level Invariants.
+*   **[walkthrough/xp/t11_first_combat_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t11_first_combat_plan.html)**: XP T11 Resolve First Combat.
+*   **[walkthrough/xp/t12_first_curses_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t12_first_curses_plan.html)**: XP T12 Resolve First Curses.
+*   **[walkthrough/xp/t13_command_results_events_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t13_command_results_events_plan.html)**: XP T13 Shape Command Results and Events.
+*   **[walkthrough/xp/t14_application_command_boundary_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t14_application_command_boundary_plan.html)**: XP T14 Add Application Command Boundary.
+*   **[walkthrough/xp/t15_deterministic_bot_baseline_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t15_deterministic_bot_baseline_plan.html)**: XP T15 Add Deterministic Bot Baseline.
+*   **[walkthrough/xp/t16_full_match_simulation_transcript_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t16_full_match_simulation_transcript_plan.html)**: XP T16 Produce Full-Match Simulation Transcript.
+*   **[walkthrough/xp/t17_terminal_snapshot_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t17_terminal_snapshot_plan.html)**: XP T17 Define Snapshot for Terminal Rendering.
+*   **[walkthrough/xp/t18_ncurses_static_smoke_path_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t18_ncurses_static_smoke_path_plan.html)**: XP T18 Add NCurses Static Smoke Path.
+*   **[walkthrough/xp/t19_local_playtest_loop_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t19_local_playtest_loop_plan.html)**: XP T19 Integrate The Local Playtest Loop.
+*   **[walkthrough/xp/t20_release_candidate_gate_plan.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/t20_release_candidate_gate_plan.html)**: XP T20 Run Release Candidate Gate.
 *   *(Add future programming guides or standalone code examples here)*
 
 ---

@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T02 Implementation Plan: Layered Build Skeleton</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; --code:#101828; --code-ink:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1180px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15,23,42,.05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { margin-top:1.6em; border-top:1px solid var(--line); padding-top:1em; }
+    h3 { margin-top:1.2em; color:#143a36; }
+    p,ul,ol,table,pre { margin:.85em 0; }
+    ul,ol { padding-left:1.4rem; }
+    li { margin:.25em 0; }
+    a { color:var(--accent); }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:var(--code); color:var(--code-ink); padding:16px; border-radius:8px; border:1px solid #1f2937; }
+    pre code { background:transparent; border:0; color:inherit; padding:0; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; }
+    th { background:#ecfdf5; text-align:left; }
+    .callout { border-left:4px solid var(--accent); background:#ecfdf5; padding:14px 16px; border-radius:6px; margin:18px 0; }
+    .warning { border-left-color:var(--warn); background:#fff7ed; }
+    .meta { color:var(--muted); font-size:.95rem; margin-top:-.5rem; }
+    .toolbar { display:grid; gap:10px; margin-bottom:18px; }
+    .toolbar input,.toolbar button { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px 10px; font:inherit; background:white; }
+    .toolbar button { cursor:pointer; color:white; background:var(--accent); border-color:var(--accent); }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    .section-hidden { display:none; }
+    li.done { opacity:.62; text-decoration:line-through; }
+    @media(max-width:860px){.page-shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}article{padding:22px}}
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter T02 plan">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#intent">Intent</a>
+      <a href="#mentor-synthesis">Mentor Synthesis</a>
+      <a href="#story">Implementation Story</a>
+      <a href="#target-shape">Target Shape</a>
+      <a href="#red">Red Slice</a>
+      <a href="#green">Green Slice</a>
+      <a href="#refactor">Refactor Slice</a>
+      <a href="#examples">Concrete Examples</a>
+      <a href="#checks">Review Checks</a>
+      <a href="#done">Definition Of Done</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Handoff plan for the human implementing XP task T02. This file is documentation only; it does not modify production source.</p>
+      <h1>T02 Implementation Plan: Layered Build Skeleton</h1>
+
+      <section data-section id="intent">
+        <h2>Intent</h2>
+        <div class="callout">
+          <strong>Goal:</strong> create the smallest build skeleton that proves Clean Architecture dependency direction before gameplay code grows.
+        </div>
+        <p>T02 exists because the game will soon need domain rules, application commands, PostgreSQL content loading, and NCurses rendering. If those are compiled into one unstructured executable first, forbidden dependencies can spread quietly. The build must make boundary mistakes visible early.</p>
+        <p>This plan is intentionally a handoff. The human implementer will edit production files manually. Agents must not write under <code>domain/</code>, <code>application/</code>, <code>infrastructure/</code>, <code>client/</code>, <code>server/</code>, or <code>shared/</code>.</p>
+      </section>
+
+      <section data-section id="mentor-synthesis">
+        <h2>Mentor Synthesis</h2>
+        <table>
+          <thead><tr><th>Mentor</th><th>Contribution To T02</th><th>Non-Negotiable</th></tr></thead>
+          <tbody>
+            <tr><td>Lead Architect</td><td>Preserve dependency direction from day one.</td><td>Domain does not include application, PostgreSQL, NCurses, sockets, pthreads, or filesystem runtime concerns.</td></tr>
+            <tr><td>Systems Programmer</td><td>Use standard C17, CMake targets, CTest, and strict warnings.</td><td>Compile with <code>-std=c17 -Wall -Wextra -Werror -pedantic</code> and avoid compiler extensions.</td></tr>
+            <tr><td>DevOps Principal Engineer</td><td>Make <code>make</code> the stable local command surface while CMake owns target generation.</td><td><code>make test</code> remains fast and does not require PostgreSQL service or interactive NCurses.</td></tr>
+            <tr><td>XP Principal Engineer</td><td>Implement red-green-refactor in a small verifiable slice.</td><td>Write the smoke test and boundary expectations before growing real gameplay logic.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-section id="story">
+        <h2>Implementation Story</h2>
+        <p><strong>Source backlog item:</strong> T02, R0, A1, SP0, DEV1.</p>
+        <p><strong>Domain behavior served:</strong> future combat, deck, curse, and command rules can be tested in pure C without database or terminal dependencies.</p>
+        <p><strong>User-visible outcome served:</strong> later gameplay increments can be implemented safely because the build catches misplaced rule ownership early.</p>
+        <p><strong>Boundaries touched by the human:</strong> root <code>CMakeLists.txt</code>, root <code>Makefile</code>, minimal placeholder source/test files under the production tree, and optional support test folders.</p>
+        <p><strong>Out of scope:</strong> real card rules, database queries, NCurses layout, Docker implementation, networking, protocol structs, and production deployment.</p>
+      </section>
+
+      <section data-section id="target-shape">
+        <h2>Target Shape</h2>
+        <pre><code>dtd_domain
+    pure C17 domain placeholders only
+    links: C standard library only
+
+dtd_application
+    application command/service placeholders
+    links: dtd_domain
+
+dtd_infrastructure_db
+    PostgreSQL adapter placeholder only
+    links: dtd_application, dtd_domain, libpq
+
+dtd_client_ncurses
+    terminal client placeholder only
+    links: dtd_application, dtd_domain, dtd_infrastructure_db, ncurses
+
+dtd_tests_domain
+    minimal CTest smoke test
+    links: dtd_domain
+
+dtd_tests_application
+    optional application smoke test
+    links: dtd_application, dtd_domain</code></pre>
+        <p>Keep <code>server/</code> and <code>shared/</code> empty or absent for T02 unless the repo already has them. They are v0.2 concerns and should not be used to justify protocol work in this slice.</p>
+      </section>
+
+      <section data-section id="red">
+        <h2>Red Slice</h2>
+        <ol>
+          <li>Create or identify a minimal domain smoke test expectation: <code>dtd_domain_smoke()</code> returns a known value such as <code>17</code>.</li>
+          <li>Define the desired CTest name before implementation: <code>domain_smoke</code>.</li>
+          <li>Write down the boundary expectation: the domain test must link only <code>dtd_domain</code>.</li>
+          <li>Run <code>make test</code> before the implementation exists. It should fail because the build skeleton or test does not exist yet.</li>
+        </ol>
+        <p>The red state is meaningful if the failure says there is no build target, no test executable, or no test registered. Do not skip this just because the code is trivial.</p>
+      </section>
+
+      <section data-section id="green">
+        <h2>Green Slice</h2>
+        <ol>
+          <li>Add the smallest possible source placeholders for domain, application, infrastructure DB, and client targets.</li>
+          <li>Add the root CMake target graph with strict C17 settings and CTest enabled.</li>
+          <li>Add the Make wrapper for <code>configure</code>, <code>build</code>, <code>test</code>, and <code>clean</code>.</li>
+          <li>Make <code>make build</code> pass.</li>
+          <li>Make <code>make test</code> pass with the domain smoke test.</li>
+        </ol>
+        <p>Green is not a gameplay milestone. It only proves the build graph and fast feedback loop.</p>
+      </section>
+
+      <section data-section id="refactor">
+        <h2>Refactor Slice</h2>
+        <ol>
+          <li>Remove any accidental target that links everything together just to make compilation easy.</li>
+          <li>Make PostgreSQL and NCurses discovery local to the targets that need them.</li>
+          <li>Keep include paths narrow. Prefer target-specific include directories over global include directories.</li>
+          <li>Rename placeholders if needed so they describe their boundary instead of future behavior they do not yet implement.</li>
+          <li>Add a short dependency review note to the PR or commit message.</li>
+        </ol>
+      </section>
+
+      <section data-section id="examples">
+        <h2>Concrete Examples</h2>
+        <h3>Example File Tree</h3>
+        <pre><code>.
+├── CMakeLists.txt
+├── Makefile
+├── domain/
+│   ├── dtd_domain_smoke.h
+│   └── dtd_domain_smoke.c
+├── application/
+│   ├── dtd_application_smoke.h
+│   └── dtd_application_smoke.c
+├── infrastructure/
+│   └── db/
+│       ├── postgresql_content_repository_smoke.h
+│       └── postgresql_content_repository_smoke.c
+├── client/
+│   ├── ncurses_client_smoke.h
+│   ├── ncurses_client_smoke.c
+│   └── main.c
+└── tests/
+    ├── domain/
+    │   └── test_domain_smoke.c
+    └── application/
+        └── test_application_smoke.c</code></pre>
+
+        <h3>Example Domain Placeholder</h3>
+        <p>Human-created file: <code>domain/dtd_domain_smoke.h</code></p>
+        <pre><code class="language-c">#ifndef DTD_DOMAIN_SMOKE_H
+#define DTD_DOMAIN_SMOKE_H
+
+int dtd_domain_smoke(void);
+
+#endif</code></pre>
+        <p>Human-created file: <code>domain/dtd_domain_smoke.c</code></p>
+        <pre><code class="language-c">#include "dtd_domain_smoke.h"
+
+int dtd_domain_smoke(void)
+{
+    return 17;
+}</code></pre>
+
+        <h3>Example Domain Test</h3>
+        <p>Human-created file: <code>tests/domain/test_domain_smoke.c</code></p>
+        <pre><code class="language-c">#include "dtd_domain_smoke.h"
+
+int main(void)
+{
+    return dtd_domain_smoke() == 17 ? 0 : 1;
+}</code></pre>
+
+        <h3>Example Application Placeholder</h3>
+        <p>Human-created file: <code>application/dtd_application_smoke.h</code></p>
+        <pre><code class="language-c">#ifndef DTD_APPLICATION_SMOKE_H
+#define DTD_APPLICATION_SMOKE_H
+
+int dtd_application_smoke(void);
+
+#endif</code></pre>
+        <p>Human-created file: <code>application/dtd_application_smoke.c</code></p>
+        <pre><code class="language-c">#include "dtd_application_smoke.h"
+#include "dtd_domain_smoke.h"
+
+int dtd_application_smoke(void)
+{
+    return dtd_domain_smoke();
+}</code></pre>
+
+        <h3>Example Infrastructure Placeholder</h3>
+        <p>Human-created file: <code>infrastructure/db/postgresql_content_repository_smoke.c</code></p>
+        <pre><code class="language-c">#include &lt;libpq-fe.h&gt;
+
+int dtd_postgresql_repository_smoke(void)
+{
+    return sizeof(PGconn *) &gt; 0 ? 0 : 1;
+}</code></pre>
+        <p>This file intentionally proves that <code>libpq-fe.h</code> is isolated to infrastructure. Do not include this header in domain or application.</p>
+
+        <h3>Example Client Placeholder</h3>
+        <p>Human-created file: <code>client/main.c</code></p>
+        <pre><code class="language-c">#include &lt;ncurses.h&gt;
+
+int main(void)
+{
+    return OK == 0 ? 0 : 0;
+}</code></pre>
+        <p>This is not a real UI. It only proves that NCurses linkage belongs to the client target. Replace it during R7.</p>
+
+        <h3>Example Root CMakeLists.txt</h3>
+        <pre><code class="language-cmake">cmake_minimum_required(VERSION 3.16)
+project(DungeonOfTechnicalDebt C)
+
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
+add_compile_options(-Wall -Wextra -Werror -pedantic)
+
+enable_testing()
+
+add_library(dtd_domain
+    domain/dtd_domain_smoke.c
+)
+target_include_directories(dtd_domain PUBLIC domain)
+
+add_library(dtd_application
+    application/dtd_application_smoke.c
+)
+target_include_directories(dtd_application PUBLIC application)
+target_link_libraries(dtd_application PUBLIC dtd_domain)
+
+find_package(PostgreSQL REQUIRED)
+add_library(dtd_infrastructure_db
+    infrastructure/db/postgresql_content_repository_smoke.c
+)
+target_include_directories(dtd_infrastructure_db PRIVATE ${PostgreSQL_INCLUDE_DIRS})
+target_link_libraries(dtd_infrastructure_db PRIVATE
+    dtd_application
+    dtd_domain
+    ${PostgreSQL_LIBRARIES}
+)
+
+find_package(Curses REQUIRED)
+add_executable(dtd_client_ncurses
+    client/main.c
+)
+target_include_directories(dtd_client_ncurses PRIVATE ${CURSES_INCLUDE_DIR})
+target_link_libraries(dtd_client_ncurses PRIVATE
+    dtd_application
+    dtd_domain
+    dtd_infrastructure_db
+    ${CURSES_LIBRARIES}
+)
+
+add_executable(dtd_tests_domain
+    tests/domain/test_domain_smoke.c
+)
+target_link_libraries(dtd_tests_domain PRIVATE dtd_domain)
+add_test(NAME domain_smoke COMMAND dtd_tests_domain)
+
+add_executable(dtd_tests_application
+    tests/application/test_application_smoke.c
+)
+target_link_libraries(dtd_tests_application PRIVATE dtd_application dtd_domain)
+add_test(NAME application_smoke COMMAND dtd_tests_application)</code></pre>
+
+        <h3>Example Application Test</h3>
+        <p>Human-created file: <code>tests/application/test_application_smoke.c</code></p>
+        <pre><code class="language-c">#include "dtd_application_smoke.h"
+
+int main(void)
+{
+    return dtd_application_smoke() == 17 ? 0 : 1;
+}</code></pre>
+
+        <h3>Example Makefile</h3>
+        <pre><code class="language-makefile">.PHONY: configure build test clean
+
+BUILD_DIR := build
+
+configure:
+	cmake -S . -B $(BUILD_DIR)
+
+build: configure
+	cmake --build $(BUILD_DIR)
+
+test: build
+	ctest --test-dir $(BUILD_DIR) --output-on-failure
+
+clean:
+	cmake -E rm -rf $(BUILD_DIR)</code></pre>
+
+        <div class="callout warning">
+          <strong>Adapt names to the repository.</strong>
+          These are examples, not a mandate to keep placeholder names forever. The important part is the target graph and dependency isolation.
+        </div>
+      </section>
+
+      <section data-section id="checks">
+        <h2>Review Checks</h2>
+        <h3>Commands</h3>
+        <pre><code>make clean
+make build
+make test
+ctest --test-dir build --output-on-failure</code></pre>
+        <h3>Manual Dependency Review</h3>
+        <ul>
+          <li>Search domain and application for forbidden includes: <code>libpq-fe.h</code>, <code>ncurses.h</code>, <code>pthread.h</code>, <code>sys/socket.h</code>, and <code>netinet/in.h</code>.</li>
+          <li>Confirm <code>dtd_tests_domain</code> links only <code>dtd_domain</code>.</li>
+          <li>Confirm <code>dtd_tests_application</code> links only <code>dtd_application</code> and <code>dtd_domain</code>.</li>
+          <li>Confirm <code>dtd_infrastructure_db</code> is the only target with PostgreSQL libraries.</li>
+          <li>Confirm <code>dtd_client_ncurses</code> is the only target with Curses libraries.</li>
+        </ul>
+        <h3>Forbidden Shortcut</h3>
+        <p>Do not create a single <code>dungeon_client</code> or <code>dtd_everything</code> target that directly compiles domain, application, infrastructure, and client files together. That hides the dependency violations T02 is meant to expose.</p>
+      </section>
+
+      <section data-section id="done">
+        <h2>Definition Of Done</h2>
+        <ul>
+          <li><code>make build</code> passes with <code>-std=c17 -Wall -Wextra -Werror -pedantic</code>.</li>
+          <li><code>make test</code> passes without a running PostgreSQL service.</li>
+          <li><code>make test</code> does not require interactive NCurses.</li>
+          <li>The target graph has separate domain, application, infrastructure DB, client, and test targets.</li>
+          <li>The domain target links only the C standard library.</li>
+          <li>The application target links domain only and does not include PostgreSQL or NCurses headers.</li>
+          <li>PostgreSQL and NCurses dependencies are isolated to infrastructure DB and client targets respectively.</li>
+          <li>The PR or commit includes a short boundary review note referencing T02 and this plan.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.querySelector('[data-search]');
+    const toggle = document.querySelector('[data-toggle-sections]');
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    document.querySelectorAll('li').forEach((li) => {
+      li.title = 'Click to mark reviewed';
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => li.classList.toggle('done'));
+    });
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        sections.forEach((section) => {
+          section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+        });
+      });
+    }
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const collapsed = document.body.dataset.collapsed === 'true';
+        document.body.dataset.collapsed = String(!collapsed);
+        sections.forEach((section) => {
+          Array.from(section.children).forEach((child, index) => {
+            if (index > 0) child.hidden = !collapsed;
+          });
+        });
+        toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+      });
+    }
+  })();
+</script>
+</body>
+</html>

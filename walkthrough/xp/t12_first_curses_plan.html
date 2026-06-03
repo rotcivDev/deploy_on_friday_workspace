@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T12 Implementation Plan: Resolve First Curses</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; --code:#101828; --code-ink:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1180px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15, 23, 42, .05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { margin-top:1.6em; border-top:1px solid var(--line); padding-top:1em; }
+    h3 { margin-top:1.2em; color:#143a36; }
+    p,ul,ol,table,pre { margin:.85em 0; }
+    ul,ol { padding-left:1.4rem; }
+    li { margin:.25em 0; }
+    a { color:var(--accent); }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:var(--code); color:var(--code-ink); padding:16px; border-radius:8px; border:1px solid #1f2937; }
+    pre code { background:transparent; border:0; color:inherit; padding:0; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; }
+    th { background:#ecfdf5; text-align:left; }
+    .callout { border-left:4px solid var(--accent); background:#ecfdf5; padding:14px 16px; border-radius:6px; margin:18px 0; }
+    .warning { border-left-color:var(--warn); background:#fff7ed; }
+    .meta { color:var(--muted); font-size:.95rem; margin-top:-.5rem; }
+    .toolbar { display:grid; gap:10px; margin-bottom:18px; }
+    .toolbar input,.toolbar button { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px 10px; font:inherit; background:white; }
+    .toolbar button { cursor:pointer; color:white; background:var(--accent); border-color:var(--accent); }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    .section-hidden { display:none; }
+    li.done { opacity:.62; text-decoration:line-through; }
+    @media(max-width:860px){.page-shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}article{padding:22px}}
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter T12 plan">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#intent">Intent</a>
+      <a href="#mentor-synthesis">Mentor Synthesis</a>
+      <a href="#story">Implementation Story</a>
+      <a href="#curse-list">Curse Effects</a>
+      <a href="#red">Red Slice</a>
+      <a href="#green">Green Slice</a>
+      <a href="#refactor">Refactor Slice</a>
+      <a href="#examples">Concrete Examples</a>
+      <a href="#checks">Review Checks</a>
+      <a href="#done">Definition Of Done</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Handoff plan for the human implementing XP task T12. This file is documentation only; it does not modify production source.</p>
+      <h1>T12 Implementation Plan: Resolve First Curses</h1>
+
+      <section data-section id="intent">
+        <h2>Intent</h2>
+        <div class="callout">
+          <strong>Goal:</strong> Implement curse cards resolution logic. Support the v0.1 curses: Broken CI (skip next combat), Scope Creep (next monster gains +5 power), and Context Window Exceeded (discard half your hand rounded down).
+        </div>
+        <p>Curses are negative effects that apply immediately when drawn from the Encounter deck. Some curses execute immediately and resolve (Context Window Exceeded), while others remain active until their expiry triggers (Broken CI, Scope Creep). We must manage this status state inside the player model.</p>
+      </section>
+
+      <section data-section id="mentor-synthesis">
+        <h2>Mentor Synthesis</h2>
+        <table>
+          <thead><tr><th>Mentor</th><th>Contribution To T12</th><th>Non-Negotiable</th></tr></thead>
+          <tbody>
+            <tr><td>Game Designer</td><td>Check balance parameters: Scope Creep adds +5 power to the next encounter. Broken CI skips the next combat.</td><td>Discards from Context Window Exceeded must round down.</td></tr>
+            <tr><td>Systems Programmer</td><td>Implement simple state flags on the player struct. Avoid malloc allocations for curse trackers.</td><td>Keep trackers simple. Use boolean or short counter integers.</td></tr>
+            <tr><td>Lead Architect</td><td>Clean up state. Let the player struct handle its curse trackers natively.</td><td>Curse evaluation must happen inside the core domain loop.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-section id="story">
+        <h2>Implementation Story</h2>
+        <p><strong>Source backlog item:</strong> T12, R5, AR4, SP2, GD3.</p>
+        <p><strong>Domain behavior served:</strong> Drawing a curse, modifying player state flags, evaluating curse impacts during combat, and decreasing/expiring active curses.</p>
+        <p><strong>User-visible outcome served:</strong> Players trigger curses that temporarily impair their stats or choices, reflecting software engineering challenges.</p>
+        <p><strong>Boundaries touched by the human:</strong> <code>domain/player.h</code>, <code>domain/player.c</code>, <code>domain/curse.h</code>, <code>domain/curse.c</code>, <code>tests/domain/test_curses.c</code>.</p>
+        <p><strong>Out of scope:</strong> Long-term persistent debts or stats debuffs that last past their specific trigger (e.g. Broken CI skips exactly 1 combat, then clears).</p>
+      </section>
+
+      <section data-section id="curse-list">
+        <h2>Curse Effects</h2>
+        <ul>
+          <li><strong>Broken CI:</strong> Sets a <code>skip_next_combat</code> flag on the player. When combat starts, it resolves as a draw/skip and clears the flag.</li>
+          <li><strong>Scope Creep:</strong> Sets a <code>next_monster_power_bonus</code> of 5 on the player. The next monster they battle has its Power temporarily increased by 5, then the bonus clears.</li>
+          <li><strong>Context Window Exceeded:</strong> Immediately discards <code>hand_count / 2</code> (rounded down) cards from the player's hand.</li>
+        </ul>
+      </section>
+
+      <section data-section id="red">
+        <h2>Red Slice</h2>
+        <ol>
+          <li>Write a CTest checking that applying "Context Window Exceeded" to a player with 5 cards discards exactly 2 (leaving 3 cards).</li>
+          <li>Check that applying "Broken CI" sets <code>skip_next_combat</code>.</li>
+          <li>Check that applying "Scope Creep" temporarily increases the opponent monster's power.</li>
+          <li>Assert that this test fails to build.</li>
+        </ol>
+      </section>
+
+      <section data-section id="green">
+        <h2>Green Slice</h2>
+        <ol>
+          <li>Add curse state variables (<code>skip_next_combat</code>, <code>next_monster_power_bonus</code>) to the <code>dtd_player_t</code> struct.</li>
+          <li>Define <code>dtd_apply_curse()</code> in <code>domain/curse.c</code>.</li>
+          <li>Update combat logic to incorporate active curse checks and clear them on resolution.</li>
+          <li>Verify CTests pass.</li>
+        </ol>
+      </section>
+
+      <section data-section id="refactor">
+        <h2>Refactor Slice</h2>
+        <ol>
+          <li>Use standard enum keys to map curse card names to the appropriate resolver logic.</li>
+        </ol>
+      </section>
+
+      <section data-section id="examples">
+        <h2>Concrete Examples</h2>
+        <h3>Example Player Struct Additions</h3>
+        <p>Human-created file: <code>domain/player.h</code> (added variables)</p>
+        <pre><code class="language-c">// Add these to dtd_player_t struct
+bool skip_next_combat;
+int next_monster_power_bonus;</code></pre>
+
+        <h3>Example Curse Resolution Interface</h3>
+        <p>Human-created file: <code>domain/curse.h</code></p>
+        <pre><code class="language-c">#ifndef DTD_CURSE_H
+#define DTD_CURSE_H
+
+#include "match.h"
+
+void dtd_apply_curse(dtd_match_t *match, int player_index, const dtd_card_def_t *curse_card);
+
+#endif</code></pre>
+
+        <h3>Example Curse Implementation</h3>
+        <p>Human-created file: <code>domain/curse.c</code></p>
+        <pre><code class="language-c">#include "curse.h"
+#include &lt;string.h&gt;
+
+void dtd_apply_curse(dtd_match_t *match, int player_index, const dtd_card_def_t *curse_card) {
+    if (!match || player_index &lt; 0 || player_index &gt;= match->player_count || !curse_card) {
+        return;
+    }
+
+    dtd_player_t *player = &match->players[player_index];
+
+    if (strcmp(curse_card->name, "Broken CI") == 0) {
+        player->skip_next_combat = true;
+    } else if (strcmp(curse_card->name, "Scope Creep") == 0) {
+        player->next_monster_power_bonus = 5;
+    } else if (strcmp(curse_card->name, "Context Window Exceeded") == 0) {
+        // Discard half hand, rounded down
+        int discard_count = player->hand_count / 2;
+        for (int i = 0; i &lt; discard_count; i++) {
+            // Discard the last card for simplicity in v0.1
+            player->hand_count--;
+        }
+    }
+}</code></pre>
+
+        <h3>Example Curse Test</h3>
+        <p>Human-created file: <code>tests/domain/test_curses.c</code></p>
+        <pre><code class="language-c">#include "match.h"
+#include "curse.h"
+#include &lt;assert.h&gt;
+#include &lt;string.h&gt;
+
+int main(void) {
+    dtd_class_def_t test_classes[6] = {
+        {1, "QA", 0}, {2, "QA", 0}, {3, "QA", 0}, {4, "QA", 0}, {5, "QA", 0}, {6, "QA", 0}
+    };
+    dtd_card_def_t test_cards[4] = {
+        {"Monster A", CARD_MONSTER, 5, 0, 5},
+        {"Coffee", CARD_TREASURE, 0, 0, 5},
+        {"Curse A", CARD_CURSE, 0, 0, 5},
+        {"AI A", CARD_AI, 2, 0, 5}
+    };
+    dtd_content_definitions_t content = {
+        .classes = test_classes,
+        .class_count = 6,
+        .cards = test_cards,
+        .card_count = 4
+    };
+
+    dtd_match_t match;
+    int class_selections[1] = {1};
+    assert(dtd_match_create(&match, &content, 42, 1, class_selections));
+
+    dtd_player_t *player = &match.players[0];
+
+    // Check Context Window Exceeded
+    // Give player 5 mock cards
+    dtd_card_def_t item = {"Item", CARD_TREASURE, 0, 0, 1};
+    player->hand_count = 0;
+    for(int i=0; i<5; i++) {
+        dtd_player_draw_to_hand(player, &item);
+    }
+    assert(player->hand_count == 5);
+
+    dtd_card_def_t curse_cw = {"Context Window Exceeded", CARD_CURSE, 0, 0, 1};
+    dtd_apply_curse(&match, 0, &curse_cw);
+    // Should discard 5 / 2 = 2. Leaving 3 cards.
+    assert(player->hand_count == 3);
+
+    // Check Broken CI
+    dtd_card_def_t curse_ci = {"Broken CI", CARD_CURSE, 0, 0, 1};
+    assert(!player->skip_next_combat);
+    dtd_apply_curse(&match, 0, &curse_ci);
+    assert(player->skip_next_combat);
+
+    return 0;
+}</code></pre>
+      </section>
+
+      <section data-section id="checks">
+        <h2>Review Checks</h2>
+        <ul>
+          <li>Verify <code>discard_count</code> division behavior operates as expected.</li>
+          <li>Verify the combat engine checks and consumes <code>skip_next_combat</code>.</li>
+        </ul>
+      </section>
+
+      <section data-section id="done">
+        <h2>Definition Of Done</h2>
+        <ul>
+          <li>Broken CI, Scope Creep, and Context Window Exceeded effects apply correctly.</li>
+          <li>Curse state flags clear properly on triggers.</li>
+          <li>Curse tests compile and run.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.querySelector('[data-search]');
+    const toggle = document.querySelector('[data-toggle-sections]');
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    document.querySelectorAll('li').forEach((li) => {
+      li.title = 'Click to mark reviewed';
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => li.classList.toggle('done'));
+    });
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        sections.forEach((section) => {
+          section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+        });
+      });
+    }
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const collapsed = document.body.dataset.collapsed === 'true';
+        document.body.dataset.collapsed = String(!collapsed);
+        sections.forEach((section) => {
+          Array.from(section.children).forEach((child, index) => {
+            if (index > 0) child.hidden = !collapsed;
+          });
+        });
+        toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+      });
+    }
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T16 Implementation Plan: Produce Full-Match Simulation Transcript</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; --code:#101828; --code-ink:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1180px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15, 23, 42, .05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { margin-top:1.6em; border-top:1px solid var(--line); padding-top:1em; }
+    h3 { margin-top:1.2em; color:#143a36; }
+    p,ul,ol,table,pre { margin:.85em 0; }
+    ul,ol { padding-left:1.4rem; }
+    li { margin:.25em 0; }
+    a { color:var(--accent); }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:var(--code); color:var(--code-ink); padding:16px; border-radius:8px; border:1px solid #1f2937; }
+    pre code { background:transparent; border:0; color:inherit; padding:0; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; }
+    th { background:#ecfdf5; text-align:left; }
+    .callout { border-left:4px solid var(--accent); background:#ecfdf5; padding:14px 16px; border-radius:6px; margin:18px 0; }
+    .warning { border-left-color:var(--warn); background:#fff7ed; }
+    .meta { color:var(--muted); font-size:.95rem; margin-top:-.5rem; }
+    .toolbar { display:grid; gap:10px; margin-bottom:18px; }
+    .toolbar input,.toolbar button { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px 10px; font:inherit; background:white; }
+    .toolbar button { cursor:pointer; color:white; background:var(--accent); border-color:var(--accent); }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    .section-hidden { display:none; }
+    li.done { opacity:.62; text-decoration:line-through; }
+    @media(max-width:860px){.page-shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}article{padding:22px}}
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter T16 plan">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#intent">Intent</a>
+      <a href="#mentor-synthesis">Mentor Synthesis</a>
+      <a href="#story">Implementation Story</a>
+      <a href="#transcript-format">Transcript Format Specification</a>
+      <a href="#red">Red Slice</a>
+      <a href="#green">Green Slice</a>
+      <a href="#refactor">Refactor Slice</a>
+      <a href="#examples">Concrete Examples</a>
+      <a href="#checks">Review Checks</a>
+      <a href="#done">Definition Of Done</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Handoff plan for the human implementing XP task T16. This file is documentation only; it does not modify production source.</p>
+      <h1>T16 Implementation Plan: Produce Full-Match Simulation Transcript</h1>
+
+      <section data-section id="intent">
+        <h2>Intent</h2>
+        <div class="callout">
+          <strong>Goal:</strong> Implement a non-interactive simulation target that uses a fixed seed and bot behaviors from T15 to run a complete 3-bot match from starting setup to Level 10 victory, writing the event log transcript to a text file.
+        </div>
+        <p>Before launching an interactive terminal loop, we must verify the entire gameplay progression is robust and doesn't get stuck in deadlocks. Running a rapid, headless game simulation that finishes and logs all events proves compile-time correctness and provides a test fixture for verifying game balance.</p>
+      </section>
+
+      <section data-section id="mentor-synthesis">
+        <h2>Mentor Synthesis</h2>
+        <table>
+          <thead><tr><th>Mentor</th><th>Contribution To T16</th><th>Non-Negotiable</th></tr></thead>
+          <tbody>
+            <tr><td>DevOps Principal Engineer</td><td>Integrate simulation targets into Makefile and output matches to <code>walkthrough/simulation_transcript.txt</code>.</td><td>The simulation output directory must reside inside the workspace.</td></tr>
+            <tr><td>Systems Programmer</td><td>Implement headless simulation execution in standard C. Check limits to prevent infinite loops.</td><td>Add a maximum turn counter limit (e.g. 500 turns) to prevent infinite loops if bots get stuck.</td></tr>
+            <tr><td>Lead Architect</td><td>Run simulation entirely in Application space using <code>dtd_game_service_t</code>.</td><td>No NCurses operations or display handles during execution.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-section id="story">
+        <h2>Implementation Story</h2>
+        <p><strong>Source backlog item:</strong> T16, R6, R8, AR7, DEV4.</p>
+        <p><strong>Domain behavior served:</strong> Long-term turn execution cycles. Victory and endgame processing.</p>
+        <p><strong>User-visible outcome served:</strong> Developers can run a single command (<code>make simulate</code>) to verify the game compiles, starts, runs to completion, and behaves stably.</p>
+        <p><strong>Boundaries touched by the human:</strong> <code>client/simulation_main.c</code> or subfolder, root <code>Makefile</code> updates, and transcript artifacts.</p>
+        <p><strong>Out of scope:</strong> Live player keyboard event polling during simulation. Headless only.</p>
+      </section>
+
+      <section data-section id="transcript-format">
+        <h2>Transcript Format Specification</h2>
+        <p>The output transcript must log:</p>
+        <ul>
+          <li>The match seed in the first line.</li>
+          <li>Initial player information.</li>
+          <li>Turn-by-turn logs listing drawn encounter cards, combat evaluations, level changes, and card play decisions.</li>
+          <li>The final winner and overall turn count.</li>
+        </ul>
+      </section>
+
+      <section data-section id="red">
+        <h2>Red Slice</h2>
+        <ol>
+          <li>Write a check command that runs the simulation with seed <code>777</code> and asserts the output transcript file exists and contains the string "WINNER" and a valid turn count.</li>
+          <li>Assert that this check fails before simulation logic is added.</li>
+        </ol>
+      </section>
+
+      <section data-section id="green">
+        <h2>Green Slice</h2>
+        <ol>
+          <li>Add a simulation entry point target in CMake: <code>dtd_simulator</code>.</li>
+          <li>Implement the loop in <code>client/simulation_main.c</code> that queries <code>dtd_bot_evaluate()</code> and executes commands using <code>dtd_service_execute()</code> until <code>PHASE_MATCH_OVER</code> is reached.</li>
+          <li>Write the generated result events out to the transcript text file.</li>
+          <li>Verify check commands pass successfully.</li>
+        </ol>
+      </section>
+
+      <section data-section id="refactor">
+        <h2>Refactor Slice</h2>
+        <ol>
+          <li>Keep the simulator separate from NCurses client targets to ensure NCurses library errors don't prevent compiling the headless simulation.</li>
+        </ol>
+      </section>
+
+      <section data-section id="examples">
+        <h2>Concrete Examples</h2>
+        <h3>Example Simulation Main</h3>
+        <p>Human-created file: <code>client/simulation_main.c</code></p>
+        <pre><code class="language-c">#include "game_service.h"
+#include "bot_ai.h"
+#include &lt;stdio.h&gt;
+
+int main(int argc, char **argv) {
+    uint64_t seed = 98765;
+    if (argc &gt; 1) {
+        // Allow overriding seed from arguments
+        sscanf(argv[1], "%lu", &seed);
+    }
+
+    FILE *out = fopen("walkthrough/simulation_transcript.txt", "w");
+    if (!out) {
+        perror("Failed to open transcript file");
+        return 1;
+    }
+
+    fprintf(out, "MATCH SIMULATION SEED: %lu\n", seed);
+    printf("Simulating game match with seed %lu...\n", seed);
+
+    dtd_game_service_t svc;
+    dtd_service_init(&svc);
+
+    // Mock content database
+    dtd_class_def_t test_classes[6] = {
+        {1, "Backend Dev", 1}, {2, "Frontend Dev", 0}, {3, "DevOps", 0},
+        {4, "QA", 0}, {5, "Security", 0}, {6, "AI", 0}
+    };
+    dtd_card_def_t test_cards[5] = {
+        {"Legacy Spooky Monster", CARD_MONSTER, 4, 0, 10},
+        {"Scope Creep", CARD_CURSE, 0, 0, 5},
+        {"Broken CI", CARD_CURSE, 0, 0, 5},
+        {"ThinkPad", CARD_EQUIPMENT, 0, 2, 10},
+        {"Linux Skill", CARD_TREASURE, 0, 1, 10}
+    };
+    dtd_content_definitions_t content = {
+        .classes = test_classes,
+        .class_count = 6,
+        .cards = test_cards,
+        .card_count = 5
+    };
+
+    // Start Match
+    dtd_command_t start_cmd = {CMD_START_MATCH, 0, 0};
+    dtd_command_result_t res = dtd_service_execute(&svc, &start_cmd, &content);
+
+    int limit = 0;
+    while (svc.match_active && svc.match.phase != PHASE_MATCH_OVER && limit &lt; 500) {
+        int active_idx = svc.match.current_player_index;
+        
+        // Evaluate bot decision
+        dtd_command_t cmd = dtd_bot_evaluate(&svc.match, active_idx, BOT_LEGACY_MAINTAINER);
+        
+        res = dtd_service_execute(&svc, &cmd, &content);
+        if (res.status == CMD_OK) {
+            for (int i = 0; i &lt; res.event_count; i++) {
+                fprintf(out, "[TURN %d][PLAYER %d] %s\n", limit, res.events[i].player_index, res.events[i].message);
+            }
+        } else {
+            fprintf(out, "[ERROR] Command failed with status %d at turn %d\n", res.status, limit);
+            break;
+        }
+
+        limit++;
+    }
+
+    fprintf(out, "SIMULATION FINISHED. TURNS ELAPSED: %d\n", limit);
+    for (int i = 0; i &lt; svc.match.player_count; i++) {
+        fprintf(out, "Player %s reached level %d\n", svc.match.players[i].name, svc.match.players[i].level);
+    }
+    fclose(out);
+
+    printf("Simulation completed successfully. Output saved to walkthrough/simulation_transcript.txt\n");
+    return 0;
+}</code></pre>
+      </section>
+
+      <section data-section id="checks">
+        <h2>Review Checks</h2>
+        <ul>
+          <li>Verify <code>make simulate</code> compiles and executes this target, outputting the transcript file.</li>
+          <li>Verify the loop terminates within 500 turns.</li>
+        </ul>
+      </section>
+
+      <section data-section id="done">
+        <h2>Definition Of Done</h2>
+        <ul>
+          <li>Simulation executes cleanly and outputs a transcript.</li>
+          <li>The simulation contains zero interactive keyboard prompts.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.querySelector('[data-search]');
+    const toggle = document.querySelector('[data-toggle-sections]');
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    document.querySelectorAll('li').forEach((li) => {
+      li.title = 'Click to mark reviewed';
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => li.classList.toggle('done'));
+    });
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        sections.forEach((section) => {
+          section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+        });
+      });
+    }
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const collapsed = document.body.dataset.collapsed === 'true';
+        document.body.dataset.collapsed = String(!collapsed);
+        sections.forEach((section) => {
+          Array.from(section.children).forEach((child, index) => {
+            if (index > 0) child.hidden = !collapsed;
+          });
+        });
+        toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+      });
+    }
+  })();
+</script>
+</body>
+</html>

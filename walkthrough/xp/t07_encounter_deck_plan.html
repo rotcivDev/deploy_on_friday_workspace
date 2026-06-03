@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T07 Implementation Plan: Build Encounter Deck From Loaded Content</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; --code:#101828; --code-ink:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1180px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15, 23, 42, .05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { margin-top:1.6em; border-top:1px solid var(--line); padding-top:1em; }
+    h3 { margin-top:1.2em; color:#143a36; }
+    p,ul,ol,table,pre { margin:.85em 0; }
+    ul,ol { padding-left:1.4rem; }
+    li { margin:.25em 0; }
+    a { color:var(--accent); }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:var(--code); color:var(--code-ink); padding:16px; border-radius:8px; border:1px solid #1f2937; }
+    pre code { background:transparent; border:0; color:inherit; padding:0; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; }
+    th { background:#ecfdf5; text-align:left; }
+    .callout { border-left:4px solid var(--accent); background:#ecfdf5; padding:14px 16px; border-radius:6px; margin:18px 0; }
+    .warning { border-left-color:var(--warn); background:#fff7ed; }
+    .meta { color:var(--muted); font-size:.95rem; margin-top:-.5rem; }
+    .toolbar { display:grid; gap:10px; margin-bottom:18px; }
+    .toolbar input,.toolbar button { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px 10px; font:inherit; background:white; }
+    .toolbar button { cursor:pointer; color:white; background:var(--accent); border-color:var(--accent); }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    .section-hidden { display:none; }
+    li.done { opacity:.62; text-decoration:line-through; }
+    @media(max-width:860px){.page-shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}article{padding:22px}}
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter T07 plan">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#intent">Intent</a>
+      <a href="#mentor-synthesis">Mentor Synthesis</a>
+      <a href="#story">Implementation Story</a>
+      <a href="#rules">Deck Behavior Rules</a>
+      <a href="#red">Red Slice</a>
+      <a href="#green">Green Slice</a>
+      <a href="#refactor">Refactor Slice</a>
+      <a href="#examples">Concrete Examples</a>
+      <a href="#checks">Review Checks</a>
+      <a href="#done">Definition Of Done</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Handoff plan for the human implementing XP task T07. This file is documentation only; it does not modify production source.</p>
+      <h1>T07 Implementation Plan: Build Encounter Deck From Loaded Content</h1>
+
+      <section data-section id="intent">
+        <h2>Intent</h2>
+        <div class="callout">
+          <strong>Goal:</strong> Implement the Encounter deck structure, draw mechanics, discard pile handling, and deterministic reshuffling using the RNG module from T06.
+        </div>
+        <p>A card deck needs separate arrays representing the "draw pile" and the "discard pile". When the draw pile runs dry, the discard pile must be shuffled and returned to the draw pile deterministically. This task builds the domain logic for these operations.</p>
+      </section>
+
+      <section data-section id="mentor-synthesis">
+        <h2>Mentor Synthesis</h2>
+        <table>
+          <thead><tr><th>Mentor</th><th>Contribution To T07</th><th>Non-Negotiable</th></tr></thead>
+          <tbody>
+            <tr><td>Systems Programmer</td><td>Manage fixed-size memory buffers for active deck cards. Avoid dynamic mallocs during turns.</td><td>Deck capacities must be statically bounded in the struct to guarantee stack safety and prevent leaks.</td></tr>
+            <tr><td>Game Designer</td><td>Define correct Encounter pile proportions of monsters and curses.</td><td>Draw pile must track actual remaining cards; discard pile must track discarded cards.</td></tr>
+            <tr><td>Lead Architect</td><td>Ensure UI or application command services draw cards only via explicit deck methods.</td><td>Decks must not know about UI rendering states or display coordinates.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-section id="story">
+        <h2>Implementation Story</h2>
+        <p><strong>Source backlog item:</strong> T07, R2, AR3, DB1, GD1.</p>
+        <p><strong>Domain behavior served:</strong> Initiating, drawing from, discarding into, and reshuffling the Encounter deck during a match loop.</p>
+        <p><strong>User-visible outcome served:</strong> Players draw random encounters deterministically. If the deck runs out, it shuffles and allows continued play.</p>
+        <p><strong>Boundaries touched by the human:</strong> <code>domain/deck.h</code>, <code>domain/deck.c</code>, <code>tests/domain/test_deck.c</code>.</p>
+        <p><strong>Out of scope:</strong> Live DB queries inside <code>domain/</code> (only load definitions loaded from application layer).</p>
+      </section>
+
+      <section data-section id="rules">
+        <h2>Deck Behavior Rules</h2>
+        <ul>
+          <li><strong>Shuffling:</strong> Uses the Knuth/Fisher-Yates shuffle algorithm with the RNG struct.</li>
+          <li><strong>Drawing:</strong> Returns the top card. If empty, triggers a reshuffle from the discard pile, then draws. If both are empty, return an empty indicator or error.</li>
+          <li><strong>Discarding:</strong> Pushes card to the discard pile array.</li>
+        </ul>
+      </section>
+
+      <section data-section id="red">
+        <h2>Red Slice</h2>
+        <ol>
+          <li>Write a CTest that instantiates a deck with 3 cards, shuffles it with seed <code>123</code>, and asserts the drawn sequence.</li>
+          <li>Draw 3 cards (deck is empty), assert drawing a 4th card triggers a reshuffle from the discard pile and returns a card.</li>
+          <li>Ensure this test fails to build or fails during runtime.</li>
+        </ol>
+      </section>
+
+      <section data-section id="green">
+        <h2>Green Slice</h2>
+        <ol>
+          <li>Define <code>dtd_deck_t</code> in <code>domain/deck.h</code> with arrays for draw/discard and trackers.</li>
+          <li>Implement <code>dtd_deck_init()</code>, <code>dtd_deck_shuffle()</code>, <code>dtd_deck_draw()</code>, and <code>dtd_deck_discard()</code>.</li>
+          <li>Verify CTests pass successfully.</li>
+        </ol>
+      </section>
+
+      <section data-section id="refactor">
+        <h2>Refactor Slice</h2>
+        <ol>
+          <li>Store only reference pointers or integer IDs of card definitions inside the deck arrays, rather than duplicating the entire card definition struct strings.</li>
+        </ol>
+      </section>
+
+      <section data-section id="examples">
+        <h2>Concrete Examples</h2>
+        <h3>Example Deck Header</h3>
+        <p>Human-created file: <code>domain/deck.h</code></p>
+        <pre><code class="language-c">#ifndef DTD_DECK_H
+#define DTD_DECK_H
+
+#include "rng.h"
+#include "content.h"
+
+#define MAX_DECK_CARDS 128
+
+typedef struct {
+    const dtd_card_def_t *draw_pile[MAX_DECK_CARDS];
+    int draw_count;
+    const dtd_card_def_t *discard_pile[MAX_DECK_CARDS];
+    int discard_count;
+} dtd_deck_t;
+
+void dtd_deck_init(dtd_deck_t *deck);
+void dtd_deck_add_card(dtd_deck_t *deck, const dtd_card_def_t *card);
+void dtd_deck_shuffle(dtd_deck_t *deck, dtd_rng_t *rng);
+const dtd_card_def_t *dtd_deck_draw(dtd_deck_t *deck, dtd_rng_t *rng);
+void dtd_deck_discard(dtd_deck_t *deck, const dtd_card_def_t *card);
+
+#endif</code></pre>
+
+        <h3>Example Deck Implementation</h3>
+        <p>Human-created file: <code>domain/deck.c</code></p>
+        <pre><code class="language-c">#include "deck.h"
+#include &lt;string.h&gt;
+
+void dtd_deck_init(dtd_deck_t *deck) {
+    if (deck) {
+        deck->draw_count = 0;
+        deck->discard_count = 0;
+    }
+}
+
+void dtd_deck_add_card(dtd_deck_t *deck, const dtd_card_def_t *card) {
+    if (deck && card && deck->draw_count &lt; MAX_DECK_CARDS) {
+        deck->draw_pile[deck->draw_count++] = card;
+    }
+}
+
+void dtd_deck_shuffle(dtd_deck_t *deck, dtd_rng_t *rng) {
+    if (!deck || !rng || deck->draw_count &lt;= 1) return;
+    for (int i = deck->draw_count - 1; i &gt; 0; i--) {
+        uint32_t j = dtd_rng_range(rng, 0, i);
+        const dtd_card_def_t *temp = deck->draw_pile[i];
+        deck->draw_pile[i] = deck->draw_pile[j];
+        deck->draw_pile[j] = temp;
+    }
+}
+
+const dtd_card_def_t *dtd_deck_draw(dtd_deck_t *deck, dtd_rng_t *rng) {
+    if (!deck) return NULL;
+    if (deck->draw_count == 0) {
+        if (deck->discard_count == 0) {
+            return NULL; // completely empty
+        }
+        // Reshuffle discard into draw
+        for (int i = 0; i &lt; deck->discard_count; i++) {
+            deck->draw_pile[i] = deck->discard_pile[i];
+        }
+        deck->draw_count = deck->discard_count;
+        deck->discard_count = 0;
+        dtd_deck_shuffle(deck, rng);
+    }
+    return deck->draw_pile[--deck->draw_count];
+}
+
+void dtd_deck_discard(dtd_deck_t *deck, const dtd_card_def_t *card) {
+    if (deck && card && deck->discard_count &lt; MAX_DECK_CARDS) {
+        deck->discard_pile[deck->discard_count++] = card;
+    }
+}</code></pre>
+
+        <h3>Example Deck Test</h3>
+        <p>Human-created file: <code>tests/domain/test_deck.c</code></p>
+        <pre><code class="language-c">#include "deck.h"
+#include "rng.h"
+#include "content.h"
+#include &lt;assert.h&gt;
+#include &lt;string.h&gt;
+
+int main(void) {
+    dtd_card_def_t card1 = {"Encounter A", CARD_MONSTER, 5, 0, 1};
+    dtd_card_def_t card2 = {"Encounter B", CARD_CURSE, 0, 0, 1};
+
+    dtd_deck_t deck;
+    dtd_deck_init(&deck);
+    dtd_deck_add_card(&deck, &card1);
+    dtd_deck_add_card(&deck, &card2);
+
+    dtd_rng_t rng;
+    dtd_rng_init(&rng, 123);
+
+    dtd_deck_shuffle(&deck, &rng);
+
+    const dtd_card_def_t *first = dtd_deck_draw(&deck, &rng);
+    const dtd_card_def_t *second = dtd_deck_draw(&deck, &rng);
+
+    assert(first != NULL);
+    assert(second != NULL);
+    assert(strcmp(first->name, second->name) != 0);
+
+    // Test reshuffle
+    dtd_deck_discard(&deck, first);
+    const dtd_card_def_t *third = dtd_deck_draw(&deck, &rng);
+    assert(third != NULL);
+    assert(strcmp(third->name, first->name) == 0);
+
+    return 0;
+}</code></pre>
+      </section>
+
+      <section data-section id="checks">
+        <h2>Review Checks</h2>
+        <ul>
+          <li>Verify Knuth Shuffle avoids standard modulo bias.</li>
+          <li>Verify <code>MAX_DECK_CARDS</code> prevents bounds overflows.</li>
+        </ul>
+      </section>
+
+      <section data-section id="done">
+        <h2>Definition Of Done</h2>
+        <ul>
+          <li>Draw mechanics handle empty state correctly by reshuffling discard pile.</li>
+          <li>Unit test compiles, runs, and confirms deck behavior.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.querySelector('[data-search]');
+    const toggle = document.querySelector('[data-toggle-sections]');
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    document.querySelectorAll('li').forEach((li) => {
+      li.title = 'Click to mark reviewed';
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => li.classList.toggle('done'));
+    });
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        sections.forEach((section) => {
+          section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+        });
+      });
+    }
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const collapsed = document.body.dataset.collapsed === 'true';
+        document.body.dataset.collapsed = String(!collapsed);
+        sections.forEach((section) => {
+          Array.from(section.children).forEach((child, index) => {
+            if (index > 0) child.hidden = !collapsed;
+          });
+        });
+        toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+      });
+    }
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T20 Implementation Plan: Run Release Candidate Gate</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; --code:#101828; --code-ink:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1180px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15, 23, 42, .05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { margin-top:1.6em; border-top:1px solid var(--line); padding-top:1em; }
+    h3 { margin-top:1.2em; color:#143a36; }
+    p,ul,ol,table,pre { margin:.85em 0; }
+    ul,ol { padding-left:1.4rem; }
+    li { margin:.25em 0; }
+    a { color:var(--accent); }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:var(--code); color:var(--code-ink); padding:16px; border-radius:8px; border:1px solid #1f2937; }
+    pre code { background:transparent; border:0; color:inherit; padding:0; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; }
+    th { background:#ecfdf5; text-align:left; }
+    .callout { border-left:4px solid var(--accent); background:#ecfdf5; padding:14px 16px; border-radius:6px; margin:18px 0; }
+    .warning { border-left-color:var(--warn); background:#fff7ed; }
+    .meta { color:var(--muted); font-size:.95rem; margin-top:-.5rem; }
+    .toolbar { display:grid; gap:10px; margin-bottom:18px; }
+    .toolbar input,.toolbar button { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px 10px; font:inherit; background:white; }
+    .toolbar button { cursor:pointer; color:white; background:var(--accent); border-color:var(--accent); }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    .section-hidden { display:none; }
+    li.done { opacity:.62; text-decoration:line-through; }
+    @media(max-width:860px){.page-shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}article{padding:22px}}
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter T20 plan">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#intent">Intent</a>
+      <a href="#mentor-synthesis">Mentor Synthesis</a>
+      <a href="#story">Implementation Story</a>
+      <a href="#gate-checklist">Release Gate Checklist</a>
+      <a href="#red">Red Slice</a>
+      <a href="#green">Green Slice</a>
+      <a href="#refactor">Refactor Slice</a>
+      <a href="#examples">Concrete Examples</a>
+      <a href="#checks">Review Checks</a>
+      <a href="#done">Definition Of Done</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Handoff plan for the human implementing XP task T20. This file is documentation only; it does not modify production source.</p>
+      <h1>T20 Implementation Plan: Run Release Candidate Gate</h1>
+
+      <section data-section id="intent">
+        <h2>Intent</h2>
+        <div class="callout">
+          <strong>Goal:</strong> Define the final release validation sequence checking compiler compatibility, mock and database execution tests, deterministic replay, boundary isolation checks, and clean project builds.
+        </div>
+        <p>A development cycle is only finished when its release gate passes. To ensure the v0.1 Root Prototype is stable, the release gate coordinates compilation cleanup, tests suite runs, DB verification scripts, and deterministic bot simulation replays before completing work.</p>
+      </section>
+
+      <section data-section id="mentor-synthesis">
+        <h2>Mentor Synthesis</h2>
+        <table>
+          <thead><tr><th>Mentor</th><th>Contribution To T20</th><th>Non-Negotiable</th></tr></thead>
+          <tbody>
+            <tr><td>DevOps Principal Engineer</td><td>Design final pipeline build execution checks.</td><td><code>make clean && make build && make test</code> must compile cleanly with zero errors/warnings.</td></tr>
+            <tr><td>Lead Architect</td><td>Run coupling checks to verify Clean Architecture has not been violated.</td><td>Ensure domain modules link only the C standard library.</td></tr>
+            <tr><td>XP Principal Engineer</td><td>Define the final criteria checklist for closing the iteration cycle.</td><td>Do not advance to new features (v0.2 scope) until the v0.1 stop conditions are satisfied.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-section id="story">
+        <h2>Implementation Story</h2>
+        <p><strong>Source backlog item:</strong> T20, R8, R9, DEV7.</p>
+        <p><strong>Domain behavior served:</strong> Repeatable build verification, compliance evaluation, and product validation.</p>
+        <p><strong>User-visible outcome served:</strong> Ensure the codebase is clean, build actions are fast, and zero broken or incomplete code leaks to production branch releases.</p>
+        <p><strong>Boundaries touched by the human:</strong> Root <code>Makefile</code> targets, and pipeline testing configurations.</p>
+        <p><strong>Out of scope:</strong> Deploying compilation bundles to server clusters. Local desktop validation only.</p>
+      </section>
+
+      <section data-section id="gate-checklist">
+        <h2>Release Gate Checklist</h2>
+        <p>Before delivering the iteration increment, verify the following steps:</p>
+        <ul>
+          <li>Run <code>make clean</code> to remove all build outputs.</li>
+          <li>Run <code>make configure</code> to check generator output files.</li>
+          <li>Run <code>make build</code> checking that compilation warnings are zero.</li>
+          <li>Run <code>make test</code> verifying all unit tests pass.</li>
+          <li>Run <code>make db-seed && make db-validate</code> checking seeded card data is valid.</li>
+          <li>Run <code>make test-db</code> verifying integration tests connect and pass.</li>
+          <li>Run <code>make simulate</code> and verify the generated <code>simulation_transcript.txt</code> finishes with a winner.</li>
+          <li>Run a manual playtest checking keyboard controls and redraw behavior in NCurses.</li>
+        </ul>
+      </section>
+
+      <section data-section id="red">
+        <h2>Red Slice</h2>
+        <ol>
+          <li>Declare a release candidate status file at <code>walkthrough/release_status.html</code> containing "STATUS: INCOMPLETE".</li>
+          <li>Ensure running the checklist validation script fails if any unit test is broken or if compilation warnings are present.</li>
+        </ol>
+      </section>
+
+      <section data-section id="green">
+        <h2>Green Slice</h2>
+        <ol>
+          <li>Address any outstanding warnings in C17 code files.</li>
+          <li>Run the validation commands.</li>
+          <li>Change the release status file to "STATUS: VERIFIED" and list the checked-in commit hash.</li>
+        </ol>
+      </section>
+
+      <section data-section id="refactor">
+        <h2>Refactor Slice</h2>
+        <ol>
+          <li>Verify no residual files or debug logs are left in unit test outputs. Clear temp items.</li>
+        </ol>
+      </section>
+
+      <section data-section id="examples">
+        <h2>Concrete Examples</h2>
+        <h3>Example Release Verification Script</h3>
+        <p>Human-created file: <code>tests/run_release_gate.sh</code></p>
+        <pre><code class="language-bash">#!/usr/bin/env bash
+
+set -euo pipefail
+
+echo "=== RUNNING RELEASE CANDIDATE GATE ==="
+
+echo "1. Cleaning previous builds..."
+make clean
+
+echo "2. Configuring and building targets..."
+make build
+
+echo "3. Running off-line unit tests..."
+make test
+
+echo "4. Seeding and validating DB templates..."
+# Optionally mock or run if service is active
+# make db-seed
+# make db-validate
+
+echo "5. Executing deterministic bot simulation replay..."
+make simulate
+
+echo "6. Checking for boundary leak issues..."
+# Simple grepping checking for forbidden includes in domain
+if grep -rn "libpq-fe.h" domain/; then
+    echo "ERROR: domain layer includes libpq-fe.h!"
+    exit 1
+fi
+
+if grep -rn "ncurses.h" domain/ application/; then
+    echo "ERROR: core layers include ncurses.h!"
+    exit 1
+fi
+
+echo "=== ALL GATE SECTIONS PASSED SUCCESSFULLY ==="</code></pre>
+      </section>
+
+      <section data-section id="checks">
+        <h2>Review Checks</h2>
+        <ul>
+          <li>Verify the verification shell script returns a clean exit code.</li>
+        </ul>
+      </section>
+
+      <section data-section id="done">
+        <h2>Definition Of Done</h2>
+        <ul>
+          <li>The verification gate script runs successfully.</li>
+          <li>Zero compilation errors or boundary leaks are detected.</li>
+          <li>Deferred v0.2 features remain excluded from the candidate scope.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.querySelector('[data-search]');
+    const toggle = document.querySelector('[data-toggle-sections]');
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    document.querySelectorAll('li').forEach((li) => {
+      li.title = 'Click to mark reviewed';
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => li.classList.toggle('done'));
+    });
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        sections.forEach((section) => {
+          section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+        });
+      });
+    }
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const collapsed = document.body.dataset.collapsed === 'true';
+        document.body.dataset.collapsed = String(!collapsed);
+        sections.forEach((section) => {
+          Array.from(section.children).forEach((child, index) => {
+            if (index > 0) child.hidden = !collapsed;
+          });
+        });
+        toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+      });
+    }
+  })();
+</script>
+</body>
+</html>

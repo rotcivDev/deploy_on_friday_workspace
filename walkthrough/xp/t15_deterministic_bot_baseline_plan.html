@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T15 Implementation Plan: Add Deterministic Bot Baseline</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; --code:#101828; --code-ink:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1180px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15, 23, 42, .05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { margin-top:1.6em; border-top:1px solid var(--line); padding-top:1em; }
+    h3 { margin-top:1.2em; color:#143a36; }
+    p,ul,ol,table,pre { margin:.85em 0; }
+    ul,ol { padding-left:1.4rem; }
+    li { margin:.25em 0; }
+    a { color:var(--accent); }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:var(--code); color:var(--code-ink); padding:16px; border-radius:8px; border:1px solid #1f2937; }
+    pre code { background:transparent; border:0; color:inherit; padding:0; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; }
+    th { background:#ecfdf5; text-align:left; }
+    .callout { border-left:4px solid var(--accent); background:#ecfdf5; padding:14px 16px; border-radius:6px; margin:18px 0; }
+    .warning { border-left-color:var(--warn); background:#fff7ed; }
+    .meta { color:var(--muted); font-size:.95rem; margin-top:-.5rem; }
+    .toolbar { display:grid; gap:10px; margin-bottom:18px; }
+    .toolbar input,.toolbar button { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px 10px; font:inherit; background:white; }
+    .toolbar button { cursor:pointer; color:white; background:var(--accent); border-color:var(--accent); }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    .section-hidden { display:none; }
+    li.done { opacity:.62; text-decoration:line-through; }
+    @media(max-width:860px){.page-shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}article{padding:22px}}
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter T15 plan">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#intent">Intent</a>
+      <a href="#mentor-synthesis">Mentor Synthesis</a>
+      <a href="#story">Implementation Story</a>
+      <a href="#bot-behaviors">Deterministic Bot Behaviors</a>
+      <a href="#red">Red Slice</a>
+      <a href="#green">Green Slice</a>
+      <a href="#refactor">Refactor Slice</a>
+      <a href="#examples">Concrete Examples</a>
+      <a href="#checks">Review Checks</a>
+      <a href="#done">Definition Of Done</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Handoff plan for the human implementing XP task T15. This file is documentation only; it does not modify production source.</p>
+      <h1>T15 Implementation Plan: Add Deterministic Bot Baseline</h1>
+
+      <section data-section id="intent">
+        <h2>Intent</h2>
+        <div class="callout">
+          <strong>Goal:</strong> Implement the deterministic bots: Legacy Maintainer and Prompt Intern. Route all bot decisions through standard application commands, ensuring reproducibility.
+        </div>
+        <p>In Dungeon of Technical Debt, matches feature one human player and two bot players. The bots must make choices deterministically rather than relying on randomized algorithms. This makes tests re-runnable and ensures bot play is predictable and debuggable.</p>
+      </section>
+
+      <section data-section id="mentor-synthesis">
+        <h2>Mentor Synthesis</h2>
+        <table>
+          <thead><tr><th>Mentor</th><th>Contribution To T15</th><th>Non-Negotiable</th></tr></thead>
+          <tbody>
+            <tr><td>Game Designer</td><td>Design bot profiles: Legacy Maintainer (passive, equips defensive items) and Prompt Intern (aggressive, sabotages).</td><td>Bots must route all actions through the standard game service commands.</td></tr>
+            <tr><td>Systems Programmer</td><td>Implement bot decisions as pure evaluation logic checking player statistics and hand options.</td><td>No hidden threads or asynchronous events. Bot loops evaluate sequentially.</td></tr>
+            <tr><td>Lead Architect</td><td>Decouple Bot AI from UI.</td><td>Bot modules evaluate match snapshots and yield command inputs.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-section id="story">
+        <h2>Implementation Story</h2>
+        <p><strong>Source backlog item:</strong> T15, R6, AR5, GD4, SP3.</p>
+        <p><strong>Domain behavior served:</strong> Non-human turn progression. Selecting cards to equip or resolving combat phases.</p>
+        <p><strong>User-visible outcome served:</strong> Bots make rapid, logical, repeatable moves during play sessions, giving players an engaging race to Level 10.</p>
+        <p><strong>Boundaries touched by the human:</strong> <code>application/bot_ai.h</code>, <code>application/bot_ai.c</code>, <code>tests/application/test_bot_ai.c</code>.</p>
+        <p><strong>Out of scope:</strong> Machine learning or neural networks. C17 bots are simple rule engines.</p>
+      </section>
+
+      <section data-section id="bot-behaviors">
+        <h2>Deterministic Bot Behaviors</h2>
+        <ul>
+          <li><strong>Legacy Maintainer:</strong> Evaluates hand. If they hold any equipment card with a power bonus > 0, they immediately equip it. When resolving an encounter, they fight the monster directly. If another player is fighting, they never help or sabotage (they stay passive).</li>
+          <li><strong>Prompt Intern:</strong> Aggressively equips the first available item. If another player is in combat, they will sabotage if they hold a sabotage card and the player has higher level.</li>
+        </ul>
+      </section>
+
+      <section data-section id="red">
+        <h2>Red Slice</h2>
+        <ol>
+          <li>Write a CTest checking that a Legacy Maintainer bot with "ThinkPad" in hand generates a <code>CMD_EQUIP_CARD</code> decision specifying the correct hand index.</li>
+          <li>Assert that a bot with no equipment in hand generates an <code>CMD_END_TURN</code> decision during the play phase.</li>
+          <li>Verify this test fails to build.</li>
+        </ol>
+      </section>
+
+      <section data-section id="green">
+        <h2>Green Slice</h2>
+        <ol>
+          <li>Create <code>application/bot_ai.h</code> and <code>application/bot_ai.c</code>.</li>
+          <li>Implement <code>dtd_bot_evaluate()</code> which returns a command payload.</li>
+          <li>Verify CTests pass.</li>
+        </ol>
+      </section>
+
+      <section data-section id="refactor">
+        <h2>Refactor Slice</h2>
+        <ol>
+          <li>Keep bot evaluations free of internal state; let them evaluate the current match snapshot dynamically.</li>
+        </ol>
+      </section>
+
+      <section data-section id="examples">
+        <h2>Concrete Examples</h2>
+        <h3>Example Bot AI Header</h3>
+        <p>Human-created file: <code>application/bot_ai.h</code></p>
+        <pre><code class="language-c">#ifndef DTD_BOT_AI_H
+#define DTD_BOT_AI_H
+
+#include "game_service.h"
+
+typedef enum {
+    BOT_LEGACY_MAINTAINER,
+    BOT_PROMPT_INTERN
+} dtd_bot_type_t;
+
+dtd_command_t dtd_bot_evaluate(const dtd_match_t *match, int bot_player_index, dtd_bot_type_t type);
+
+#endif</code></pre>
+
+        <h3>Example Bot AI Implementation</h3>
+        <p>Human-created file: <code>application/bot_ai.c</code></p>
+        <pre><code class="language-c">#include "bot_ai.h"
+
+dtd_command_t dtd_bot_evaluate(const dtd_match_t *match, int bot_player_index, dtd_bot_type_t type) {
+    dtd_command_t cmd = {0};
+    cmd.player_index = bot_player_index;
+
+    if (!match || bot_player_index &lt; 0 || bot_player_index &gt;= match->player_count) {
+        cmd.type = CMD_END_TURN;
+        return cmd;
+    }
+
+    const dtd_player_t *bot = &match->players[bot_player_index];
+
+    if (match->phase == PHASE_START_TURN) {
+        cmd.type = CMD_KICK_BACKLOG;
+        return cmd;
+    }
+
+    if (match->phase == PHASE_RESOLVE_ENCOUNTER) {
+        cmd.type = CMD_RESOLVE_ENCOUNTER;
+        return cmd;
+    }
+
+    if (match->phase == PHASE_LOBBY_PLAY) {
+        // Look for items to equip
+        for (int i = 0; i &lt; bot->hand_count; i++) {
+            if (bot->hand[i]->type == CARD_EQUIPMENT) {
+                cmd.type = CMD_EQUIP_CARD;
+                cmd.hand_index = i;
+                return cmd;
+            }
+        }
+
+        // If nothing to play, end turn
+        cmd.type = CMD_END_TURN;
+    }
+
+    return cmd;
+}</code></pre>
+
+        <h3>Example Bot Test</h3>
+        <p>Human-created file: <code>tests/application/test_bot_ai.c</code></p>
+        <pre><code class="language-c">#include "bot_ai.h"
+#include &lt;assert.h&gt;
+
+int main(void) {
+    dtd_class_def_t test_classes[6] = {
+        {1, "QA", 0}, {2, "QA", 0}, {3, "QA", 0}, {4, "QA", 0}, {5, "QA", 0}, {6, "QA", 0}
+    };
+    dtd_card_def_t test_cards[4] = {
+        {"Monster A", CARD_MONSTER, 3, 0, 5},
+        {"ThinkPad", CARD_EQUIPMENT, 0, 2, 5},
+        {"Curse A", CARD_CURSE, 0, 0, 5},
+        {"AI A", CARD_AI, 2, 0, 5}
+    };
+    dtd_content_definitions_t content = {
+        .classes = test_classes,
+        .class_count = 6,
+        .cards = test_cards,
+        .card_count = 4
+    };
+
+    dtd_match_t match;
+    int class_selections[2] = {1, 2};
+    assert(dtd_match_create(&match, &content, 42, 2, class_selections));
+
+    // Current player index is 0. Transition phase to play.
+    match.phase = PHASE_LOBBY_PLAY;
+
+    // Check bot decision with equipment card in hand
+    // Player index 0 is QA class, starting hand has 2 treasure cards (should have drawn ThinkPads in this test content setup)
+    dtd_command_t decision = dtd_bot_evaluate(&match, 0, BOT_LEGACY_MAINTAINER);
+    
+    // Legacy maintainer equips the equipment card
+    assert(decision.type == CMD_EQUIP_CARD);
+    assert(decision.player_index == 0);
+
+    return 0;
+}</code></pre>
+      </section>
+
+      <section data-section id="checks">
+        <h2>Review Checks</h2>
+        <ul>
+          <li>Verify bot decision loops evaluate correctly for all phases.</li>
+        </ul>
+      </section>
+
+      <section data-section id="done">
+        <h2>Definition Of Done</h2>
+        <ul>
+          <li>Bot AI decision returns standardized command schemas.</li>
+          <li>Bots perform decisions deterministically from match state inputs.</li>
+          <li>Tests build and run successfully.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.querySelector('[data-search]');
+    const toggle = document.querySelector('[data-toggle-sections]');
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    document.querySelectorAll('li').forEach((li) => {
+      li.title = 'Click to mark reviewed';
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => li.classList.toggle('done'));
+    });
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        sections.forEach((section) => {
+          section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+        });
+      });
+    }
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const collapsed = document.body.dataset.collapsed === 'true';
+        document.body.dataset.collapsed = String(!collapsed);
+        sections.forEach((section) => {
+          Array.from(section.children).forEach((child, index) => {
+            if (index > 0) child.hidden = !collapsed;
+          });
+        });
+        toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+      });
+    }
+  })();
+</script>
+</body>
+</html>

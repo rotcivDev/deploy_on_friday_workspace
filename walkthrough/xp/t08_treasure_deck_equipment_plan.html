@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T08 Implementation Plan: Build Treasure Deck and Equipment Progression</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; --code:#101828; --code-ink:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1180px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15, 23, 42, .05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { margin-top:1.6em; border-top:1px solid var(--line); padding-top:1em; }
+    h3 { margin-top:1.2em; color:#143a36; }
+    p,ul,ol,table,pre { margin:.85em 0; }
+    ul,ol { padding-left:1.4rem; }
+    li { margin:.25em 0; }
+    a { color:var(--accent); }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:var(--code); color:var(--code-ink); padding:16px; border-radius:8px; border:1px solid #1f2937; }
+    pre code { background:transparent; border:0; color:inherit; padding:0; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; }
+    th { background:#ecfdf5; text-align:left; }
+    .callout { border-left:4px solid var(--accent); background:#ecfdf5; padding:14px 16px; border-radius:6px; margin:18px 0; }
+    .warning { border-left-color:var(--warn); background:#fff7ed; }
+    .meta { color:var(--muted); font-size:.95rem; margin-top:-.5rem; }
+    .toolbar { display:grid; gap:10px; margin-bottom:18px; }
+    .toolbar input,.toolbar button { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px 10px; font:inherit; background:white; }
+    .toolbar button { cursor:pointer; color:white; background:var(--accent); border-color:var(--accent); }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    .section-hidden { display:none; }
+    li.done { opacity:.62; text-decoration:line-through; }
+    @media(max-width:860px){.page-shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}article{padding:22px}}
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter T08 plan">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#intent">Intent</a>
+      <a href="#mentor-synthesis">Mentor Synthesis</a>
+      <a href="#story">Implementation Story</a>
+      <a href="#red">Red Slice</a>
+      <a href="#green">Green Slice</a>
+      <a href="#refactor">Refactor Slice</a>
+      <a href="#examples">Concrete Examples</a>
+      <a href="#checks">Review Checks</a>
+      <a href="#done">Definition Of Done</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Handoff plan for the human implementing XP task T08. This file is documentation only; it does not modify production source.</p>
+      <h1>T08 Implementation Plan: Build Treasure Deck and Equipment Progression</h1>
+
+      <section data-section id="intent">
+        <h2>Intent</h2>
+        <div class="callout">
+          <strong>Goal:</strong> Implement the Treasure deck, card draw mechanics, player hands, and equipping of cards which modify player Power stat calculations.
+        </div>
+        <p>In Dungeon of Technical Debt, players receive rewards (Treasure cards) upon winning combats. These cards can be kept in hand and equipped to permanently increase player combat Power. This plan establishes the card hand tracking and stats modifier application.</p>
+      </section>
+
+      <section data-section id="mentor-synthesis">
+        <h2>Mentor Synthesis</h2>
+        <table>
+          <thead><tr><th>Mentor</th><th>Contribution To T08</th><th>Non-Negotiable</th></tr></thead>
+          <tbody>
+            <tr><td>Game Designer</td><td>Confirm the equipment lists and their power bonus calculations.</td><td>Items like ThinkPad (+2), Emacs Mastery (+3) must add bonuses correctly. Defer slot limits (e.g. head, body, hand) for v0.1.</td></tr>
+            <tr><td>Systems Programmer</td><td>Implement simple array tracking for player cards in hand and equipped slots.</td><td>Use clear indexing bounds to avoid buffer overflows when adding items.</td></tr>
+            <tr><td>Lead Architect</td><td>Maintain Clean Architecture boundaries.</td><td>Power calculation is a pure domain function. Do not query database models during combat calculations.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-section id="story">
+        <h2>Implementation Story</h2>
+        <p><strong>Source backlog item:</strong> T08, R3, AR3, GD1.</p>
+        <p><strong>Domain behavior served:</strong> Card collection in hand, equipping items, and dynamically recalculating player combat power.</p>
+        <p><strong>User-visible outcome served:</strong> Players can equip items to increase their Power, which is displayed in snapshots and logs.</p>
+        <p><strong>Boundaries touched by the human:</strong> <code>domain/player.h</code>, <code>domain/player.c</code>, <code>tests/domain/test_equipment.c</code>.</p>
+        <p><strong>Out of scope:</strong> Checking card requirements or advanced slot conditions (e.g. "cannot equip two two-handed weapons"). Keep items general for v0.1.</p>
+      </section>
+
+      <section data-section id="red">
+        <h2>Red Slice</h2>
+        <ol>
+          <li>Write a CTest checking that a player starting at level 1 with no items has Power 1.</li>
+          <li>Add "ThinkPad" (power bonus 2) to their equipment slots and assert their computed Power is now 3.</li>
+          <li>Assert that this unit test fails or does not compile before implementing the player equipment module.</li>
+        </ol>
+      </section>
+
+      <section data-section id="green">
+        <h2>Green Slice</h2>
+        <ol>
+          <li>Add hand and equipment arrays to the <code>dtd_player_t</code> struct in <code>domain/player.h</code>.</li>
+          <li>Implement <code>dtd_player_equip()</code> and <code>dtd_player_get_power()</code>.</li>
+          <li>Make the unit test compile and pass.</li>
+        </ol>
+      </section>
+
+      <section data-section id="refactor">
+        <h2>Refactor Slice</h2>
+        <ol>
+          <li>Instead of duplicating card objects, store pointers to constant <code>dtd_card_def_t</code> definitions in the player hands/slots arrays.</li>
+          <li>Clamp max hand size and max equipment count using static macros.</li>
+        </ol>
+      </section>
+
+      <section data-section id="examples">
+        <h2>Concrete Examples</h2>
+        <h3>Example Player Header Addition</h3>
+        <p>Human-created file: <code>domain/player.h</code></p>
+        <pre><code class="language-c">#ifndef DTD_PLAYER_H
+#define DTD_PLAYER_H
+
+#include "content.h"
+
+#define MAX_HAND_CARDS 16
+#define MAX_EQUIPPED_CARDS 8
+
+typedef struct {
+    char name[64];
+    int level;
+    int base_power_bonus;
+    const dtd_card_def_t *hand[MAX_HAND_CARDS];
+    int hand_count;
+    const dtd_card_def_t *equipped[MAX_EQUIPPED_CARDS];
+    int equipped_count;
+} dtd_player_t;
+
+void dtd_player_init(dtd_player_t *player, const char *name, int base_power_bonus);
+bool dtd_player_draw_to_hand(dtd_player_t *player, const dtd_card_def_t *card);
+bool dtd_player_equip_from_hand(dtd_player_t *player, int hand_index);
+int dtd_player_get_power(const dtd_player_t *player);
+
+#endif</code></pre>
+
+        <h3>Example Player Implementation</h3>
+        <p>Human-created file: <code>domain/player.c</code></p>
+        <pre><code class="language-c">#include "player.h"
+#include &lt;string.h&gt;
+
+void dtd_player_init(dtd_player_t *player, const char *name, int base_power_bonus) {
+    if (!player) return;
+    strncpy(player->name, name ? name : "Player", sizeof(player->name) - 1);
+    player->level = 1;
+    player->base_power_bonus = base_power_bonus;
+    player->hand_count = 0;
+    player->equipped_count = 0;
+}
+
+bool dtd_player_draw_to_hand(dtd_player_t *player, const dtd_card_def_t *card) {
+    if (!player || !card || player->hand_count >= MAX_HAND_CARDS) return false;
+    player->hand[player->hand_count++] = card;
+    return true;
+}
+
+bool dtd_player_equip_from_hand(dtd_player_t *player, int hand_index) {
+    if (!player || hand_index &lt; 0 || hand_index >= player->hand_count) return false;
+    if (player->equipped_count >= MAX_EQUIPPED_CARDS) return false;
+
+    const dtd_card_def_t *card = player->hand[hand_index];
+    if (card->type != CARD_EQUIPMENT) return false;
+
+    // Add to equipped
+    player->equipped[player->equipped_count++] = card;
+
+    // Remove from hand and shift remaining hand cards left
+    for (int i = hand_index; i &lt; player->hand_count - 1; i++) {
+        player->hand[i] = player->hand[i + 1];
+    }
+    player->hand_count--;
+    return true;
+}
+
+int dtd_player_get_power(const dtd_player_t *player) {
+    if (!player) return 0;
+    int power = player->level + player->base_power_bonus;
+    for (int i = 0; i &lt; player->equipped_count; i++) {
+        power += player->equipped[i]->power_bonus;
+    }
+    return power;
+}</code></pre>
+
+        <h3>Example Equipment Test</h3>
+        <p>Human-created file: <code>tests/domain/test_equipment.c</code></p>
+        <pre><code class="language-c">#include "player.h"
+#include "content.h"
+#include &lt;assert.h&gt;
+
+int main(void) {
+    dtd_player_t player;
+    dtd_player_init(&player, "Senior backend devs", 1); // level 1 + base 1 = 2
+
+    assert(dtd_player_get_power(&player) == 2);
+
+    // Create ThinkPad
+    dtd_card_def_t thinkpad = {"ThinkPad T480", CARD_EQUIPMENT, 0, 2, 1};
+
+    // Draw and equip
+    assert(dtd_player_draw_to_hand(&player, &thinkpad));
+    assert(player.hand_count == 1);
+    
+    assert(dtd_player_equip_from_hand(&player, 0));
+    assert(player.hand_count == 0);
+    assert(player.equipped_count == 1);
+
+    // Power should now be level (1) + base (1) + ThinkPad (2) = 4
+    assert(dtd_player_get_power(&player) == 4);
+
+    return 0;
+}</code></pre>
+      </section>
+
+      <section data-section id="checks">
+        <h2>Review Checks</h2>
+        <ul>
+          <li>Verify <code>dtd_player_equip_from_hand</code> shifts array items correctly without leaving duplicate entries at the end.</li>
+          <li>Verify power calculations sum up the correct values.</li>
+        </ul>
+      </section>
+
+      <section data-section id="done">
+        <h2>Definition Of Done</h2>
+        <ul>
+          <li>Players can hold cards in hand and equip cards from hand.</li>
+          <li>Power calculations sum class bonuses, level, and equipment bonuses.</li>
+          <li>Unit tests execute cleanly.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.querySelector('[data-search]');
+    const toggle = document.querySelector('[data-toggle-sections]');
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    document.querySelectorAll('li').forEach((li) => {
+      li.title = 'Click to mark reviewed';
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => li.classList.toggle('done'));
+    });
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        sections.forEach((section) => {
+          section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+        });
+      });
+    }
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const collapsed = document.body.dataset.collapsed === 'true';
+        document.body.dataset.collapsed = String(!collapsed);
+        sections.forEach((section) => {
+          Array.from(section.children).forEach((child, index) => {
+            if (index > 0) child.hidden = !collapsed;
+          });
+        });
+        toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+      });
+    }
+  })();
+</script>
+</body>
+</html>

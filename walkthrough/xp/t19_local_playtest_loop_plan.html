@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T19 Implementation Plan: Integrate The Local Playtest Loop</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; --code:#101828; --code-ink:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1180px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15, 23, 42, .05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { margin-top:1.6em; border-top:1px solid var(--line); padding-top:1em; }
+    h3 { margin-top:1.2em; color:#143a36; }
+    p,ul,ol,table,pre { margin:.85em 0; }
+    ul,ol { padding-left:1.4rem; }
+    li { margin:.25em 0; }
+    a { color:var(--accent); }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:var(--code); color:var(--code-ink); padding:16px; border-radius:8px; border:1px solid #1f2937; }
+    pre code { background:transparent; border:0; color:inherit; padding:0; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; }
+    th { background:#ecfdf5; text-align:left; }
+    .callout { border-left:4px solid var(--accent); background:#ecfdf5; padding:14px 16px; border-radius:6px; margin:18px 0; }
+    .warning { border-left-color:var(--warn); background:#fff7ed; }
+    .meta { color:var(--muted); font-size:.95rem; margin-top:-.5rem; }
+    .toolbar { display:grid; gap:10px; margin-bottom:18px; }
+    .toolbar input,.toolbar button { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px 10px; font:inherit; background:white; }
+    .toolbar button { cursor:pointer; color:white; background:var(--accent); border-color:var(--accent); }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    .section-hidden { display:none; }
+    li.done { opacity:.62; text-decoration:line-through; }
+    @media(max-width:860px){.page-shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}article{padding:22px}}
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter T19 plan">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#intent">Intent</a>
+      <a href="#mentor-synthesis">Mentor Synthesis</a>
+      <a href="#story">Implementation Story</a>
+      <a href="#playtest-criteria">Playtest Flow Specification</a>
+      <a href="#red">Red Slice</a>
+      <a href="#green">Green Slice</a>
+      <a href="#refactor">Refactor Slice</a>
+      <a href="#examples">Concrete Examples</a>
+      <a href="#checks">Review Checks</a>
+      <a href="#done">Definition Of Done</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Handoff plan for the human implementing XP task T19. This file is documentation only; it does not modify production source.</p>
+      <h1>T19 Implementation Plan: Integrate The Local Playtest Loop</h1>
+
+      <section data-section id="intent">
+        <h2>Intent</h2>
+        <div class="callout">
+          <strong>Goal:</strong> Connect the game startup, command resolution, rendering, and bot moves into a playable local terminal loop.
+        </div>
+        <p>A multiplayer game needs visual integration. By combining the interactive human input path and the deterministic bot AI turns into one cohesive loop, we enable real-time playtesting, balancing evaluations, and manual verification of v0.1 deliverables.</p>
+      </section>
+
+      <section data-section id="mentor-synthesis">
+        <h2>Mentor Synthesis</h2>
+        <table>
+          <thead><tr><th>Mentor</th><th>Contribution To T19</th><th>Non-Negotiable</th></tr></thead>
+          <tbody>
+            <tr><td>Game Designer</td><td>Verify card balance and progression pacing. Monitor that the transition from Level 1 to 10 is challenging but solvable.</td><td>Human players take turns, followed by bot turns evaluated using the same API ruleset.</td></tr>
+            <tr><td>Systems Programmer</td><td>Integrate standard keyboard polling. Handle blocking/non-blocking input modes based on whose turn it is.</td><td>The input loop must sleep during bot turns or display a short delay so the human can see bot actions in the logs.</td></tr>
+            <tr><td>Lead Architect</td><td>Ensure separation: the core event loop coordinates input from UI and dispatches updates.</td><td>UI code does not call state setters directly.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-section id="story">
+        <h2>Implementation Story</h2>
+        <p><strong>Source backlog item:</strong> T19, R7, AR7, GD5.</p>
+        <p><strong>Domain behavior served:</strong> Interactive play loop, bot decision sequences, and player action cycles.</p>
+        <p><strong>User-visible outcome served:</strong> A user can run <code>make run</code>, select their class, play cards, watch the bots execute their turns, and play until someone wins.</p>
+        <p><strong>Boundaries touched by the human:</strong> <code>client/main.c</code>, <code>client/ncurses_client.c</code>.</p>
+        <p><strong>Out of scope:</strong> Persistence or database writing of session logs. Simple state loops only.</p>
+      </section>
+
+      <section data-section id="playtest-criteria">
+        <h2>Playtest Flow Specification</h2>
+        <p>The interactive main loop must follow this flow:</p>
+        <ol>
+          <li>Initialize database repository interface (or mocks if native dependencies are absent) and load content.</li>
+          <li>Set up active game match using selected starting configs.</li>
+          <li>Initialize NCurses screen layout.</li>
+          <li>Loop:
+            <ul>
+              <li>Fetch active match snapshot.</li>
+              <li>Render snapshot to screen panels.</li>
+              <li>If active player is human: wait for keyboard command.</li>
+              <li>If active player is bot: wait 1 second, query bot AI decision, execute.</li>
+              <li>Run command and check for match victory.</li>
+            </ul>
+          </li>
+          <li>Close NCurses layout and display final stats.</li>
+        </ol>
+      </section>
+
+      <section data-section id="red">
+        <h2>Red Slice</h2>
+        <ol>
+          <li>Prepare a playtest notes markdown file at <code>walkthrough/playtest_notes_stub.md</code> asserting that a user running the build can successfully complete a full game of 10 turns.</li>
+          <li>Assert that trying to execute this loop yields compilation errors or fails to launch due to disconnected loops.</li>
+        </ol>
+      </section>
+
+      <section data-section id="green">
+        <h2>Green Slice</h2>
+        <ol>
+          <li>Update <code>client/main.c</code> to implement the interactive loop.</li>
+          <li>Handle bot turns by triggering <code>dtd_bot_evaluate()</code> when `current_player_index` refers to a bot.</li>
+          <li>Include short delay timers (e.g. <code>usleep</code>) between bot steps to make actions readable.</li>
+          <li>Verify manual playtest runs successfully from start to finish.</li>
+        </ol>
+      </section>
+
+      <section data-section id="refactor">
+        <h2>Refactor Slice</h2>
+        <ol>
+          <li>Keep the log display scrolling clean. Trim long message lines to avoid wrapping bugs in smaller windows.</li>
+        </ol>
+      </section>
+
+      <section data-section id="examples">
+        <h2>Concrete Examples</h2>
+        <h3>Example Play Loop Main Stub</h3>
+        <p>Human-created file: <code>client/main.c</code></p>
+        <pre><code class="language-c">#include "game_service.h"
+#include "bot_ai.h"
+#include "ncurses_client.h"
+#include &lt;unistd.h&gt;
+
+int main(void) {
+    // Stub databases
+    dtd_class_def_t test_classes[6] = {
+        {1, "Backend Dev", 1}, {2, "Frontend Dev", 0}, {3, "DevOps", 0},
+        {4, "QA", 0}, {5, "Security", 0}, {6, "AI", 0}
+    };
+    dtd_card_def_t test_cards[4] = {
+        {"Spooky Monster", CARD_MONSTER, 4, 0, 10},
+        {"CI Curse", CARD_CURSE, 0, 0, 5},
+        {"ThinkPad", CARD_EQUIPMENT, 0, 2, 10},
+        {"Skill Book", CARD_TREASURE, 0, 1, 10}
+    };
+    dtd_content_definitions_t content = {
+        .classes = test_classes,
+        .class_count = 6,
+        .cards = test_cards,
+        .card_count = 4
+    };
+
+    dtd_game_service_t svc;
+    dtd_service_init(&svc);
+
+    // Human player index: 0. Bots indices: 1, 2.
+    dtd_command_t start_cmd = {CMD_START_MATCH, 0, 0};
+    dtd_service_execute(&svc, &start_cmd, &content);
+
+    dtd_ui_init();
+
+    bool running = true;
+    while (running &amp;&amp; svc.match_active &amp;&amp; svc.match.phase != PHASE_MATCH_OVER) {
+        dtd_match_snapshot_t snap;
+        dtd_match_get_snapshot(&svc.match, &snap);
+
+        dtd_ui_render(&snap);
+
+        int active = snap.current_player_index;
+
+        if (active == 0) {
+            // Human player turn: process inputs
+            int ch = dtd_ui_get_input();
+            dtd_command_t cmd = {0};
+            cmd.player_index = 0;
+
+            if (ch == 'q') {
+                running = false;
+            } else if (ch == 'k') {
+                cmd.type = CMD_KICK_BACKLOG;
+                dtd_service_execute(&svc, &cmd, &content);
+            } else if (ch == 'r') {
+                cmd.type = CMD_RESOLVE_ENCOUNTER;
+                dtd_service_execute(&svc, &cmd, &content);
+            } else if (ch &gt;= '1' &amp;&amp; ch &lt;= '9') {
+                cmd.type = CMD_EQUIP_CARD;
+                cmd.hand_index = ch - '1';
+                dtd_service_execute(&svc, &cmd, &content);
+            } else if (ch == 'e') {
+                cmd.type = CMD_END_TURN;
+                dtd_service_execute(&svc, &cmd, &content);
+            }
+        } else {
+            // Bot player turn: simulate and log
+            usleep(800000); // 800ms sleep so action is visible
+            dtd_command_t cmd = dtd_bot_evaluate(&svc.match, active, BOT_LEGACY_MAINTAINER);
+            dtd_service_execute(&svc, &cmd, &content);
+        }
+    }
+
+    dtd_ui_shutdown();
+    printf("Game Over! Thanks for playing Dungeon of Technical Debt.\n");
+    return 0;
+}</code></pre>
+      </section>
+
+      <section data-section id="checks">
+        <h2>Review Checks</h2>
+        <ul>
+          <li>Verify <code>make run</code> compiles and successfully starts this loop.</li>
+        </ul>
+      </section>
+
+      <section data-section id="done">
+        <h2>Definition Of Done</h2>
+        <ul>
+          <li>Interactive game loop transitions correctly between human input steps and bot evaluations.</li>
+          <li>Game ends cleanly and shutdowns NCurses safely.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.querySelector('[data-search]');
+    const toggle = document.querySelector('[data-toggle-sections]');
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    document.querySelectorAll('li').forEach((li) => {
+      li.title = 'Click to mark reviewed';
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => li.classList.toggle('done'));
+    });
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        sections.forEach((section) => {
+          section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+        });
+      });
+    }
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const collapsed = document.body.dataset.collapsed === 'true';
+        document.body.dataset.collapsed = String(!collapsed);
+        sections.forEach((section) => {
+          Array.from(section.children).forEach((child, index) => {
+            if (index > 0) child.hidden = !collapsed;
+          });
+        });
+        toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+      });
+    }
+  })();
+</script>
+</body>
+</html>

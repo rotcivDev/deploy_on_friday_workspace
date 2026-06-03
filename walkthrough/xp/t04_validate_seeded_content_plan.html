@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T04 Implementation Plan: Validate Seeded Content Before Match Startup</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; --code:#101828; --code-ink:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1180px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15, 23, 42, .05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { margin-top:1.6em; border-top:1px solid var(--line); padding-top:1em; }
+    h3 { margin-top:1.2em; color:#143a36; }
+    p,ul,ol,table,pre { margin:.85em 0; }
+    ul,ol { padding-left:1.4rem; }
+    li { margin:.25em 0; }
+    a { color:var(--accent); }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:var(--code); color:var(--code-ink); padding:16px; border-radius:8px; border:1px solid #1f2937; }
+    pre code { background:transparent; border:0; color:inherit; padding:0; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; }
+    th { background:#ecfdf5; text-align:left; }
+    .callout { border-left:4px solid var(--accent); background:#ecfdf5; padding:14px 16px; border-radius:6px; margin:18px 0; }
+    .warning { border-left-color:var(--warn); background:#fff7ed; }
+    .meta { color:var(--muted); font-size:.95rem; margin-top:-.5rem; }
+    .toolbar { display:grid; gap:10px; margin-bottom:18px; }
+    .toolbar input,.toolbar button { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px 10px; font:inherit; background:white; }
+    .toolbar button { cursor:pointer; color:white; background:var(--accent); border-color:var(--accent); }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    .section-hidden { display:none; }
+    li.done { opacity:.62; text-decoration:line-through; }
+    @media(max-width:860px){.page-shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}article{padding:22px}}
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter T04 plan">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#intent">Intent</a>
+      <a href="#mentor-synthesis">Mentor Synthesis</a>
+      <a href="#story">Implementation Story</a>
+      <a href="#rules">Domain Invariants</a>
+      <a href="#red">Red Slice</a>
+      <a href="#green">Green Slice</a>
+      <a href="#refactor">Refactor Slice</a>
+      <a href="#examples">Concrete Examples</a>
+      <a href="#checks">Review Checks</a>
+      <a href="#done">Definition Of Done</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Handoff plan for the human implementing XP task T04. This file is documentation only; it does not modify production source.</p>
+      <h1>T04 Implementation Plan: Validate Seeded Content Before Match Startup</h1>
+
+      <section data-section id="intent">
+        <h2>Intent</h2>
+        <div class="callout">
+          <strong>Goal:</strong> Validate that the game has loaded all required starter classes and cards before initializing a match. If any required seed data is missing or invalid, fail fast at startup.
+        </div>
+        <p>A data-driven card game depends on the content stored in its database. Rather than allowing silent failures (such as a segmentation fault when a player picks a class that wasn't loaded), the application layer must validate content definitions immediately upon loading, using a clear validation function.</p>
+      </section>
+
+      <section data-section id="mentor-synthesis">
+        <h2>Mentor Synthesis</h2>
+        <table>
+          <thead><tr><th>Mentor</th><th>Contribution To T04</th><th>Non-Negotiable</th></tr></thead>
+          <tbody>
+            <tr><td>PostgreSQL Architect</td><td>Ensure SQL seeding scripts are complete and validation checks correspond to table constraints.</td><td>Content validation must be complete before creating a game instance. Relational integrity must remain in the DB.</td></tr>
+            <tr><td>Lead Architect</td><td>Clean Architecture separation: DB queries belong in infrastructure; validation and match rules belong in application/domain.</td><td>Domain types must contain clean C structs; they must not reference SQL types or <code>PGresult</code> directly.</td></tr>
+            <tr><td>Game Designer</td><td>Provide expectations for what cards and classes are required for v0.1 balance.</td><td>Must have 6 classes and at least 1 monster, AI, curse, and equipment.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-section id="story">
+        <h2>Implementation Story</h2>
+        <p><strong>Source backlog item:</strong> T04, R1, AR2, DB0, DB3, GD0.</p>
+        <p><strong>Domain behavior served:</strong> Validation of the match setup. A match can only start if we have valid classes and decks loaded.</p>
+        <p><strong>User-visible outcome served:</strong> Transparent developer error messaging when a SQL migration or seed script is broken or out of sync.</p>
+        <p><strong>Boundaries touched by the human:</strong> <code>application/content.h</code>, <code>application/content.c</code>, <code>infrastructure/db/postgresql_content_repository.c</code>, <code>tests/application/test_content_validation.c</code>.</p>
+        <p><strong>Out of scope:</strong> Actually connecting to the live DB inside domain unit tests (use a mock repository instead).</p>
+      </section>
+
+      <section data-section id="rules">
+        <h2>Domain Invariants</h2>
+        <p>The content validator must assert that the loaded content definitions satisfy the following requirements:</p>
+        <ul>
+          <li>At least 6 distinct classes are loaded (Backend, Frontend, DevOps, QA, Security, AI).</li>
+          <li>At least 7 card types are supported (MONSTER, EQUIPMENT, CURSE, EVENT, PVP, AI, TREASURE).</li>
+          <li>At least 1 card of type <code>MONSTER</code> is present.</li>
+          <li>At least 1 card of type <code>EQUIPMENT</code> is present.</li>
+          <li>At least 1 card of type <code>CURSE</code> is present.</li>
+          <li>At least 1 card of type <code>AI</code> is present.</li>
+          <li>Every loaded card has a name, positive quantity, and non-empty card type.</li>
+        </ul>
+      </section>
+
+      <section data-section id="red">
+        <h2>Red Slice</h2>
+        <ol>
+          <li>Write a CTest unit test that initializes an empty <code>dtd_content_definitions_t</code> struct.</li>
+          <li>Call <code>dtd_validate_content(&amp;empty_content)</code> and assert it returns <code>false</code>.</li>
+          <li>Verify this test fails to compile or run until the validation interface is added.</li>
+        </ol>
+      </section>
+
+      <section data-section id="green">
+        <h2>Green Slice</h2>
+        <ol>
+          <li>Define <code>dtd_card_def_t</code> and <code>dtd_class_def_t</code> structs in <code>application/content.h</code>.</li>
+          <li>Implement <code>dtd_validate_content()</code> in <code>application/content.c</code> checking the rules described under Domain Invariants.</li>
+          <li>Implement a fake repository in the unit tests that returns a subset of valid data to make the validation test pass.</li>
+        </ol>
+      </section>
+
+      <section data-section id="refactor">
+        <h2>Refactor Slice</h2>
+        <ol>
+          <li>Isolate the data transformation logic. Let the infrastructure repository layer map database columns to plain C structs (e.g. mapping string fields to enums).</li>
+          <li>Provide diagnostic messages to <code>stderr</code> when validation fails, specifying exactly which check failed.</li>
+        </ol>
+      </section>
+
+      <section data-section id="examples">
+        <h2>Concrete Examples</h2>
+        <h3>Example Content Definitions header</h3>
+        <p>Human-created file: <code>application/content.h</code></p>
+        <pre><code class="language-c">#ifndef DTD_CONTENT_H
+#define DTD_CONTENT_H
+
+#include &lt;stdbool.h&gt;
+
+typedef enum {
+    CARD_MONSTER,
+    CARD_EQUIPMENT,
+    CARD_CURSE,
+    CARD_EVENT,
+    CARD_PVP,
+    CARD_AI,
+    CARD_TREASURE,
+    CARD_TYPE_COUNT
+} dtd_card_type_t;
+
+typedef struct {
+    char name[64];
+    dtd_card_type_t type;
+    int power;
+    int power_bonus;
+    int quantity;
+} dtd_card_def_t;
+
+typedef struct {
+    int class_id;
+    char name[64];
+    int base_power_bonus;
+} dtd_class_def_t;
+
+typedef struct {
+    dtd_card_def_t *cards;
+    int card_count;
+    dtd_class_def_t *classes;
+    int class_count;
+} dtd_content_definitions_t;
+
+bool dtd_validate_content(const dtd_content_definitions_t *content);
+
+#endif</code></pre>
+
+        <h3>Example Content Validator implementation</h3>
+        <p>Human-created file: <code>application/content.c</code></p>
+        <pre><code class="language-c">#include "content.h"
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+bool dtd_validate_content(const dtd_content_definitions_t *content) {
+    if (!content) {
+        fprintf(stderr, "Validation failed: content is NULL\n");
+        return false;
+    }
+    if (content->class_count &lt; 6) {
+        fprintf(stderr, "Validation failed: expected at least 6 classes, got %d\n", content->class_count);
+        return false;
+    }
+    if (content->card_count &lt; 4) {
+        fprintf(stderr, "Validation failed: expected at least 4 cards for v0.1\n");
+        return false;
+    }
+
+    bool has_monster = false;
+    bool has_equip = false;
+    bool has_curse = false;
+    bool has_ai = false;
+
+    for (int i = 0; i &lt; content->card_count; i++) {
+        const dtd_card_def_t *c = &content->cards[i];
+        if (strlen(c->name) == 0) {
+            fprintf(stderr, "Validation failed: card at index %d has no name\n", i);
+            return false;
+        }
+        if (c->quantity &lt;= 0) {
+            fprintf(stderr, "Validation failed: card '%s' has non-positive quantity: %d\n", c->name, c->quantity);
+            return false;
+        }
+        if (c->type == CARD_MONSTER) has_monster = true;
+        if (c->type == CARD_EQUIPMENT) has_equip = true;
+        if (c->type == CARD_CURSE) has_curse = true;
+        if (c->type == CARD_AI) has_ai = true;
+    }
+
+    if (!has_monster || !has_equip || !has_curse || !has_ai) {
+        fprintf(stderr, "Validation failed: missing required card types (Monster:%d, Equip:%d, Curse:%d, AI:%d)\n",
+                has_monster, has_equip, has_curse, has_ai);
+        return false;
+    }
+
+    return true;
+}</code></pre>
+
+        <h3>Example Content Test</h3>
+        <p>Human-created file: <code>tests/application/test_content_validation.c</code></p>
+        <pre><code class="language-c">#include "content.h"
+#include &lt;assert.h&gt;
+
+int main(void) {
+    // Red: empty validation fails
+    dtd_content_definitions_t empty = {0};
+    assert(!dtd_validate_content(&empty));
+
+    // Green: valid validation passes
+    dtd_class_def_t test_classes[6] = {
+        {1, "Backend Developer", 0},
+        {2, "Frontend Developer", 0},
+        {3, "DevOps Engineer", 0},
+        {4, "QA Engineer", 0},
+        {5, "Security Engineer", 0},
+        {6, "AI Engineer", 0}
+    };
+
+    dtd_card_def_t test_cards[4] = {
+        {"Legacy Code Monster", CARD_MONSTER, 5, 0, 2},
+        {"ThinkPad T480", CARD_EQUIPMENT, 0, 2, 2},
+        {"Broken CI", CARD_CURSE, 0, 0, 1},
+        {"Prompt Intern", CARD_AI, 2, 0, 1}
+    };
+
+    dtd_content_definitions_t valid = {
+        .classes = test_classes,
+        .class_count = 6,
+        .cards = test_cards,
+        .card_count = 4
+    };
+
+    assert(dtd_validate_content(&valid));
+
+    return 0;
+}</code></pre>
+      </section>
+
+      <section data-section id="checks">
+        <h2>Review Checks</h2>
+        <ul>
+          <li>Verify unit test is included in <code>CMakeLists.txt</code> and registered as a CTest.</li>
+          <li>Verify PostgreSQL dependencies are completely separated and mocked in the unit test.</li>
+        </ul>
+      </section>
+
+      <section data-section id="done">
+        <h2>Definition Of Done</h2>
+        <ul>
+          <li><code>dtd_validate_content()</code> fails cleanly with descriptive logs if any class or critical card type is missing.</li>
+          <li>Unit tests verify both failing and passing content structures.</li>
+          <li>CMake builds and tests run successfully.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.querySelector('[data-search]');
+    const toggle = document.querySelector('[data-toggle-sections]');
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    document.querySelectorAll('li').forEach((li) => {
+      li.title = 'Click to mark reviewed';
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => li.classList.toggle('done'));
+    });
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        sections.forEach((section) => {
+          section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+        });
+      });
+    }
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const collapsed = document.body.dataset.collapsed === 'true';
+        document.body.dataset.collapsed = String(!collapsed);
+        sections.forEach((section) => {
+          Array.from(section.children).forEach((child, index) => {
+            if (index > 0) child.hidden = !collapsed;
+          });
+        });
+        toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+      });
+    }
+  })();
+</script>
+</body>
+</html>
