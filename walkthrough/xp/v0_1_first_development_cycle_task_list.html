@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>XP First Development Cycle Task List: v0.1 Root Prototype</title>
+  <style>
+    :root {
+      --bg: #f7f8fb;
+      --panel: #ffffff;
+      --ink: #17202a;
+      --muted: #637083;
+      --line: #d8dee9;
+      --accent: #0f766e;
+      --warn: #b45309;
+      --code: #101828;
+      --code-ink: #e5edf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    .page-shell { display: grid; grid-template-columns: minmax(220px, 280px) minmax(0, 1fr); min-height: 100vh; }
+    aside { position: sticky; top: 0; height: 100vh; overflow: auto; padding: 24px 18px; border-right: 1px solid var(--line); background: #eef2f7; }
+    main { padding: 32px min(5vw, 64px) 72px; }
+    article { max-width: 1160px; margin: 0 auto; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: clamp(24px, 4vw, 48px); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05); }
+    h1, h2, h3 { line-height: 1.2; letter-spacing: 0; }
+    h1 { margin-top: 0; font-size: clamp(2rem, 4vw, 3rem); }
+    h2 { margin-top: 1.6em; border-top: 1px solid var(--line); padding-top: 1em; }
+    h3 { margin-top: 1.2em; color: #143a36; }
+    p, ul, ol, table, pre { margin: 0.85em 0; }
+    ul, ol { padding-left: 1.4rem; }
+    li { margin: 0.25em 0; }
+    a { color: var(--accent); }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; background: #edf2f7; border: 1px solid #d9e2ec; border-radius: 4px; padding: 0.05em 0.3em; }
+    pre { overflow-x: auto; background: var(--code); color: var(--code-ink); padding: 16px; border-radius: 8px; border: 1px solid #1f2937; }
+    pre code { background: transparent; border: 0; color: inherit; padding: 0; }
+    table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+    th, td { border: 1px solid var(--line); padding: 8px 10px; vertical-align: top; }
+    th { background: #ecfdf5; text-align: left; }
+    .callout { border-left: 4px solid var(--accent); background: #ecfdf5; padding: 14px 16px; border-radius: 6px; margin: 18px 0; }
+    .warning { border-left-color: var(--warn); background: #fff7ed; }
+    .meta { color: var(--muted); font-size: 0.95rem; margin-top: -0.5rem; }
+    .toolbar { display: grid; gap: 10px; margin-bottom: 18px; }
+    .toolbar input, .toolbar button { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 9px 10px; font: inherit; background: white; }
+    .toolbar button { cursor: pointer; color: white; background: var(--accent); border-color: var(--accent); }
+    .toc a { display: block; padding: 6px 0; color: #334155; text-decoration: none; font-size: 0.92rem; }
+    .task { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin: 14px 0; }
+    .task h3 { margin-top: 0; }
+    .tags { color: var(--muted); font-size: 0.92rem; }
+    .section-hidden { display: none; }
+    li.done { opacity: 0.62; text-decoration: line-through; }
+    @media (max-width: 860px) {
+      .page-shell { display: block; }
+      aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      main { padding: 20px 14px 48px; }
+      article { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter tasks">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#goal">Cycle Goal</a>
+      <a href="#sources">Reviewed Sources</a>
+      <a href="#rules">Working Rules</a>
+      <a href="#story-map">Story Map</a>
+      <a href="#task-list">First Task List</a>
+      <a href="#release-gate">Release Gate</a>
+      <a href="#pairing">Pairing Prompts</a>
+      <a href="#stop">Stop Condition</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">XP implementation planning artifact. Click checklist items during pairing or review.</p>
+      <h1>XP First Development Cycle Task List: v0.1 Root Prototype</h1>
+
+      <section data-section id="goal">
+        <h2>Cycle Goal</h2>
+        <div class="callout">
+          <strong>Complete the proposed v0.1 development cycle by producing one reproducible local match:</strong>
+          one human player, two deterministic bots, seeded PostgreSQL content, in-memory decks and rules, visible terminal logs, and a fixed-seed simulation that can be replayed.
+        </div>
+        <p>The domain source of truth is the Level 1 to Level 10 race through encounters, treasure, curses, help, sabotage, and readable logs. Build targets, database adapters, Docker, CMake, CTest, and NCurses are useful only when they protect that behavior or make feedback reproducible.</p>
+      </section>
+
+      <section data-section id="sources">
+        <h2>Reviewed Sources</h2>
+        <ul>
+          <li><a href="../architecture/kickoff_backlog.html">kickoff_backlog.html</a>: R0 through R9 proposed v0.1 cycle.</li>
+          <li><a href="../architecture/software_engineering_principles.html">software_engineering_principles.html</a>: domain-first source-of-truth rule.</li>
+          <li><a href="../architecture/lead_architecture_refinement_guide.html">lead_architecture_refinement_guide.html</a>: unified increment order AR0 through AR8.</li>
+          <li><a href="../design/gameplay_refinement_guide.html">gameplay_refinement_guide.html</a>: content bands, combat targets, curse expiry, bot behavior, and playtest metrics.</li>
+          <li><a href="../database/db_refinement_guide.html">db_refinement_guide.html</a>: seed validation, deck membership, content repository contract, and deferred event persistence.</li>
+          <li><a href="../testing/systems_refinement_guide.html">systems_refinement_guide.html</a>: layered C17 targets, deterministic RNG, command tests, ownership, and NCurses smoke path.</li>
+          <li><a href="../devops/devops_refinement_guide.html">devops_refinement_guide.html</a>: Make workflow, Docker/Compose bootstrap, DB lifecycle, simulation artifacts, and release readiness.</li>
+        </ul>
+      </section>
+
+      <section data-section id="rules">
+        <h2>Working Rules</h2>
+        <ul>
+          <li>Write the failing test, validation query, or playtest checklist before implementation.</li>
+          <li>Keep pure domain/application tests independent of PostgreSQL, NCurses, sockets, pthreads, and filesystem fixtures.</li>
+          <li>Load seeded content at match startup; do not query PostgreSQL during each turn.</li>
+          <li>Use explicit seeds for shuffles, bot decisions, and simulation transcripts.</li>
+          <li>Route human and bot actions through application commands; the UI renders snapshots and sends intentions only.</li>
+          <li>Defer networking, account persistence, rankings, runtime JSONB event persistence, production deployment, and complex class abilities.</li>
+        </ul>
+      </section>
+
+      <section data-section id="story-map">
+        <h2>Story Map</h2>
+        <table>
+          <thead>
+            <tr><th>Order</th><th>Outcome</th><th>Backlog Coverage</th><th>Primary Verification</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>Reproducible local command surface</td><td>R0, R0.5, A1, SP0, DEV0, DEV1</td><td><code>make build</code>, <code>make test</code>, Docker dry-run checklist</td></tr>
+            <tr><td>2</td><td>Validated content startup</td><td>R1, A3, DB0, DB1, DB2, DB3, GD0</td><td>SQL validation plus fake repository startup tests</td></tr>
+            <tr><td>3</td><td>Deterministic decks and starting match</td><td>R2, R3, A2, A6, SP1, GD1</td><td>Fixed-seed deck tests</td></tr>
+            <tr><td>4</td><td>Combat, rewards, curses, and events</td><td>R4, R5, A7, A8, SP2, GD2, GD3</td><td>Pure rule tests and event ordering tests</td></tr>
+            <tr><td>5</td><td>Application commands and deterministic bots</td><td>R6, A4, AR5, SP3, GD4</td><td>Command tests and fixed-seed bot simulation</td></tr>
+            <tr><td>6</td><td>Snapshot terminal loop</td><td>R7, A5, SP5, GD5</td><td>Static snapshot smoke plus manual NCurses playtest</td></tr>
+            <tr><td>7</td><td>Release candidate readiness</td><td>R8, R9, DEV3, DEV4, DEV7</td><td>Release checklist, simulation transcript, architecture review</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-section id="task-list">
+        <h2>First Task List</h2>
+
+        <div class="task">
+          <h3>T01. Confirm Cycle Boundary And Deferred Scope - Complete</h3>
+          <p class="tags">Status: Complete. Source: R9, AR0. Boundary touched: planning and review only. Evidence: <a href="../architecture/t01_cycle_boundary_review.html">t01_cycle_boundary_review.html</a>.</p>
+          <ul>
+            <li>Complete: Red added a review checklist that asks which domain behavior or release risk each accepted technical task serves.</li>
+            <li>Complete: Green marked networking, accounts, rankings, achievements runtime, JSONB event writes, cloud deployment, and class abilities as deferred.</li>
+            <li>Complete: Refactor collapsed duplicate scope statements into one v0.1 boundary note centered on the local Level 1 to Level 10 match.</li>
+            <li>Complete: Gate evidence now lets another mentor trace every cycle slice to player-visible value, deterministic feedback, or release readiness.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T02. Establish Layered Build Skeleton</h3>
+          <p class="tags">Source: R0, A1, SP0, DEV1. Boundaries touched by human implementation: root build files and protected source targets.</p>
+          <ul>
+            <li>Red: add a minimal CTest smoke test and a dependency review expectation that domain links only the C standard library.</li>
+            <li>Green: create the smallest CMake/Make shape for <code>dtd_domain</code>, <code>dtd_application</code>, <code>dtd_infrastructure_db</code>, <code>dtd_client_ncurses</code>, and tests.</li>
+            <li>Refactor: remove any accidental all-in-one target dependency that hides <code>libpq</code> or NCurses linkage.</li>
+            <li>Gate: <code>make build</code> and <code>make test</code> pass without PostgreSQL service or interactive NCurses.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T03. Define Local Workflow And Docker Bootstrap Contract</h3>
+          <p class="tags">Source: R0, R0.5, DEV0, DEV1. Boundary touched: local support files and build workflow.</p>
+          <ul>
+            <li>Red: document expected commands before implementation: <code>make configure</code>, <code>make build</code>, <code>make test</code>, <code>make db-seed</code>, <code>make db-validate</code>, <code>make test-db</code>, <code>make simulate</code>, <code>make run</code>, and Docker equivalents.</li>
+            <li>Green: make host-native and Docker commands wrap the same build, test, DB validation, and simulation intent.</li>
+            <li>Refactor: keep package installation and privileged service mutation out of default Make targets.</li>
+            <li>Gate: a new contributor can identify the C17 compiler, CMake, CTest, PostgreSQL/libpq, NCurses, and Docker/Compose path without guessing.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T04. Validate Seeded Content Before Match Startup</h3>
+          <p class="tags">Source: R1, AR2, DB0, DB3, GD0.</p>
+          <ul>
+            <li>Red: write validation checks for seven card types, six starting classes, at least one monster, AI, curse, and equipment card, and readable missing-content failures.</li>
+            <li>Green: add the minimum application startup gate that refuses to create a match from empty or partial content.</li>
+            <li>Refactor: keep SQL row mapping in infrastructure and return plain content definitions to application/domain code.</li>
+            <li>Gate: fake repository startup tests pass, and DB validation fails clearly for missing card type, missing class, missing deck card, or zero quantity.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T05. Add Deck Membership Seed Plan</h3>
+          <p class="tags">Source: R2, R3, DB1, GD1.</p>
+          <ul>
+            <li>Red: write SQL validation expectations for <code>Core Monster Deck</code>, <code>Treasure Deck</code>, and positive <code>deck_cards.quantity</code>.</li>
+            <li>Green: define deck membership for encounter threats, curses, and equipment rewards, using a future <code>05_seed_deck_cards.sql</code> support file or equivalent implementation.</li>
+            <li>Refactor: keep <code>The Singularity</code> rare or scripted so early fixed-seed tests are not dominated by boss-tier threats.</li>
+            <li>Gate: validation proves the Encounter deck and Treasure deck are non-empty with expected card names before shuffling starts.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T06. Introduce Deterministic RNG</h3>
+          <p class="tags">Source: R2, R3, A6, SP1.</p>
+          <ul>
+            <li>Red: add a test that the same seed produces the same sequence and different seeds can produce different sequences.</li>
+            <li>Green: implement a small explicit RNG state used by shuffles and bot decisions; do not use hidden global <code>rand()</code>.</li>
+            <li>Refactor: store match seed and RNG state in match/application state and record the seed in events or logs.</li>
+            <li>Gate: fixed-seed tests are stable across repeated runs.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T07. Build Encounter Deck From Loaded Content</h3>
+          <p class="tags">Source: R2, AR3, DB1, GD1.</p>
+          <ul>
+            <li>Red: write a fixed-seed deck test that asserts count, first draw sequence, discard behavior, and reshuffle behavior.</li>
+            <li>Green: build the Encounter deck from monster, AI-threat, and curse content definitions.</li>
+            <li>Refactor: separate card definition identity from card instance position so hand/menu indexes can remain stable later.</li>
+            <li>Gate: same seed gives the same Encounter draw order, and an empty draw pile reshuffles discard deterministically.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T08. Build Treasure Deck And Equipment Progression</h3>
+          <p class="tags">Source: R3, AR3, GD1.</p>
+          <ul>
+            <li>Red: write a test that reward draws increase hand count and equipping an item changes Power by its <code>power_bonus</code>.</li>
+            <li>Green: build the Treasure deck from equipment definitions and support basic equip behavior.</li>
+            <li>Refactor: defer equipment slot limits; keep equipment as a simple persistent Power bonus for v0.1.</li>
+            <li>Gate: ThinkPad, Linux Mastery, PostgreSQL Expertise, and Emacs Mastery can appear as deterministic rewards.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T09. Create Match Starting State</h3>
+          <p class="tags">Source: v0.1 constraints, A2, AR3.</p>
+          <ul>
+            <li>Red: add a pure test for three players starting at Level 1, Influence 0, no equipment, two Encounter cards, and two Treasure cards.</li>
+            <li>Green: create the minimum match setup from loaded classes, loaded deck content, and explicit seed.</li>
+            <li>Refactor: keep match creation independent of PostgreSQL and NCurses by using plain values.</li>
+            <li>Gate: fake content can start a match in pure tests.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T10. Implement Power And Level Invariants</h3>
+          <p class="tags">Source: R4, A2, SP2, GD2.</p>
+          <ul>
+            <li>Red: test <code>Level + class base_power_bonus + equipment power_bonus + temporary modifiers</code>, Level minimum 1, and Level maximum 10.</li>
+            <li>Green: implement pure stat and invariant functions.</li>
+            <li>Refactor: keep calculations side-effect free and easy to reuse in combat and snapshots.</li>
+            <li>Gate: domain tests prove Power and Level bounds without infrastructure dependencies.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T11. Resolve First Combat</h3>
+          <p class="tags">Source: R4, AR4, SP2, GD2.</p>
+          <ul>
+            <li>Red: add scripted combat tests for win, loss, rewards, fallback bad stuff, and immediate Level 10 victory.</li>
+            <li>Green: implement combat where player Power greater than or equal to monster Power wins.</li>
+            <li>Refactor: return structured results and events instead of forcing UI code to infer the outcome.</li>
+            <li>Gate: combat tests show reward events before match-ended events when Level 10 is reached.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T12. Resolve First Curses</h3>
+          <p class="tags">Source: R5, AR4, SP2, GD3.</p>
+          <ul>
+            <li>Red: add tests for <code>Broken CI</code>, <code>Scope Creep</code>, and <code>Context Window Exceeded</code> effects and expiry.</li>
+            <li>Green: implement <code>skip_next_combat</code>, <code>next_monster_power_bonus</code>, and immediate half-hand discard rounded down.</li>
+            <li>Refactor: keep curse state explicit and short-lived; avoid hidden long-term debt systems.</li>
+            <li>Gate: each curse emits a readable event and clears or persists exactly as specified.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T13. Shape Command Results And Events</h3>
+          <p class="tags">Source: A7, A8, SP3.</p>
+          <ul>
+            <li>Red: test success result, invalid action result, repository failure result, event ordering, and cleanup ownership.</li>
+            <li>Green: return status, typed error, snapshot, event count, and event list from application commands.</li>
+            <li>Refactor: document ownership in public headers: create/destroy, init/deinit, borrowed, copied, and result cleanup.</li>
+            <li>Gate: invalid commands leave state unchanged and require no UI inspection of private state.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T14. Add Application Command Boundary</h3>
+          <p class="tags">Source: A4, AR5, SP3.</p>
+          <ul>
+            <li>Red: add tests for <code>START_LOCAL_MATCH</code>, <code>KICK_BACKLOG</code>, <code>EQUIP_CARD</code>, <code>RESOLVE_COMBAT</code>, <code>END_TURN</code>, and invalid phase errors.</li>
+            <li>Green: route match mutation through application commands rather than direct UI or bot state writes.</li>
+            <li>Refactor: keep command names close to domain language and future protocol intent.</li>
+            <li>Gate: snapshots and ordered events are returned for every successful command.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T15. Add Deterministic Bot Baseline</h3>
+          <p class="tags">Source: R6, AR5, GD4, SP3.</p>
+          <ul>
+            <li>Red: write fixed-seed tests for bot equip choice, help threshold, sabotage threshold, and replayed decisions.</li>
+            <li>Green: implement Legacy Maintainer and Prompt Intern with simple deterministic equip, help, and sabotage rules.</li>
+            <li>Refactor: route bot actions through the same application command validation path as human actions.</li>
+            <li>Gate: a non-interactive fixed-seed simulation reaches bot actions with repeatable log events.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T16. Produce Full-Match Simulation Transcript</h3>
+          <p class="tags">Source: R6, R8, AR7, DEV4.</p>
+          <ul>
+            <li>Red: define transcript expectations for seed, winner, turn count, bot actions, combat results, curse effects, level gains, and final event.</li>
+            <li>Green: add a non-interactive simulation command using fixed seed and fake or validated content.</li>
+            <li>Refactor: write transcript output under an artifact path and include the seed on failure.</li>
+            <li>Gate: one fixed-seed match completes before manual NCurses work is considered done.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T17. Define Snapshot For Terminal Rendering</h3>
+          <p class="tags">Source: R7, A5, AR6, SP5.</p>
+          <ul>
+            <li>Red: add snapshot tests after key commands: start match, reveal encounter, equip card, resolve curse, resolve combat, and bot action.</li>
+            <li>Green: include active player, phase, player summaries, visible encounter, hand view, equipment view, available actions, and recent events.</li>
+            <li>Refactor: ensure Power, rewards, legality, and phase are supplied by application state, not recalculated by UI code.</li>
+            <li>Gate: a static snapshot fixture contains everything needed for a UI smoke render.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T18. Add NCurses Static Smoke Path</h3>
+          <p class="tags">Source: R7, A5, SP5, GD5.</p>
+          <ul>
+            <li>Red: define a static snapshot layout check or manual smoke checklist for terminal size, panels, hand indexes, battle area, logs, and cleanup on exit.</li>
+            <li>Green: render snapshots and translate selected keys into application commands.</li>
+            <li>Refactor: split layout calculation from direct NCurses drawing where feasible so tests can run without interactive terminal control.</li>
+            <li>Gate: redraw and resize do not mutate domain state.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T19. Integrate The Local Playtest Loop</h3>
+          <p class="tags">Source: R7, AR7, GD5.</p>
+          <ul>
+            <li>Red: prepare a manual playtest checklist that requires one combat win, one loss or curse, one equipment play, one bot action, and one Level gain within the first 10 turns.</li>
+            <li>Green: connect startup, command loop, snapshots, logs, human choices, and bot turns into one local terminal match.</li>
+            <li>Refactor: trim terminal text for clarity and keep logs short enough to scan.</li>
+            <li>Gate: a human can complete a local match from Level 1 to Level 10 without changing rules mid-playtest.</li>
+          </ul>
+        </div>
+
+        <div class="task">
+          <h3>T20. Run Release Candidate Gate</h3>
+          <p class="tags">Source: R8, R9, DEV7.</p>
+          <ul>
+            <li>Red: assemble the release checklist before declaring the cycle complete.</li>
+            <li>Green: run <code>make clean</code>, <code>make build</code>, <code>make test</code>, DB seed and validation, explicit DB tests when available, fixed-seed simulation, Docker/Compose bootstrap checks, and manual NCurses playtest.</li>
+            <li>Refactor: fix reproducibility, diagnostics, or boundary leaks before adding new content or mechanics.</li>
+            <li>Gate: the release candidate is reproducible, validated, manually checked, and still excludes deferred v0.2 scope.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section data-section id="release-gate">
+        <h2>Release Gate</h2>
+        <pre><code>make clean
+make build
+make test
+make db-reset
+make db-seed
+make db-validate
+make test-db
+make simulate DTD_MATCH_SEED=&lt;known-seed&gt;
+manual NCurses playtest checklist
+architecture boundary checklist</code></pre>
+        <p>A cycle is not complete if the fixed-seed simulation cannot replay, if content validation can start an empty match, if domain/application tests require PostgreSQL or NCurses, or if the UI owns combat, reward, curse, or bot decision rules.</p>
+      </section>
+
+      <section data-section id="pairing">
+        <h2>Pairing Prompts</h2>
+        <ul>
+          <li>What player-visible rule or release risk does this task prove?</li>
+          <li>What is the smallest failing test, SQL validation, transcript expectation, or playtest note?</li>
+          <li>Which dependency must not leak into this layer?</li>
+          <li>What event should the UI log instead of inferring from private state?</li>
+          <li>What seed, fixture, or transcript will let us replay the bug?</li>
+        </ul>
+      </section>
+
+      <section data-section id="stop">
+        <h2>Stop Condition</h2>
+        <p>Stop the cycle when the v0.1 release gate passes and one reviewed transcript plus one manual playtest note prove the local Level 1 to Level 10 match. Do not continue into sockets, event persistence, rankings, accounts, advanced AI, or expanded card catalogs until this stop condition is met.</p>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.querySelector('[data-search]');
+    const toggle = document.querySelector('[data-toggle-sections]');
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    document.querySelectorAll('li').forEach((li) => {
+      li.title = 'Click to mark reviewed';
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => li.classList.toggle('done'));
+    });
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        sections.forEach((section) => {
+          section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+        });
+      });
+    }
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const collapsed = document.body.dataset.collapsed === 'true';
+        document.body.dataset.collapsed = String(!collapsed);
+        sections.forEach((section) => {
+          Array.from(section.children).forEach((child, index) => {
+            if (index > 0) child.hidden = !collapsed;
+          });
+        });
+        toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+      });
+    }
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T01 Architecture Review: Cycle Boundary And Deferred Scope</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; --code:#101828; --code-ink:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1120px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15,23,42,.05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { margin-top:1.6em; border-top:1px solid var(--line); padding-top:1em; }
+    h3 { margin-top:1.2em; color:#143a36; }
+    p,ul,ol,table,pre { margin:.85em 0; }
+    ul,ol { padding-left:1.4rem; }
+    li { margin:.25em 0; }
+    a { color:var(--accent); }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:var(--code); color:var(--code-ink); padding:16px; border-radius:8px; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; }
+    th { background:#ecfdf5; text-align:left; }
+    .callout { border-left:4px solid var(--accent); background:#ecfdf5; padding:14px 16px; border-radius:6px; margin:18px 0; }
+    .warning { border-left-color:var(--warn); background:#fff7ed; }
+    .meta { color:var(--muted); font-size:.95rem; margin-top:-.5rem; }
+    .toolbar { display:grid; gap:10px; margin-bottom:18px; }
+    .toolbar input,.toolbar button { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px 10px; font:inherit; background:white; }
+    .toolbar button { cursor:pointer; color:white; background:var(--accent); border-color:var(--accent); }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    .section-hidden { display:none; }
+    li.done { opacity:.62; text-decoration:line-through; }
+    @media(max-width:860px){.page-shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}article{padding:22px}}
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter review">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#decision">Decision</a>
+      <a href="#checklist">Review Checklist</a>
+      <a href="#deferred">Deferred Scope</a>
+      <a href="#traceability">Cycle Traceability</a>
+      <a href="#boundaries">Boundary Notes</a>
+      <a href="#done">T01 Completion Evidence</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Lead Architect execution artifact for XP task T01 in the v0.1 first development cycle.</p>
+      <h1>T01 Architecture Review: Cycle Boundary And Deferred Scope</h1>
+
+      <section data-section id="decision">
+        <h2>Decision</h2>
+        <div class="callout">
+          <strong>T01 is complete when v0.1 has one accepted boundary rule:</strong>
+          implementation work is accepted only when it serves a player-visible domain behavior, deterministic feedback loop, content validation need, or local release-readiness risk.
+        </div>
+        <p>The v0.1 cycle remains a local Root Prototype. It should prove a complete Level 1 to Level 10 match with one human player, two deterministic bots, seeded content, in-memory rules, replayable simulation, and a terminal playtest. Clean Architecture, CMake, Docker/Compose, PostgreSQL, and NCurses are tactical supports for that outcome, not independent goals.</p>
+      </section>
+
+      <section data-section id="checklist">
+        <h2>Review Checklist</h2>
+        <p>Use this checklist before accepting any task into the v0.1 implementation cycle.</p>
+        <ul>
+          <li>Does the task name the gameplay behavior, content rule, deterministic check, or release risk it protects?</li>
+          <li>Does the task preserve the dependency direction: client to application, application to domain and ports, infrastructure behind ports?</li>
+          <li>Can the task be verified by CTest, SQL validation, fixed-seed transcript, Docker/Compose check, or manual terminal playtest?</li>
+          <li>Does the task keep pure domain/application tests independent of PostgreSQL, NCurses, sockets, pthreads, and filesystem fixtures?</li>
+          <li>Does the task avoid pulling deferred v0.2 concerns into v0.1?</li>
+          <li>Does the task keep human and bot actions routed through application commands instead of UI-owned rule mutation?</li>
+          <li>Does the task return structured results or events when the UI needs to explain what happened?</li>
+        </ul>
+      </section>
+
+      <section data-section id="deferred">
+        <h2>Deferred Scope</h2>
+        <p>The following are explicitly out of the v0.1 first development cycle unless a later product decision replaces this boundary review:</p>
+        <ul>
+          <li>TCP multiplayer server/client synchronization, sockets, packet routing, reconnect, spectator mode, and shared binary protocol structs.</li>
+          <li>pthread worker pools, connection pools, production runtime concurrency, and lobby orchestration.</li>
+          <li>Persistent accounts, authentication, rankings, achievements runtime, inventory persistence, and match history.</li>
+          <li>Required JSONB <code>game_events</code> writes during normal play. Runtime events stay in application/domain result flow for v0.1.</li>
+          <li>Cloud deployment, Kubernetes, production image publishing, production secrets platforms, and production observability stacks.</li>
+          <li>Full PvP card play, trading, negotiation economies, equipment slot limits, deep Influence economy, and class-specific active abilities.</li>
+          <li>Large card expansion, rarity balancing pass, AI chain reactions, and complex bot intelligence beyond deterministic baseline rules.</li>
+        </ul>
+      </section>
+
+      <section data-section id="traceability">
+        <h2>Cycle Traceability</h2>
+        <table>
+          <thead>
+            <tr><th>Cycle Slice</th><th>Accepted Because It Serves</th><th>Primary Boundary</th><th>Verification Gate</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>R0/R0.5 local readiness</td><td>Reproducible developer feedback for every gameplay increment</td><td>DevOps supports feedback; it does not define runtime architecture</td><td><code>make build</code>, <code>make test</code>, Docker bootstrap checklist</td></tr>
+            <tr><td>R1 seeded content smoke</td><td>Preventing empty or invalid content from starting a match</td><td>Application content port; infrastructure owns SQL and <code>libpq</code></td><td>SQL validation and fake repository startup tests</td></tr>
+            <tr><td>R2 Encounter deck</td><td>Kick Open The Backlog phase with repeatable threats and curses</td><td>Domain/application values; no DB or UI dependency in deck tests</td><td>Fixed-seed draw-order and reshuffle tests</td></tr>
+            <tr><td>R3 Treasure deck</td><td>Visible long-term player progression through equipment rewards</td><td>Domain equipment and hand state; UI receives snapshots only</td><td>Reward draw, hand count, and Power recalculation tests</td></tr>
+            <tr><td>R4 combat resolver</td><td>Fair, debuggable win/loss and Level 10 victory rules</td><td>Domain owns combat and reward rules</td><td>Win, loss, fallback bad stuff, and Level 10 tests</td></tr>
+            <tr><td>R5 curse resolvers</td><td>Immediate readable setbacks in the Encounter deck</td><td>Domain owns curse state and expiry; UI logs events</td><td>Broken CI, Scope Creep, and Context Window Exceeded tests</td></tr>
+            <tr><td>R6 bot baseline</td><td>Solo playtests exercise help and sabotage without nondeterminism</td><td>Application routes bot choices through the same command validation as humans</td><td>Fixed-seed bot command and full-match simulation tests</td></tr>
+            <tr><td>R7 terminal playtest loop</td><td>Human player can inspect state and make current-phase decisions</td><td>Client renders snapshots and sends intentions; it does not own rules</td><td>Static snapshot smoke and manual NCurses playtest checklist</td></tr>
+            <tr><td>R8 release readiness</td><td>Playable means reproducible, validated, and manually checked</td><td>Release gate collects evidence without expanding scope</td><td>Build/test/seed/simulate/playtest checklist</td></tr>
+            <tr><td>R9 source-of-truth review</td><td>Keeping tactical work subordinate to domain learning</td><td>Architecture governance only</td><td>This T01 checklist and traceability table</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-section id="boundaries">
+        <h2>Boundary Notes</h2>
+        <pre><code>client/ncurses
+    sends intentions and renders snapshots
+        -> application
+            coordinates commands, ports, snapshots, bot orchestration
+                -> domain
+                    owns deterministic rules, cards, decks, players, match state
+            -> application ports
+                <- infrastructure/postgresql
+                    owns SQL, libpq, row mapping, connection lifecycle</code></pre>
+        <ul>
+          <li>Domain headers must not include <code>libpq-fe.h</code>, <code>ncurses.h</code>, POSIX socket headers, pthread headers, or application service headers.</li>
+          <li>Application services may call domain functions and application ports, but must not issue SQL or render terminal panels.</li>
+          <li>Infrastructure adapters convert database rows into plain content definitions before returning data.</li>
+          <li>The NCurses client renders only application snapshots and uses stable IDs or indexes supplied by the application.</li>
+          <li>Every command result should include status, typed error where needed, updated snapshot, and ordered events.</li>
+        </ul>
+      </section>
+
+      <section data-section id="done">
+        <h2>T01 Completion Evidence</h2>
+        <ul>
+          <li>Red complete: this document adds the review checklist that asks which domain behavior or release risk each accepted task serves.</li>
+          <li>Green complete: deferred networking, accounts, rankings, achievements runtime, JSONB event writes, cloud deployment, and class abilities are explicitly listed.</li>
+          <li>Refactor complete: v0.1 scope is collapsed into one boundary decision centered on the local Level 1 to Level 10 match.</li>
+          <li>Gate complete: the traceability table maps each cycle slice to domain value, ownership boundary, and verification evidence.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.querySelector('[data-search]');
+    const toggle = document.querySelector('[data-toggle-sections]');
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    document.querySelectorAll('li').forEach((li) => {
+      li.title = 'Click to mark reviewed';
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => li.classList.toggle('done'));
+    });
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        sections.forEach((section) => {
+          section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+        });
+      });
+    }
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const collapsed = document.body.dataset.collapsed === 'true';
+        document.body.dataset.collapsed = String(!collapsed);
+        sections.forEach((section) => {
+          Array.from(section.children).forEach((child, index) => {
+            if (index > 0) child.hidden = !collapsed;
+          });
+        });
+        toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+      });
+    }
+  })();
+</script>
+</body>
+</html>

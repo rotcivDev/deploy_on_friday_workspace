@@ -102,6 +102,7 @@ The following skills are placed in the project root [`.agent/skills/`](file:///h
 | **Lead Software Architect** | [`lead-architect`](file:///home/msratso/workspaces/c_dev/.agent/skills/lead-architect/SKILL.md) | Clean Architecture, coupling, dependency flows, interfaces. |
 | **Senior Game Designer** | [`game-designer`](file:///home/msratso/workspaces/c_dev/.agent/skills/game-designer/SKILL.md) | Game balancing, cards, level milestones, lore, and engineering satire. |
 | **Senior Systems Programmer** | [`systems-programmer`](file:///home/msratso/workspaces/c_dev/.agent/skills/systems-programmer/SKILL.md) | POSIX sockets, pthreads thread-safety, CMake builds, binary packet layouts. |
+| **Extreme Programming Principal Engineer** | [`xp-principal-engineer`](file:///home/msratso/workspaces/c_dev/.agent/skills/xp-principal-engineer/SKILL.md) / [`Codex discovery mirror`](file:///home/msratso/workspaces/c_dev/.agents/skills/xp-principal-engineer/SKILL.md) | XP implementation stories, TDD task slices, pairing prompts, acceptance tests, and small-release planning. |
 | **PostgreSQL Architect** | [`db-architect`](file:///home/msratso/workspaces/c_dev/.agent/skills/db-architect/SKILL.md) | Database tables, indexes, event logging using JSONB/GIN, DDL template migrations. |
 | **Game Industry DevOps Principal Engineer** | [`devops-principal-engineer`](file:///home/msratso/workspaces/c_dev/.agent/skills/devops-principal-engineer/SKILL.md) | Local environments, CI/CD, runtime services, deployment topology, secrets, observability, release gates. |
 | **Git Specialist** | [`git-specialist`](file:///home/msratso/workspaces/c_dev/.agent/skills/git-specialist/SKILL.md) | Git operations, branching strategy, Conventional Commits, ignore/attribute configurations. |
@@ -119,6 +120,7 @@ When agents generate documents, specs, examples, or templates, they must be regi
 *   **[walkthrough/architecture/kickoff_backlog.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/kickoff_backlog.html)**: Product backlog for the v0.1 Root Prototype, compiled last by the Project Manager / Product Owner.
 *   **[walkthrough/architecture/software_engineering_principles.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/software_engineering_principles.html)**: Source-of-truth engineering principle: domain understanding before tactical structure.
 *   **[walkthrough/architecture/lead_architecture_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/lead_architecture_refinement_guide.html)**: Lead architecture synthesis of team backlog refinements, dependency boundaries, and unified increment order.
+*   **[walkthrough/architecture/t01_cycle_boundary_review.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/t01_cycle_boundary_review.html)**: Lead Architect completion evidence for XP task T01, confirming v0.1 cycle boundary, deferred scope, and traceability gates.
 *   **[walkthrough/design/gameplay_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/design/gameplay_refinement_guide.html)**: Gameplay/content backlog refinement, v0.1 balance targets, bot behavior, and playtest plan.
 *   *(Add future design files here)*
 
@@ -131,6 +133,7 @@ When agents generate documents, specs, examples, or templates, they must be regi
 *   **[walkthrough/devops/devops_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/devops/devops_refinement_guide.html)**: DevOps refinement guide for local environment, Make workflow, CI gates, database lifecycle, runtime topology, and v0.1 release readiness.
 *   **[walkthrough/git/git_workflow_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/git/git_workflow_refinement_guide.html)**: Git workflow and repository hygiene refinement guide for HTML walkthrough migration and v0.1 delivery.
 *   **[walkthrough/testing/systems_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/testing/systems_refinement_guide.html)**: Systems architecture compile, run and tests guide for v0.1.
+*   **[walkthrough/xp/v0_1_first_development_cycle_task_list.html](file:///home/msratso/workspaces/c_dev/walkthrough/xp/v0_1_first_development_cycle_task_list.html)**: XP task list for completing the proposed v0.1 development cycle, including TDD slices, pairing prompts, and release gates.
 *   *(Add future programming guides or standalone code examples here)*
 
 ---
