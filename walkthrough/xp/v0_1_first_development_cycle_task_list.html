@@ -165,7 +165,7 @@
 
         <div class="task">
           <h3>T03. Define Local Workflow And Docker Bootstrap Contract</h3>
-          <p class="tags">Source: R0, R0.5, DEV0, DEV1. Boundary touched: local support files and build workflow.</p>
+          <p class="tags">Source: R0, R0.5, DEV0, DEV1. Boundary touched: local support files and build workflow. Human implementation plan: <a href="t03_local_workflow_docker_bootstrap_plan.html">t03_local_workflow_docker_bootstrap_plan.html</a>.</p>
           <ul>
             <li>Red: document expected commands before implementation: <code>make configure</code>, <code>make build</code>, <code>make test</code>, <code>make db-seed</code>, <code>make db-validate</code>, <code>make test-db</code>, <code>make simulate</code>, <code>make run</code>, and Docker equivalents.</li>
             <li>Green: make host-native and Docker commands wrap the same build, test, DB validation, and simulation intent.</li>
@@ -176,7 +176,7 @@
 
         <div class="task">
           <h3>T04. Validate Seeded Content Before Match Startup</h3>
-          <p class="tags">Source: R1, AR2, DB0, DB3, GD0.</p>
+          <p class="tags">Source: R1, AR2, DB0, DB3, GD0. Human implementation plan: <a href="t04_validate_seeded_content_plan.html">t04_validate_seeded_content_plan.html</a>.</p>
           <ul>
             <li>Red: write validation checks for seven card types, six starting classes, at least one monster, AI, curse, and equipment card, and readable missing-content failures.</li>
             <li>Green: add the minimum application startup gate that refuses to create a match from empty or partial content.</li>
@@ -187,7 +187,7 @@
 
         <div class="task">
           <h3>T05. Add Deck Membership Seed Plan</h3>
-          <p class="tags">Source: R2, R3, DB1, GD1.</p>
+          <p class="tags">Source: R2, R3, DB1, GD1. Human implementation plan: <a href="t05_deck_membership_seed_plan.html">t05_deck_membership_seed_plan.html</a>.</p>
           <ul>
             <li>Red: write SQL validation expectations for <code>Core Monster Deck</code>, <code>Treasure Deck</code>, and positive <code>deck_cards.quantity</code>.</li>
             <li>Green: define deck membership for encounter threats, curses, and equipment rewards, using a future <code>05_seed_deck_cards.sql</code> support file or equivalent implementation.</li>
@@ -198,7 +198,7 @@
 
         <div class="task">
           <h3>T06. Introduce Deterministic RNG</h3>
-          <p class="tags">Source: R2, R3, A6, SP1.</p>
+          <p class="tags">Source: R2, R3, A6, SP1. Human implementation plan: <a href="t06_deterministic_rng_plan.html">t06_deterministic_rng_plan.html</a>.</p>
           <ul>
             <li>Red: add a test that the same seed produces the same sequence and different seeds can produce different sequences.</li>
             <li>Green: implement a small explicit RNG state used by shuffles and bot decisions; do not use hidden global <code>rand()</code>.</li>
@@ -209,7 +209,7 @@
 
         <div class="task">
           <h3>T07. Build Encounter Deck From Loaded Content</h3>
-          <p class="tags">Source: R2, AR3, DB1, GD1.</p>
+          <p class="tags">Source: R2, AR3, DB1, GD1. Human implementation plan: <a href="t07_encounter_deck_plan.html">t07_encounter_deck_plan.html</a>.</p>
           <ul>
             <li>Red: write a fixed-seed deck test that asserts count, first draw sequence, discard behavior, and reshuffle behavior.</li>
             <li>Green: build the Encounter deck from monster, AI-threat, and curse content definitions.</li>
@@ -220,7 +220,7 @@
 
         <div class="task">
           <h3>T08. Build Treasure Deck And Equipment Progression</h3>
-          <p class="tags">Source: R3, AR3, GD1.</p>
+          <p class="tags">Source: R3, AR3, GD1. Human implementation plan: <a href="t08_treasure_deck_equipment_plan.html">t08_treasure_deck_equipment_plan.html</a>.</p>
           <ul>
             <li>Red: write a test that reward draws increase hand count and equipping an item changes Power by its <code>power_bonus</code>.</li>
             <li>Green: build the Treasure deck from equipment definitions and support basic equip behavior.</li>
@@ -231,7 +231,7 @@
 
         <div class="task">
           <h3>T09. Create Match Starting State</h3>
-          <p class="tags">Source: v0.1 constraints, A2, AR3.</p>
+          <p class="tags">Source: v0.1 constraints, A2, AR3. Human implementation plan: <a href="t09_match_starting_state_plan.html">t09_match_starting_state_plan.html</a>.</p>
           <ul>
             <li>Red: add a pure test for three players starting at Level 1, Influence 0, no equipment, two Encounter cards, and two Treasure cards.</li>
             <li>Green: create the minimum match setup from loaded classes, loaded deck content, and explicit seed.</li>
@@ -242,7 +242,7 @@
 
         <div class="task">
           <h3>T10. Implement Power And Level Invariants</h3>
-          <p class="tags">Source: R4, A2, SP2, GD2.</p>
+          <p class="tags">Source: R4, A2, SP2, GD2. Human implementation plan: <a href="t10_power_level_invariants_plan.html">t10_power_level_invariants_plan.html</a>.</p>
           <ul>
             <li>Red: test <code>Level + class base_power_bonus + equipment power_bonus + temporary modifiers</code>, Level minimum 1, and Level maximum 10.</li>
             <li>Green: implement pure stat and invariant functions.</li>
@@ -253,7 +253,7 @@
 
         <div class="task">
           <h3>T11. Resolve First Combat</h3>
-          <p class="tags">Source: R4, AR4, SP2, GD2.</p>
+          <p class="tags">Source: R4, AR4, SP2, GD2. Human implementation plan: <a href="t11_first_combat_plan.html">t11_first_combat_plan.html</a>.</p>
           <ul>
             <li>Red: add scripted combat tests for win, loss, rewards, fallback bad stuff, and immediate Level 10 victory.</li>
             <li>Green: implement combat where player Power greater than or equal to monster Power wins.</li>
@@ -264,7 +264,7 @@
 
         <div class="task">
           <h3>T12. Resolve First Curses</h3>
-          <p class="tags">Source: R5, AR4, SP2, GD3.</p>
+          <p class="tags">Source: R5, AR4, SP2, GD3. Human implementation plan: <a href="t12_first_curses_plan.html">t12_first_curses_plan.html</a>.</p>
           <ul>
             <li>Red: add tests for <code>Broken CI</code>, <code>Scope Creep</code>, and <code>Context Window Exceeded</code> effects and expiry.</li>
             <li>Green: implement <code>skip_next_combat</code>, <code>next_monster_power_bonus</code>, and immediate half-hand discard rounded down.</li>
@@ -275,7 +275,7 @@
 
         <div class="task">
           <h3>T13. Shape Command Results And Events</h3>
-          <p class="tags">Source: A7, A8, SP3.</p>
+          <p class="tags">Source: A7, A8, SP3. Human implementation plan: <a href="t13_command_results_events_plan.html">t13_command_results_events_plan.html</a>.</p>
           <ul>
             <li>Red: test success result, invalid action result, repository failure result, event ordering, and cleanup ownership.</li>
             <li>Green: return status, typed error, snapshot, event count, and event list from application commands.</li>
@@ -286,7 +286,7 @@
 
         <div class="task">
           <h3>T14. Add Application Command Boundary</h3>
-          <p class="tags">Source: A4, AR5, SP3.</p>
+          <p class="tags">Source: A4, AR5, SP3. Human implementation plan: <a href="t14_application_command_boundary_plan.html">t14_application_command_boundary_plan.html</a>.</p>
           <ul>
             <li>Red: add tests for <code>START_LOCAL_MATCH</code>, <code>KICK_BACKLOG</code>, <code>EQUIP_CARD</code>, <code>RESOLVE_COMBAT</code>, <code>END_TURN</code>, and invalid phase errors.</li>
             <li>Green: route match mutation through application commands rather than direct UI or bot state writes.</li>
@@ -297,7 +297,7 @@
 
         <div class="task">
           <h3>T15. Add Deterministic Bot Baseline</h3>
-          <p class="tags">Source: R6, AR5, GD4, SP3.</p>
+          <p class="tags">Source: R6, AR5, GD4, SP3. Human implementation plan: <a href="t15_deterministic_bot_baseline_plan.html">t15_deterministic_bot_baseline_plan.html</a>.</p>
           <ul>
             <li>Red: write fixed-seed tests for bot equip choice, help threshold, sabotage threshold, and replayed decisions.</li>
             <li>Green: implement Legacy Maintainer and Prompt Intern with simple deterministic equip, help, and sabotage rules.</li>
@@ -308,7 +308,7 @@
 
         <div class="task">
           <h3>T16. Produce Full-Match Simulation Transcript</h3>
-          <p class="tags">Source: R6, R8, AR7, DEV4.</p>
+          <p class="tags">Source: R6, R8, AR7, DEV4. Human implementation plan: <a href="t16_full_match_simulation_transcript_plan.html">t16_full_match_simulation_transcript_plan.html</a>.</p>
           <ul>
             <li>Red: define transcript expectations for seed, winner, turn count, bot actions, combat results, curse effects, level gains, and final event.</li>
             <li>Green: add a non-interactive simulation command using fixed seed and fake or validated content.</li>
@@ -319,7 +319,7 @@
 
         <div class="task">
           <h3>T17. Define Snapshot For Terminal Rendering</h3>
-          <p class="tags">Source: R7, A5, AR6, SP5.</p>
+          <p class="tags">Source: R7, A5, AR6, SP5. Human implementation plan: <a href="t17_terminal_snapshot_plan.html">t17_terminal_snapshot_plan.html</a>.</p>
           <ul>
             <li>Red: add snapshot tests after key commands: start match, reveal encounter, equip card, resolve curse, resolve combat, and bot action.</li>
             <li>Green: include active player, phase, player summaries, visible encounter, hand view, equipment view, available actions, and recent events.</li>
@@ -330,7 +330,7 @@
 
         <div class="task">
           <h3>T18. Add NCurses Static Smoke Path</h3>
-          <p class="tags">Source: R7, A5, SP5, GD5.</p>
+          <p class="tags">Source: R7, A5, SP5, GD5. Human implementation plan: <a href="t18_ncurses_static_smoke_path_plan.html">t18_ncurses_static_smoke_path_plan.html</a>.</p>
           <ul>
             <li>Red: define a static snapshot layout check or manual smoke checklist for terminal size, panels, hand indexes, battle area, logs, and cleanup on exit.</li>
             <li>Green: render snapshots and translate selected keys into application commands.</li>
@@ -341,7 +341,7 @@
 
         <div class="task">
           <h3>T19. Integrate The Local Playtest Loop</h3>
-          <p class="tags">Source: R7, AR7, GD5.</p>
+          <p class="tags">Source: R7, AR7, GD5. Human implementation plan: <a href="t19_local_playtest_loop_plan.html">t19_local_playtest_loop_plan.html</a>.</p>
           <ul>
             <li>Red: prepare a manual playtest checklist that requires one combat win, one loss or curse, one equipment play, one bot action, and one Level gain within the first 10 turns.</li>
             <li>Green: connect startup, command loop, snapshots, logs, human choices, and bot turns into one local terminal match.</li>
@@ -352,7 +352,7 @@
 
         <div class="task">
           <h3>T20. Run Release Candidate Gate</h3>
-          <p class="tags">Source: R8, R9, DEV7.</p>
+          <p class="tags">Source: R8, R9, DEV7. Human implementation plan: <a href="t20_release_candidate_gate_plan.html">t20_release_candidate_gate_plan.html</a>.</p>
           <ul>
             <li>Red: assemble the release checklist before declaring the cycle complete.</li>
             <li>Green: run <code>make clean</code>, <code>make build</code>, <code>make test</code>, DB seed and validation, explicit DB tests when available, fixed-seed simulation, Docker/Compose bootstrap checks, and manual NCurses playtest.</li>
