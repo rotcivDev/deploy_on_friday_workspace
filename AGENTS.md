@@ -1,6 +1,6 @@
 # Agent and Mentorship Hub (AGENTS.md)
 
-Welcome to the **Dungeon of Technical Debt** Agent Hub. This file acts as a central registry and organizer for all agent configurations, workspace skills, and agent-generated support files (documentation, guides, specs, templates).
+Welcome to the **Dungeons and Devs** Agent Hub. This file acts as a central registry and organizer for all agent configurations, workspace skills, and agent-generated support files (documentation, guides, specs, templates).
 
 ---
 

@@ -68,7 +68,7 @@
         <div class="callout">
           <strong>Goal:</strong> Implement the Treasure deck, card draw mechanics, player hands, and equipping of cards which modify player Power stat calculations.
         </div>
-        <p>In Dungeon of Technical Debt, players receive rewards (Treasure cards) upon winning combats. These cards can be kept in hand and equipped to permanently increase player combat Power. This plan establishes the card hand tracking and stats modifier application.</p>
+        <p>In Dungeons and Devs, players receive rewards (Treasure cards) upon winning combats. These cards can be kept in hand and equipped to permanently increase player combat Power. This plan establishes the card hand tracking and stats modifier application.</p>
       </section>
 
       <section data-section id="mentor-synthesis">
@@ -104,8 +104,8 @@
       <section data-section id="green">
         <h2>Green Slice</h2>
         <ol>
-          <li>Add hand and equipment arrays to the <code>dtd_player_t</code> struct in <code>domain/player.h</code>.</li>
-          <li>Implement <code>dtd_player_equip()</code> and <code>dtd_player_get_power()</code>.</li>
+          <li>Add hand and equipment arrays to the <code>dad_player_t</code> struct in <code>domain/player.h</code>.</li>
+          <li>Implement <code>dad_player_equip()</code> and <code>dad_player_get_power()</code>.</li>
           <li>Make the unit test compile and pass.</li>
         </ol>
       </section>
@@ -113,7 +113,7 @@
       <section data-section id="refactor">
         <h2>Refactor Slice</h2>
         <ol>
-          <li>Instead of duplicating card objects, store pointers to constant <code>dtd_card_def_t</code> definitions in the player hands/slots arrays.</li>
+          <li>Instead of duplicating card objects, store pointers to constant <code>dad_card_def_t</code> definitions in the player hands/slots arrays.</li>
           <li>Clamp max hand size and max equipment count using static macros.</li>
         </ol>
       </section>
@@ -134,16 +134,16 @@ typedef struct {
     char name[64];
     int level;
     int base_power_bonus;
-    const dtd_card_def_t *hand[MAX_HAND_CARDS];
+    const dad_card_def_t *hand[MAX_HAND_CARDS];
     int hand_count;
-    const dtd_card_def_t *equipped[MAX_EQUIPPED_CARDS];
+    const dad_card_def_t *equipped[MAX_EQUIPPED_CARDS];
     int equipped_count;
-} dtd_player_t;
+} dad_player_t;
 
-void dtd_player_init(dtd_player_t *player, const char *name, int base_power_bonus);
-bool dtd_player_draw_to_hand(dtd_player_t *player, const dtd_card_def_t *card);
-bool dtd_player_equip_from_hand(dtd_player_t *player, int hand_index);
-int dtd_player_get_power(const dtd_player_t *player);
+void dad_player_init(dad_player_t *player, const char *name, int base_power_bonus);
+bool dad_player_draw_to_hand(dad_player_t *player, const dad_card_def_t *card);
+bool dad_player_equip_from_hand(dad_player_t *player, int hand_index);
+int dad_player_get_power(const dad_player_t *player);
 
 #endif</code></pre>
 
@@ -152,7 +152,7 @@ int dtd_player_get_power(const dtd_player_t *player);
         <pre><code class="language-c">#include "player.h"
 #include &lt;string.h&gt;
 
-void dtd_player_init(dtd_player_t *player, const char *name, int base_power_bonus) {
+void dad_player_init(dad_player_t *player, const char *name, int base_power_bonus) {
     if (!player) return;
     strncpy(player->name, name ? name : "Player", sizeof(player->name) - 1);
     player->level = 1;
@@ -161,17 +161,17 @@ void dtd_player_init(dtd_player_t *player, const char *name, int base_power_bonu
     player->equipped_count = 0;
 }
 
-bool dtd_player_draw_to_hand(dtd_player_t *player, const dtd_card_def_t *card) {
+bool dad_player_draw_to_hand(dad_player_t *player, const dad_card_def_t *card) {
     if (!player || !card || player->hand_count >= MAX_HAND_CARDS) return false;
     player->hand[player->hand_count++] = card;
     return true;
 }
 
-bool dtd_player_equip_from_hand(dtd_player_t *player, int hand_index) {
+bool dad_player_equip_from_hand(dad_player_t *player, int hand_index) {
     if (!player || hand_index &lt; 0 || hand_index >= player->hand_count) return false;
     if (player->equipped_count >= MAX_EQUIPPED_CARDS) return false;
 
-    const dtd_card_def_t *card = player->hand[hand_index];
+    const dad_card_def_t *card = player->hand[hand_index];
     if (card->type != CARD_EQUIPMENT) return false;
 
     // Add to equipped
@@ -185,7 +185,7 @@ bool dtd_player_equip_from_hand(dtd_player_t *player, int hand_index) {
     return true;
 }
 
-int dtd_player_get_power(const dtd_player_t *player) {
+int dad_player_get_power(const dad_player_t *player) {
     if (!player) return 0;
     int power = player->level + player->base_power_bonus;
     for (int i = 0; i &lt; player->equipped_count; i++) {
@@ -201,24 +201,24 @@ int dtd_player_get_power(const dtd_player_t *player) {
 #include &lt;assert.h&gt;
 
 int main(void) {
-    dtd_player_t player;
-    dtd_player_init(&player, "Senior backend devs", 1); // level 1 + base 1 = 2
+    dad_player_t player;
+    dad_player_init(&player, "Senior backend devs", 1); // level 1 + base 1 = 2
 
-    assert(dtd_player_get_power(&player) == 2);
+    assert(dad_player_get_power(&player) == 2);
 
     // Create ThinkPad
-    dtd_card_def_t thinkpad = {"ThinkPad T480", CARD_EQUIPMENT, 0, 2, 1};
+    dad_card_def_t thinkpad = {"ThinkPad T480", CARD_EQUIPMENT, 0, 2, 1};
 
     // Draw and equip
-    assert(dtd_player_draw_to_hand(&player, &thinkpad));
+    assert(dad_player_draw_to_hand(&player, &thinkpad));
     assert(player.hand_count == 1);
     
-    assert(dtd_player_equip_from_hand(&player, 0));
+    assert(dad_player_equip_from_hand(&player, 0));
     assert(player.hand_count == 0);
     assert(player.equipped_count == 1);
 
     // Power should now be level (1) + base (1) + ThinkPad (2) = 4
-    assert(dtd_player_get_power(&player) == 4);
+    assert(dad_player_get_power(&player) == 4);
 
     return 0;
 }</code></pre>
@@ -227,7 +227,7 @@ int main(void) {
       <section data-section id="checks">
         <h2>Review Checks</h2>
         <ul>
-          <li>Verify <code>dtd_player_equip_from_hand</code> shifts array items correctly without leaving duplicate entries at the end.</li>
+          <li>Verify <code>dad_player_equip_from_hand</code> shifts array items correctly without leaving duplicate entries at the end.</li>
           <li>Verify power calculations sum up the correct values.</li>
         </ul>
       </section>

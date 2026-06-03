@@ -114,8 +114,8 @@
       <section data-section id="green">
         <h2>Green Slice</h2>
         <ol>
-          <li>Define <code>dtd_deck_t</code> in <code>domain/deck.h</code> with arrays for draw/discard and trackers.</li>
-          <li>Implement <code>dtd_deck_init()</code>, <code>dtd_deck_shuffle()</code>, <code>dtd_deck_draw()</code>, and <code>dtd_deck_discard()</code>.</li>
+          <li>Define <code>dad_deck_t</code> in <code>domain/deck.h</code> with arrays for draw/discard and trackers.</li>
+          <li>Implement <code>dad_deck_init()</code>, <code>dad_deck_shuffle()</code>, <code>dad_deck_draw()</code>, and <code>dad_deck_discard()</code>.</li>
           <li>Verify CTests pass successfully.</li>
         </ol>
       </section>
@@ -140,17 +140,17 @@
 #define MAX_DECK_CARDS 128
 
 typedef struct {
-    const dtd_card_def_t *draw_pile[MAX_DECK_CARDS];
+    const dad_card_def_t *draw_pile[MAX_DECK_CARDS];
     int draw_count;
-    const dtd_card_def_t *discard_pile[MAX_DECK_CARDS];
+    const dad_card_def_t *discard_pile[MAX_DECK_CARDS];
     int discard_count;
-} dtd_deck_t;
+} dad_deck_t;
 
-void dtd_deck_init(dtd_deck_t *deck);
-void dtd_deck_add_card(dtd_deck_t *deck, const dtd_card_def_t *card);
-void dtd_deck_shuffle(dtd_deck_t *deck, dtd_rng_t *rng);
-const dtd_card_def_t *dtd_deck_draw(dtd_deck_t *deck, dtd_rng_t *rng);
-void dtd_deck_discard(dtd_deck_t *deck, const dtd_card_def_t *card);
+void dad_deck_init(dad_deck_t *deck);
+void dad_deck_add_card(dad_deck_t *deck, const dad_card_def_t *card);
+void dad_deck_shuffle(dad_deck_t *deck, dad_rng_t *rng);
+const dad_card_def_t *dad_deck_draw(dad_deck_t *deck, dad_rng_t *rng);
+void dad_deck_discard(dad_deck_t *deck, const dad_card_def_t *card);
 
 #endif</code></pre>
 
@@ -159,30 +159,30 @@ void dtd_deck_discard(dtd_deck_t *deck, const dtd_card_def_t *card);
         <pre><code class="language-c">#include "deck.h"
 #include &lt;string.h&gt;
 
-void dtd_deck_init(dtd_deck_t *deck) {
+void dad_deck_init(dad_deck_t *deck) {
     if (deck) {
         deck->draw_count = 0;
         deck->discard_count = 0;
     }
 }
 
-void dtd_deck_add_card(dtd_deck_t *deck, const dtd_card_def_t *card) {
+void dad_deck_add_card(dad_deck_t *deck, const dad_card_def_t *card) {
     if (deck && card && deck->draw_count &lt; MAX_DECK_CARDS) {
         deck->draw_pile[deck->draw_count++] = card;
     }
 }
 
-void dtd_deck_shuffle(dtd_deck_t *deck, dtd_rng_t *rng) {
+void dad_deck_shuffle(dad_deck_t *deck, dad_rng_t *rng) {
     if (!deck || !rng || deck->draw_count &lt;= 1) return;
     for (int i = deck->draw_count - 1; i &gt; 0; i--) {
-        uint32_t j = dtd_rng_range(rng, 0, i);
-        const dtd_card_def_t *temp = deck->draw_pile[i];
+        uint32_t j = dad_rng_range(rng, 0, i);
+        const dad_card_def_t *temp = deck->draw_pile[i];
         deck->draw_pile[i] = deck->draw_pile[j];
         deck->draw_pile[j] = temp;
     }
 }
 
-const dtd_card_def_t *dtd_deck_draw(dtd_deck_t *deck, dtd_rng_t *rng) {
+const dad_card_def_t *dad_deck_draw(dad_deck_t *deck, dad_rng_t *rng) {
     if (!deck) return NULL;
     if (deck->draw_count == 0) {
         if (deck->discard_count == 0) {
@@ -194,12 +194,12 @@ const dtd_card_def_t *dtd_deck_draw(dtd_deck_t *deck, dtd_rng_t *rng) {
         }
         deck->draw_count = deck->discard_count;
         deck->discard_count = 0;
-        dtd_deck_shuffle(deck, rng);
+        dad_deck_shuffle(deck, rng);
     }
     return deck->draw_pile[--deck->draw_count];
 }
 
-void dtd_deck_discard(dtd_deck_t *deck, const dtd_card_def_t *card) {
+void dad_deck_discard(dad_deck_t *deck, const dad_card_def_t *card) {
     if (deck && card && deck->discard_count &lt; MAX_DECK_CARDS) {
         deck->discard_pile[deck->discard_count++] = card;
     }
@@ -214,29 +214,29 @@ void dtd_deck_discard(dtd_deck_t *deck, const dtd_card_def_t *card) {
 #include &lt;string.h&gt;
 
 int main(void) {
-    dtd_card_def_t card1 = {"Encounter A", CARD_MONSTER, 5, 0, 1};
-    dtd_card_def_t card2 = {"Encounter B", CARD_CURSE, 0, 0, 1};
+    dad_card_def_t card1 = {"Encounter A", CARD_MONSTER, 5, 0, 1};
+    dad_card_def_t card2 = {"Encounter B", CARD_CURSE, 0, 0, 1};
 
-    dtd_deck_t deck;
-    dtd_deck_init(&deck);
-    dtd_deck_add_card(&deck, &card1);
-    dtd_deck_add_card(&deck, &card2);
+    dad_deck_t deck;
+    dad_deck_init(&deck);
+    dad_deck_add_card(&deck, &card1);
+    dad_deck_add_card(&deck, &card2);
 
-    dtd_rng_t rng;
-    dtd_rng_init(&rng, 123);
+    dad_rng_t rng;
+    dad_rng_init(&rng, 123);
 
-    dtd_deck_shuffle(&deck, &rng);
+    dad_deck_shuffle(&deck, &rng);
 
-    const dtd_card_def_t *first = dtd_deck_draw(&deck, &rng);
-    const dtd_card_def_t *second = dtd_deck_draw(&deck, &rng);
+    const dad_card_def_t *first = dad_deck_draw(&deck, &rng);
+    const dad_card_def_t *second = dad_deck_draw(&deck, &rng);
 
     assert(first != NULL);
     assert(second != NULL);
     assert(strcmp(first->name, second->name) != 0);
 
     // Test reshuffle
-    dtd_deck_discard(&deck, first);
-    const dtd_card_def_t *third = dtd_deck_draw(&deck, &rng);
+    dad_deck_discard(&deck, first);
+    const dad_card_def_t *third = dad_deck_draw(&deck, &rng);
     assert(third != NULL);
     assert(strcmp(third->name, first->name) == 0);
 

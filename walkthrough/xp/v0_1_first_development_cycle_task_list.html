@@ -157,7 +157,7 @@
           <p class="tags">Status: Planned. Source: R0, A1, SP0, DEV1. Boundaries touched by human implementation: root build files and protected source targets. Human implementation plan: <a href="t02_layered_build_skeleton_plan.html">t02_layered_build_skeleton_plan.html</a>.</p>
           <ul>
             <li>Red: add a minimal CTest smoke test and a dependency review expectation that domain links only the C standard library.</li>
-            <li>Green: create the smallest CMake/Make shape for <code>dtd_domain</code>, <code>dtd_application</code>, <code>dtd_infrastructure_db</code>, <code>dtd_client_ncurses</code>, and tests.</li>
+            <li>Green: create the smallest CMake/Make shape for <code>dad_domain</code>, <code>dad_application</code>, <code>dad_infrastructure_db</code>, <code>dad_client_ncurses</code>, and tests.</li>
             <li>Refactor: remove any accidental all-in-one target dependency that hides <code>libpq</code> or NCurses linkage.</li>
             <li>Gate: <code>make build</code> and <code>make test</code> pass without PostgreSQL service or interactive NCurses.</li>
           </ul>

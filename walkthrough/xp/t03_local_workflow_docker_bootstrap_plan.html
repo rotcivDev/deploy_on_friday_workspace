@@ -142,9 +142,9 @@ services:
   db:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: dtd_db
-      POSTGRES_USER: dtd_user
-      POSTGRES_PASSWORD: dtd_password
+      POSTGRES_DB: dad_db
+      POSTGRES_USER: dad_user
+      POSTGRES_PASSWORD: dad_password
     ports:
       - "5432:5432"
     volumes:
@@ -157,9 +157,9 @@ services:
     environment:
       - PGHOST=db
       - PGPORT=5432
-      - PGDATABASE=dtd_db
-      - PGUSER=dtd_user
-      - PGPASSWORD=dtd_password
+      - PGDATABASE=dad_db
+      - PGUSER=dad_user
+      - PGPASSWORD=dad_password
     depends_on:
       - db
     volumes:
@@ -189,7 +189,7 @@ WORKDIR /workspace</code></pre>
         <pre><code class="language-makefile">.PHONY: configure build test clean db-up db-down db-seed db-validate test-db simulate run
 
 BUILD_DIR := build
-DB_URL := postgresql://dtd_user:dtd_password@localhost:5432/dtd_db
+DB_URL := postgresql://dad_user:dad_password@localhost:5432/dad_db
 
 configure:
 	cmake -S . -B $(BUILD_DIR)
@@ -208,9 +208,9 @@ db-down:
 
 db-seed: db-up
 	@echo "Seeding database..."
-	PGPASSWORD=dtd_password psql -h localhost -U dtd_user -d dtd_db -f walkthrough/database/01_schema.sql
-	PGPASSWORD=dtd_password psql -h localhost -U dtd_user -d dtd_db -f walkthrough/database/02_seed_core_data.sql
-	PGPASSWORD=dtd_password psql -h localhost -U dtd_user -d dtd_db -f walkthrough/database/03_seed_cards.sql
+	PGPASSWORD=dad_password psql -h localhost -U dad_user -d dad_db -f walkthrough/database/01_schema.sql
+	PGPASSWORD=dad_password psql -h localhost -U dad_user -d dad_db -f walkthrough/database/02_seed_core_data.sql
+	PGPASSWORD=dad_password psql -h localhost -U dad_user -d dad_db -f walkthrough/database/03_seed_cards.sql
 
 db-validate: db-up
 	@echo "Validating seeded content integrity..."
@@ -221,10 +221,10 @@ test-db: build db-up
 	ctest --test-dir $(BUILD_DIR) -R "db|integration" --output-on-failure
 
 simulate: build
-	./$(BUILD_DIR)/dtd_client_ncurses --simulate
+	./$(BUILD_DIR)/dad_client_ncurses --simulate
 
 run: build
-	./$(BUILD_DIR)/dtd_client_ncurses
+	./$(BUILD_DIR)/dad_client_ncurses
 
 clean:
 	cmake -E rm -rf $(BUILD_DIR)</code></pre>

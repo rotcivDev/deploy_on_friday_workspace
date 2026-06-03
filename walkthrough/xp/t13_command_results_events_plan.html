@@ -114,7 +114,7 @@
       <section data-section id="green">
         <h2>Green Slice</h2>
         <ol>
-          <li>Define <code>dtd_event_type_t</code>, <code>dtd_event_t</code>, and <code>dtd_command_result_t</code> in <code>application/command_result.h</code>.</li>
+          <li>Define <code>dad_event_type_t</code>, <code>dad_event_t</code>, and <code>dad_command_result_t</code> in <code>application/command_result.h</code>.</li>
           <li>Implement allocation and destruction helpers in <code>application/command_result.c</code>.</li>
           <li>Verify CTests pass cleanly.</li>
         </ol>
@@ -142,7 +142,7 @@ typedef enum {
     CMD_INVALID_ACTION,
     CMD_NOT_FOUND,
     CMD_ERROR
-} dtd_command_status_t;
+} dad_command_status_t;
 
 typedef enum {
     EV_MATCH_STARTED,
@@ -153,25 +153,25 @@ typedef enum {
     EV_CURSE_APPLIED,
     EV_LEVEL_CHANGED,
     EV_TURN_ENDED
-} dtd_event_type_t;
+} dad_event_type_t;
 
 typedef struct {
-    dtd_event_type_t type;
+    dad_event_type_t type;
     char message[128];
     int player_index;
-} dtd_event_t;
+} dad_event_t;
 
 #define MAX_COMMAND_EVENTS 16
 
 typedef struct {
-    dtd_command_status_t status;
+    dad_command_status_t status;
     char error_message[128];
-    dtd_event_t events[MAX_COMMAND_EVENTS];
+    dad_event_t events[MAX_COMMAND_EVENTS];
     int event_count;
-} dtd_command_result_t;
+} dad_command_result_t;
 
-void dtd_result_init(dtd_command_result_t *res, dtd_command_status_t status);
-bool dtd_result_add_event(dtd_command_result_t *res, dtd_event_type_t type, const char *msg, int player_index);
+void dad_result_init(dad_command_result_t *res, dad_command_status_t status);
+bool dad_result_add_event(dad_command_result_t *res, dad_event_type_t type, const char *msg, int player_index);
 
 #endif</code></pre>
 
@@ -180,16 +180,16 @@ bool dtd_result_add_event(dtd_command_result_t *res, dtd_event_type_t type, cons
         <pre><code class="language-c">#include "command_result.h"
 #include &lt;string.h&gt;
 
-void dtd_result_init(dtd_command_result_t *res, dtd_command_status_t status) {
+void dad_result_init(dad_command_result_t *res, dad_command_status_t status) {
     if (!res) return;
     res->status = status;
     res->error_message[0] = '\0';
     res->event_count = 0;
 }
 
-bool dtd_result_add_event(dtd_command_result_t *res, dtd_event_type_t type, const char *msg, int player_index) {
+bool dad_result_add_event(dad_command_result_t *res, dad_event_type_t type, const char *msg, int player_index) {
     if (!res || res->event_count >= MAX_COMMAND_EVENTS) return false;
-    dtd_event_t *ev = &res->events[res->event_count++];
+    dad_event_t *ev = &res->events[res->event_count++];
     ev->type = type;
     ev->player_index = player_index;
     strncpy(ev->message, msg ? msg : "", sizeof(ev->message) - 1);
@@ -204,13 +204,13 @@ bool dtd_result_add_event(dtd_command_result_t *res, dtd_event_type_t type, cons
 #include &lt;string.h&gt;
 
 int main(void) {
-    dtd_command_result_t result;
-    dtd_result_init(&result, CMD_OK);
+    dad_command_result_t result;
+    dad_result_init(&result, CMD_OK);
 
     assert(result.status == CMD_OK);
     assert(result.event_count == 0);
 
-    bool ok = dtd_result_add_event(&result, EV_LEVEL_CHANGED, "Senior backend dev gained Level 2", 0);
+    bool ok = dad_result_add_event(&result, EV_LEVEL_CHANGED, "Senior backend dev gained Level 2", 0);
     assert(ok);
     assert(result.event_count == 1);
     assert(result.events[0].type == EV_LEVEL_CHANGED);

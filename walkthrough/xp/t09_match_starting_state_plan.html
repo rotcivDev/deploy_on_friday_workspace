@@ -66,7 +66,7 @@
       <section data-section id="intent">
         <h2>Intent</h2>
         <div class="callout">
-          <strong>Goal:</strong> Implement the <code>dtd_match_t</code> game state structure and initialization rules. Define how the game sets up the Encounter and Treasure decks, instantiates the player array, and seeds the game's deterministic RNG.
+          <strong>Goal:</strong> Implement the <code>dad_match_t</code> game state structure and initialization rules. Define how the game sets up the Encounter and Treasure decks, instantiates the player array, and seeds the game's deterministic RNG.
         </div>
         <p>A multiplayer game needs a unified match state struct. This match state holds the player list, active cards, current phase (e.g. Draw Phase, Play Phase, Combat Phase), current player index, and the match random state, making the complete system state easy to test, serialize, and verify.</p>
       </section>
@@ -76,7 +76,7 @@
         <table>
           <thead><tr><th>Mentor</th><th>Contribution To T09</th><th>Non-Negotiable</th></tr></thead>
           <tbody>
-            <tr><td>Lead Architect</td><td>Define standard C17 structs representing match state. Keep it decoupled from PostgreSQL and NCurses.</td><td>Match setup logic must accept a plain <code>dtd_content_definitions_t</code> content configuration structure.</td></tr>
+            <tr><td>Lead Architect</td><td>Define standard C17 structs representing match state. Keep it decoupled from PostgreSQL and NCurses.</td><td>Match setup logic must accept a plain <code>dad_content_definitions_t</code> content configuration structure.</td></tr>
             <tr><td>Game Designer</td><td>Specify starting conditions: 3 players starting at level 1, influence 0, no items, and 2 starting Treasure rewards.</td><td>Players must begin at Level 1 and have no starting equipment active.</td></tr>
             <tr><td>Systems Programmer</td><td>Initialize decks using Knuth shuffle with the supplied seed.</td><td>Ensure pointers, sizes, and memory pools are cleanly zeroed out.</td></tr>
           </tbody>
@@ -104,8 +104,8 @@
       <section data-section id="green">
         <h2>Green Slice</h2>
         <ol>
-          <li>Define <code>dtd_match_phase_t</code> enum and <code>dtd_match_t</code> struct in <code>domain/match.h</code>.</li>
-          <li>Implement <code>dtd_match_create()</code> in <code>domain/match.c</code>.</li>
+          <li>Define <code>dad_match_phase_t</code> enum and <code>dad_match_t</code> struct in <code>domain/match.h</code>.</li>
+          <li>Implement <code>dad_match_create()</code> in <code>domain/match.c</code>.</li>
           <li>Ensure starting hands are drawn correctly for each player.</li>
           <li>Verify CTests pass.</li>
         </ol>
@@ -136,23 +136,23 @@ typedef enum {
     PHASE_LOBBY_PLAY,
     PHASE_END_TURN,
     PHASE_MATCH_OVER
-} dtd_match_phase_t;
+} dad_match_phase_t;
 
 #define MAX_PLAYERS 4
 
 typedef struct {
-    dtd_player_t players[MAX_PLAYERS];
+    dad_player_t players[MAX_PLAYERS];
     int player_count;
     int current_player_index;
-    dtd_deck_t encounter_deck;
-    dtd_deck_t treasure_deck;
-    dtd_rng_t rng;
+    dad_deck_t encounter_deck;
+    dad_deck_t treasure_deck;
+    dad_rng_t rng;
     uint64_t seed;
-    dtd_match_phase_t phase;
-    const dtd_card_def_t *active_encounter;
-} dtd_match_t;
+    dad_match_phase_t phase;
+    const dad_card_def_t *active_encounter;
+} dad_match_t;
 
-bool dtd_match_create(dtd_match_t *match, const dtd_content_definitions_t *content, uint64_t seed, int player_count, const int class_ids[MAX_PLAYERS]);
+bool dad_match_create(dad_match_t *match, const dad_content_definitions_t *content, uint64_t seed, int player_count, const int class_ids[MAX_PLAYERS]);
 
 #endif</code></pre>
 
@@ -161,11 +161,11 @@ bool dtd_match_create(dtd_match_t *match, const dtd_content_definitions_t *conte
         <pre><code class="language-c">#include "match.h"
 #include &lt;string.h&gt;
 
-bool dtd_match_create(dtd_match_t *match, const dtd_content_definitions_t *content, uint64_t seed, int player_count, const int class_ids[MAX_PLAYERS]) {
+bool dad_match_create(dad_match_t *match, const dad_content_definitions_t *content, uint64_t seed, int player_count, const int class_ids[MAX_PLAYERS]) {
     if (!match || !content || player_count &lt; 1 || player_count &gt; MAX_PLAYERS) return false;
 
     // Validate loaded content definitions
-    if (!dtd_validate_content(content)) return false;
+    if (!dad_validate_content(content)) return false;
 
     match->player_count = player_count;
     match->current_player_index = 0;
@@ -173,27 +173,27 @@ bool dtd_match_create(dtd_match_t *match, const dtd_content_definitions_t *conte
     match->phase = PHASE_START_TURN;
     match->active_encounter = NULL;
 
-    dtd_rng_init(&match->rng, seed);
-    dtd_deck_init(&match->encounter_deck);
-    dtd_deck_init(&match->treasure_deck);
+    dad_rng_init(&match->rng, seed);
+    dad_deck_init(&match->encounter_deck);
+    dad_deck_init(&match->treasure_deck);
 
     // Load Decks from content definitions
     for (int i = 0; i &lt; content->card_count; i++) {
-        const dtd_card_def_t *card = &content->cards[i];
+        const dad_card_def_t *card = &content->cards[i];
         if (card->type == CARD_MONSTER || card->type == CARD_CURSE || card->type == CARD_AI) {
             for (int k = 0; k &lt; card->quantity; k++) {
-                dtd_deck_add_card(&match->encounter_deck, card);
+                dad_deck_add_card(&match->encounter_deck, card);
             }
         } else if (card->type == CARD_EQUIPMENT || card->type == CARD_TREASURE) {
             for (int k = 0; k &lt; card->quantity; k++) {
-                dtd_deck_add_card(&match->treasure_deck, card);
+                dad_deck_add_card(&match->treasure_deck, card);
             }
         }
     }
 
     // Shuffle Decks
-    dtd_deck_shuffle(&match->encounter_deck, &match->rng);
-    dtd_deck_shuffle(&match->treasure_deck, &match->rng);
+    dad_deck_shuffle(&match->encounter_deck, &match->rng);
+    dad_deck_shuffle(&match->treasure_deck, &match->rng);
 
     // Initialize players and draw 2 starting treasure cards to hands
     for (int i = 0; i &lt; player_count; i++) {
@@ -208,13 +208,13 @@ bool dtd_match_create(dtd_match_t *match, const dtd_content_definitions_t *conte
             }
         }
 
-        dtd_player_init(&match->players[i], class_name, base_power);
+        dad_player_init(&match->players[i], class_name, base_power);
 
         // Draw 2 starting treasure cards
         for (int d = 0; d &lt; 2; d++) {
-            const dtd_card_def_t *treasure = dtd_deck_draw(&match->treasure_deck, &match->rng);
+            const dad_card_def_t *treasure = dad_deck_draw(&match->treasure_deck, &match->rng);
             if (treasure) {
-                dtd_player_draw_to_hand(&match->players[i], treasure);
+                dad_player_draw_to_hand(&match->players[i], treasure);
             }
         }
     }
@@ -229,27 +229,27 @@ bool dtd_match_create(dtd_match_t *match, const dtd_content_definitions_t *conte
 
 int main(void) {
     // Setup fake content
-    dtd_class_def_t test_classes[6] = {
+    dad_class_def_t test_classes[6] = {
         {1, "Backend Developer", 1},
         {2, "Frontend Developer", 0},
         {3, "DevOps", 0}, {4, "QA", 0}, {5, "Sec", 0}, {6, "AI", 0}
     };
-    dtd_card_def_t test_cards[4] = {
+    dad_card_def_t test_cards[4] = {
         {"Monster A", CARD_MONSTER, 5, 0, 5},
         {"Equip A", CARD_EQUIPMENT, 0, 2, 5},
         {"Curse A", CARD_CURSE, 0, 0, 5},
         {"AI A", CARD_AI, 2, 0, 5}
     };
-    dtd_content_definitions_t content = {
+    dad_content_definitions_t content = {
         .classes = test_classes,
         .class_count = 6,
         .cards = test_cards,
         .card_count = 4
     };
 
-    dtd_match_t match;
+    dad_match_t match;
     int class_selections[3] = {1, 2, 3};
-    bool ok = dtd_match_create(&match, &content, 42, 3, class_selections);
+    bool ok = dad_match_create(&match, &content, 42, 3, class_selections);
     assert(ok);
 
     assert(match.player_count == 3);
@@ -258,7 +258,7 @@ int main(void) {
 
     // Verify Backend Dev has base power bonus 1, level 1, total power = 2 (no items equipped yet)
     assert(match.players[0].level == 1);
-    assert(dtd_player_get_power(&match.players[0]) == 2);
+    assert(dad_player_get_power(&match.players[0]) == 2);
 
     // Verify starting hands have 2 cards
     assert(match.players[0].hand_count == 2);

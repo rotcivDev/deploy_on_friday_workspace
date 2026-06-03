@@ -125,7 +125,7 @@
         <h2>Green Slice</h2>
         <ol>
           <li>Update <code>client/main.c</code> to implement the interactive loop.</li>
-          <li>Handle bot turns by triggering <code>dtd_bot_evaluate()</code> when `current_player_index` refers to a bot.</li>
+          <li>Handle bot turns by triggering <code>dad_bot_evaluate()</code> when `current_player_index` refers to a bot.</li>
           <li>Include short delay timers (e.g. <code>usleep</code>) between bot steps to make actions readable.</li>
           <li>Verify manual playtest runs successfully from start to finish.</li>
         </ol>
@@ -149,73 +149,73 @@
 
 int main(void) {
     // Stub databases
-    dtd_class_def_t test_classes[6] = {
+    dad_class_def_t test_classes[6] = {
         {1, "Backend Dev", 1}, {2, "Frontend Dev", 0}, {3, "DevOps", 0},
         {4, "QA", 0}, {5, "Security", 0}, {6, "AI", 0}
     };
-    dtd_card_def_t test_cards[4] = {
+    dad_card_def_t test_cards[4] = {
         {"Spooky Monster", CARD_MONSTER, 4, 0, 10},
         {"CI Curse", CARD_CURSE, 0, 0, 5},
         {"ThinkPad", CARD_EQUIPMENT, 0, 2, 10},
         {"Skill Book", CARD_TREASURE, 0, 1, 10}
     };
-    dtd_content_definitions_t content = {
+    dad_content_definitions_t content = {
         .classes = test_classes,
         .class_count = 6,
         .cards = test_cards,
         .card_count = 4
     };
 
-    dtd_game_service_t svc;
-    dtd_service_init(&svc);
+    dad_game_service_t svc;
+    dad_service_init(&svc);
 
     // Human player index: 0. Bots indices: 1, 2.
-    dtd_command_t start_cmd = {CMD_START_MATCH, 0, 0};
-    dtd_service_execute(&svc, &start_cmd, &content);
+    dad_command_t start_cmd = {CMD_START_MATCH, 0, 0};
+    dad_service_execute(&svc, &start_cmd, &content);
 
-    dtd_ui_init();
+    dad_ui_init();
 
     bool running = true;
     while (running &amp;&amp; svc.match_active &amp;&amp; svc.match.phase != PHASE_MATCH_OVER) {
-        dtd_match_snapshot_t snap;
-        dtd_match_get_snapshot(&svc.match, &snap);
+        dad_match_snapshot_t snap;
+        dad_match_get_snapshot(&svc.match, &snap);
 
-        dtd_ui_render(&snap);
+        dad_ui_render(&snap);
 
         int active = snap.current_player_index;
 
         if (active == 0) {
             // Human player turn: process inputs
-            int ch = dtd_ui_get_input();
-            dtd_command_t cmd = {0};
+            int ch = dad_ui_get_input();
+            dad_command_t cmd = {0};
             cmd.player_index = 0;
 
             if (ch == 'q') {
                 running = false;
             } else if (ch == 'k') {
                 cmd.type = CMD_KICK_BACKLOG;
-                dtd_service_execute(&svc, &cmd, &content);
+                dad_service_execute(&svc, &cmd, &content);
             } else if (ch == 'r') {
                 cmd.type = CMD_RESOLVE_ENCOUNTER;
-                dtd_service_execute(&svc, &cmd, &content);
+                dad_service_execute(&svc, &cmd, &content);
             } else if (ch &gt;= '1' &amp;&amp; ch &lt;= '9') {
                 cmd.type = CMD_EQUIP_CARD;
                 cmd.hand_index = ch - '1';
-                dtd_service_execute(&svc, &cmd, &content);
+                dad_service_execute(&svc, &cmd, &content);
             } else if (ch == 'e') {
                 cmd.type = CMD_END_TURN;
-                dtd_service_execute(&svc, &cmd, &content);
+                dad_service_execute(&svc, &cmd, &content);
             }
         } else {
             // Bot player turn: simulate and log
             usleep(800000); // 800ms sleep so action is visible
-            dtd_command_t cmd = dtd_bot_evaluate(&svc.match, active, BOT_LEGACY_MAINTAINER);
-            dtd_service_execute(&svc, &cmd, &content);
+            dad_command_t cmd = dad_bot_evaluate(&svc.match, active, BOT_LEGACY_MAINTAINER);
+            dad_service_execute(&svc, &cmd, &content);
         }
     }
 
-    dtd_ui_shutdown();
-    printf("Game Over! Thanks for playing Dungeon of Technical Debt.\n");
+    dad_ui_shutdown();
+    printf("Game Over! Thanks for playing Dungeons and Devs.\n");
     return 0;
 }</code></pre>
       </section>
