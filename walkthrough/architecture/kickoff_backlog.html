@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kickoff Raw Backlog: v0.1 Root Prototype</title><style>
+:root{--bg:#f7f8fb;--panel:#fff;--ink:#17202a;--muted:#637083;--line:#d8dee9;--accent:#0f766e;--accent2:#b45309;--codebg:#101828;--codeink:#e5edf8}*{box-sizing:border-box}body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;color:var(--ink);background:var(--bg)}.page-shell{display:grid;grid-template-columns:minmax(220px,280px) minmax(0,1fr);min-height:100vh}aside{position:sticky;top:0;height:100vh;overflow:auto;padding:24px 18px;border-right:1px solid var(--line);background:#eef2f7}main{padding:32px min(5vw,64px) 72px}article{max-width:1120px;margin:0 auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:clamp(24px,4vw,48px);box-shadow:0 8px 24px rgba(15,23,42,.05)}h1,h2,h3,h4{line-height:1.2;margin:1.4em 0 .55em;letter-spacing:0}h1{margin-top:0;font-size:clamp(2rem,4vw,3rem)}h2{border-top:1px solid var(--line);padding-top:1.1em;font-size:1.55rem}h3{font-size:1.2rem;color:#143a36}a{color:var(--accent)}p,ul,ol,table,pre{margin:.85em 0}ul,ol{padding-left:1.4rem}li{margin:.25em 0}code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;background:#edf2f7;border:1px solid #d9e2ec;border-radius:4px;padding:.05em .3em}pre{overflow-x:auto;background:var(--codebg);color:var(--codeink);padding:16px;border-radius:8px;border:1px solid #1f2937}pre code{background:transparent;border:0;color:inherit;padding:0}table{width:100%;border-collapse:collapse;display:block;overflow-x:auto}th,td{border:1px solid var(--line);padding:8px 10px;vertical-align:top}th{background:#ecfdf5;text-align:left}blockquote{border-left:4px solid var(--accent2);margin:1em 0;padding:.25em 1em;background:#fff7ed;color:#4a2f12}hr{border:0;border-top:1px solid var(--line);margin:2rem 0}.toolbar{display:grid;gap:10px;margin-bottom:18px}.toolbar input,.toolbar button{width:100%;border:1px solid var(--line);border-radius:6px;padding:9px 10px;font:inherit;background:white}.toolbar button{cursor:pointer;color:white;background:var(--accent);border-color:var(--accent)}.toc a{display:block;padding:6px 0;color:#334155;text-decoration:none;font-size:.92rem}.meta{color:var(--muted);font-size:.95rem;margin-top:-.5rem}.section-hidden{display:none}li.done{opacity:.62;text-decoration:line-through}@media(max-width:860px){.page-shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}article{padding:22px}}
+</style></head>
+<body><div class="page-shell"><aside><a href="../index.html">Walkthrough Index</a><div class="toolbar"><input data-search type="search" placeholder="Filter sections"><button data-toggle-sections type="button">Collapse Sections</button></div><nav class="toc"><a style="padding-left:0px" href="#kickoff-raw-backlog-v0-1-root-prototype">Kickoff Raw Backlog: v0.1 Root Prototype</a>
+<a style="padding-left:10px" href="#epic-list">📋 Epic List</a>
+<a style="padding-left:10px" href="#first-refinement-pass-playable-v0-1-slice">First Refinement Pass: Playable v0.1 Slice</a>
+<a style="padding-left:20px" href="#product-owner-update-devops-refinement-integration">Product Owner Update: DevOps Refinement Integration</a>
+<a style="padding-left:20px" href="#product-owner-review-docker-first-dependency-isolation">Product Owner Review: Docker-First Dependency Isolation</a>
+<a style="padding-left:20px" href="#product-owner-review-cross-specialist-source-of-truth-alignment">Product Owner Review: Cross-Specialist Source-of-Truth Alignment</a>
+<a style="padding-left:20px" href="#product-owner-html-compilation-inputs">Product Owner HTML Compilation Inputs</a>
+<a style="padding-left:20px" href="#v0-1-design-constraints">v0.1 Design Constraints</a>
+<a style="padding-left:20px" href="#suggested-build-order">Suggested Build Order</a>
+<a style="padding-left:20px" href="#refined-mvp-stories">Refined MVP Stories</a>
+<a style="padding-left:20px" href="#deferred-from-first-refinement">Deferred From First Refinement</a>
+<a style="padding-left:10px" href="#architecture-refinement-pass-clean-v0-1-boundaries">Architecture Refinement Pass: Clean v0.1 Boundaries</a>
+<a style="padding-left:20px" href="#dependency-rule-for-v0-1">Dependency Rule For v0.1</a>
+<a style="padding-left:20px" href="#architectural-guardrails">Architectural Guardrails</a>
+<a style="padding-left:20px" href="#refined-architecture-stories">Refined Architecture Stories</a>
+<a style="padding-left:20px" href="#architecture-deferred-from-v0-1">Architecture Deferred From v0.1</a>
+<a style="padding-left:10px" href="#epic-1-project-scaffolding-cmake-build">🛠️ Epic 1: Project Scaffolding &amp;amp; CMake Build</a>
+<a style="padding-left:20px" href="#user-story">User Story</a>
+<a style="padding-left:20px" href="#acceptance-criteria">Acceptance Criteria</a>
+<a style="padding-left:20px" href="#implementation-notes">Implementation Notes</a>
+<a style="padding-left:10px" href="#epic-2-clean-architecture-postgresql-repository">🗄️ Epic 2: Clean Architecture PostgreSQL Repository</a>
+<a style="padding-left:20px" href="#user-story-2">User Story</a>
+<a style="padding-left:20px" href="#acceptance-criteria-2">Acceptance Criteria</a>
+<a style="padding-left:20px" href="#implementation-notes-2">Implementation Notes</a>
+<a style="padding-left:10px" href="#epic-3-in-memory-card-deck-engine">🎴 Epic 3: In-Memory Card &amp;amp; Deck Engine</a>
+<a style="padding-left:20px" href="#user-story-3">User Story</a>
+<a style="padding-left:20px" href="#acceptance-criteria-3">Acceptance Criteria</a>
+<a style="padding-left:20px" href="#implementation-notes-3">Implementation Notes</a>
+<a style="padding-left:10px" href="#epic-4-turn-loop-stats-engine">🔄 Epic 4: Turn Loop &amp;amp; Stats Engine</a>
+<a style="padding-left:20px" href="#user-story-4">User Story</a>
+<a style="padding-left:20px" href="#acceptance-criteria-4">Acceptance Criteria</a>
+<a style="padding-left:20px" href="#implementation-notes-4">Implementation Notes</a>
+<a style="padding-left:10px" href="#epic-5-automated-mock-opponent-bots">🤖 Epic 5: Automated Mock Opponent Bots</a>
+<a style="padding-left:20px" href="#user-story-5">User Story</a>
+<a style="padding-left:20px" href="#acceptance-criteria-5">Acceptance Criteria</a>
+<a style="padding-left:20px" href="#implementation-notes-5">Implementation Notes</a>
+<a style="padding-left:10px" href="#epic-6-ncurses-multi-panel-cli-layout">📺 Epic 6: NCurses Multi-Panel CLI Layout</a>
+<a style="padding-left:20px" href="#user-story-6">User Story</a>
+<a style="padding-left:20px" href="#acceptance-criteria-6">Acceptance Criteria</a>
+<a style="padding-left:20px" href="#implementation-notes-6">Implementation Notes</a>
+<a style="padding-left:10px" href="#epic-7-local-devops-release-readiness">⚙️ Epic 7: Local DevOps &amp;amp; Release Readiness</a>
+<a style="padding-left:20px" href="#user-story-7">User Story</a>
+<a style="padding-left:20px" href="#acceptance-criteria-7">Acceptance Criteria</a>
+<a style="padding-left:20px" href="#implementation-notes-7">Implementation Notes</a></nav></aside><main><article><p class="meta">Self-contained HTML walkthrough. Use the filter and click checklist items during review.</p>
+<section data-section id="section-kickoff-raw-backlog-v0-1-root-prototype">
+<h1 id="kickoff-raw-backlog-v0-1-root-prototype">Kickoff Raw Backlog: v0.1 Root Prototype</h1>
+<p>This document defines the raw product backlog for the <strong>v0.1 Root Prototype</strong> of <strong>Dungeon of Technical Debt</strong> (Dungeons and Devs). It breaks down the requirements for creating a local, playable prototype running with an NCurses terminal interface, mock opponent bots, and PostgreSQL data integration.</p>
+<hr>
+</section>
+<section data-section id="section-epic-list">
+<h2 id="epic-list">📋 Epic List</h2>
+<ul>
+<li><strong>Epic 1: Project Scaffolding &amp; CMake Build</strong></li>
+<li><strong>Epic 2: Clean Architecture PostgreSQL Repository</strong></li>
+<li><strong>Epic 3: In-Memory Card &amp; Deck Engine</strong></li>
+<li><strong>Epic 4: Turn Loop &amp; Stats Engine</strong></li>
+<li><strong>Epic 5: Automated Mock Opponent Bots</strong></li>
+<li><strong>Epic 6: NCurses Multi-Panel CLI Layout</strong></li>
+<li><strong>Epic 7: Local DevOps &amp; Release Readiness</strong></li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-first-refinement-pass-playable-v0-1-slice">
+<h2 id="first-refinement-pass-playable-v0-1-slice">First Refinement Pass: Playable v0.1 Slice</h2>
+<p>The first implementation slice should prove the game loop before expanding the full card catalog, networking, accounts, or persistent match history. The v0.1 prototype is successful when one local human player and two deterministic mock bots can play a complete terminal match from Level 1 to Level 10 using seeded database cards, a shuffled in-memory deck, visible turn logs, simple help/sabotage interactions, and a reproducible local build/test/seed/run workflow.</p>
+<section data-section id="section-product-owner-update-devops-refinement-integration">
+<h3 id="product-owner-update-devops-refinement-integration">Product Owner Update: DevOps Refinement Integration</h3>
+<p>This backlog now incorporates <a href="../devops/devops_refinement_guide.html">devops_refinement_guide.html</a> as a delivery-readiness constraint. DevOps work should not replace playable value, but v0.1 is not release-ready unless a developer can reproduce the local environment, validate seed content, run fast tests, run optional database tests, capture a fixed-seed simulation transcript, and complete a manual NCurses playtest checklist.</p>
+<section data-section id="section-product-owner-review-docker-first-dependency-isolation">
+<h3 id="product-owner-review-docker-first-dependency-isolation">Product Owner Review: Docker-First Dependency Isolation</h3>
+<p>After the updated DevOps recommendation, the v0.1 backlog should treat Docker/Compose as the recommended first-time development path for dependency isolation. The product intent is not to introduce production deployment early; it is to reduce setup friction and make the C17 toolchain, PostgreSQL, <code>libpq</code>, NCurses headers, CMake, and CTest repeatable across machines.</p>
+<p>Product decision: Docker/Compose is now part of the v0.1 delivery-readiness baseline, but host-native development remains supported as a secondary path for debugging, terminal behavior, and learning. Containerization must not collapse Clean Architecture test boundaries or turn v0.1 into a cloud/runtime orchestration project.</p>
+<ul>
+<li><strong>Recommended default</strong>: first-time contributors use Docker/Compose for build, fast tests, DB seed validation, DB adapter tests, and fixed-seed simulation.</li>
+<li><strong>Secondary path</strong>: host-native Make/CMake remains documented for developers who want direct toolchain learning or need better NCurses terminal debugging.</li>
+<li><strong>Boundary</strong>: Docker is a local dependency-isolation tool in v0.1, not a production deployment plan.</li>
+</ul>
+<section data-section id="section-product-owner-review-cross-specialist-source-of-truth-alignment">
+<h3 id="product-owner-review-cross-specialist-source-of-truth-alignment">Product Owner Review: Cross-Specialist Source-of-Truth Alignment</h3>
+<p>After all specialist refinements were reviewed again, the backlog now treats <a href="software_engineering_principles.html">software_engineering_principles.html</a> as the decision source of truth. The shared conclusion is that the v0.1 plan should continue, but every technical increment must be justified by domain clarity, player-facing behavior, deterministic feedback, or release learning.</p>
+<ul>
+<li><strong>Lead Architect</strong>: Clean Architecture is still required as a boundary discipline, but domain mapping and ubiquitous language come first.</li>
+<li><strong>Game Designer</strong>: Card rules, encounter bands, bot behavior, and playtest metrics are primary domain language, not implementation details.</li>
+<li><strong>Database Architect</strong>: Schema and repository contracts should follow content loading and match lifecycle needs, not generic persistence templates.</li>
+<li><strong>Systems Programmer</strong>: C17 APIs, ownership rules, deterministic RNG, and tests must make domain behavior reproducible before adding systems breadth.</li>
+<li><strong>DevOps Principal Engineer</strong>: Docker/Compose is recommended for first-time dependency isolation because it improves domain feedback loops, not because v0.1 is a deployment project.</li>
+<li><strong>Git Specialist</strong>: Repository workflow should make domain decisions reviewable and traceable in focused documentation and planning commits.</li>
+</ul>
+<section data-section id="section-product-owner-html-compilation-inputs">
+<h3 id="product-owner-html-compilation-inputs">Product Owner HTML Compilation Inputs</h3>
+<p>This final backlog is compiled after the role refinements so it can act as the v0.1 planning entry point:</p>
+<ul>
+<li><a href="lead_architecture_refinement_guide.html">lead_architecture_refinement_guide.html</a>: architecture boundaries, unified increment order, and v0.2 deferral posture.</li>
+<li><a href="../design/gameplay_refinement_guide.html">gameplay_refinement_guide.html</a>: encounter pacing, treasure balance, curse expiry, bot baseline, and playtest metrics.</li>
+<li><a href="../database/db_refinement_guide.html">db_refinement_guide.html</a>: seed validation, deck membership, content repository contract, and deferred JSONB event persistence.</li>
+<li><a href="../testing/systems_refinement_guide.html">systems_refinement_guide.html</a>: layered CMake targets, deterministic RNG, command tests, memory ownership, and NCurses smoke path.</li>
+<li><a href="../devops/devops_refinement_guide.html">devops_refinement_guide.html</a>: local environment, Make workflow, CI gates, database lifecycle, runtime topology, and release readiness.</li>
+<li><a href="../git/git_workflow_refinement_guide.html">git_workflow_refinement_guide.html</a>: repository hygiene, Conventional Commit guidance, and HTML migration review gates.</li>
+</ul>
+<section data-section id="section-v0-1-design-constraints">
+<h3 id="v0-1-design-constraints">v0.1 Design Constraints</h3>
+<ul>
+<li><strong>Player count</strong>: 1 human player plus 2 mock bots.</li>
+<li><strong>Victory</strong>: First character to reach Level 10 immediately wins.</li>
+<li><strong>Combat rule</strong>: Player Power must be greater than or equal to Monster Power to win.</li>
+<li><strong>Base Power formula</strong>: <code>Level + class base_power_bonus + equipment power_bonus + temporary modifiers</code>.</li>
+<li><strong>Influence</strong>: Track as a stat in v0.1, but keep most Influence card interactions deferred unless already represented by seeded cards.</li>
+<li><strong>Randomness</strong>: All shuffles and bot decisions must accept an explicit seed so playthroughs can be reproduced in tests.</li>
+<li><strong>Starting state</strong>: Every player begins at Level 1, Influence 0, no equipment, 2 Encounter cards in hand, and 2 Treasure cards in hand.</li>
+<li><strong>Deck target</strong>: Use the current seeded card set as the initial content floor; add only the minimum card links/quantities needed to build repeatable Encounter and Treasure draw piles.</li>
+<li><strong>Interaction target</strong>: Bots may help or apply a simple sabotage modifier, but only through deterministic thresholds. Full PvP card play remains deferred unless seeded PvP cards are added.</li>
+<li><strong>Operational readiness</strong>: v0.1 must remain local-first, Make-driven, Docker/Compose-friendly, and reproducible. Docker/Compose is the recommended first-time path for dependency isolation; cloud deployment, Kubernetes, production secrets platforms, and required event persistence stay deferred.</li>
+</ul>
+<section data-section id="section-suggested-build-order">
+<h3 id="suggested-build-order">Suggested Build Order</h3>
+<ol>
+<li>R0 Local Development Readiness Gate.</li>
+<li>R0.5 Docker/Compose Bootstrap Gate.</li>
+<li>R1 Seeded Content Smoke Test.</li>
+<li>R2 Deterministic Encounter Deck.</li>
+<li>R3 Deterministic Treasure Deck.</li>
+<li>R4 First Combat Resolver.</li>
+<li>R5 First Curse Resolvers.</li>
+<li>R6 Bot Personality Baseline.</li>
+<li>R7 Terminal Playtest Loop.</li>
+<li>R8 Release Candidate Readiness Gate.</li>
+<li>R9 Cross-Specialist Source-of-Truth Review Gate.</li>
+</ol>
+<section data-section id="section-refined-mvp-stories">
+<h3 id="refined-mvp-stories">Refined MVP Stories</h3>
+<h4 id="r0-local-development-readiness-gate">R0. Local Development Readiness Gate</h4>
+<p>As a developer, I want a documented local workflow for build, test, database setup, validation, simulation, and run tasks, So that every gameplay increment can be reproduced without relying on one person&#x27;s machine state.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given a clean local checkout with prerequisites installed, when a developer follows the setup guide, then they can identify the required C17 compiler, CMake, Make, CTest, PostgreSQL or local DB service, <code>libpq</code>, and NCurses dependencies.</li>
+<li>Given Docker is available, when a first-time developer starts the recommended path, then they can build a development image and run the fast test suite without installing PostgreSQL, <code>libpq</code>, or NCurses headers directly on the host.</li>
+<li>Given the Make wrapper exists, when a developer runs the normal workflow, then <code>make build</code> and <code>make test</code> provide fast feedback without requiring PostgreSQL or interactive NCurses.</li>
+<li>Given the Docker wrapper exists, when a developer runs the isolated workflow, then <code>make docker-build</code>, <code>make docker-test</code>, <code>make docker-db-up</code>, <code>make docker-db-seed</code>, and <code>make docker-test-db</code> are documented as first-class commands.</li>
+<li>Given database-backed validation is needed, when a developer runs the DB workflow, then <code>make db-seed</code>, <code>make db-validate</code>, and <code>make test-db</code> are explicit commands rather than hidden side effects of normal unit tests.</li>
+<li>Given a fixed match seed is supplied, when a simulation command exists, then it records the seed and produces a replayable transcript artifact.</li>
+<li><em>Verification</em>: Documentation review against the DevOps readiness checklist plus local dry-run once the Make targets exist.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>This story consumes DevOps increments DEV0, DEV1, DEV2, DEV3, and DEV4.</li>
+<li>Do not add package installation, service mutation, or network downloads to default build/test commands.</li>
+<li>The first Make targets can be templates until the corresponding production implementation exists, but the command contract should remain stable.</li>
+<li>Docker/Compose commands should wrap the same CMake/CTest and DB validation workflow as host-native commands so the container path proves parity instead of creating a separate implementation reality.</li>
+</ul>
+<h4 id="r0-5-docker-compose-bootstrap-gate">R0.5 Docker/Compose Bootstrap Gate</h4>
+<p>As a new contributor, I want a Docker/Compose path that isolates compiler, database, and native library dependencies, So that I can validate the project without first tuning my host machine.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given Docker is installed, when the contributor runs the bootstrap workflow, then a development container provides the C17 compiler, CMake, Make, CTest, PostgreSQL client tooling, <code>libpq</code> headers, and NCurses headers.</li>
+<li>Given Compose starts local services, when the DB service is up, then PostgreSQL is reachable from the development container through a documented DSN and no real credentials are committed.</li>
+<li>Given the contributor runs fast checks in the container, when <code>make docker-test</code> completes, then domain/application tests still run without depending on PostgreSQL or interactive NCurses.</li>
+<li>Given the contributor runs database checks in the container, when <code>make docker-test-db</code> completes, then seed SQL and repository adapter validation use the Compose PostgreSQL service.</li>
+<li>Given the contributor needs terminal playtesting, when NCurses behavior is hard to validate inside Docker, then the backlog permits a host-native manual playtest path while preserving Docker for build/test/DB parity.</li>
+<li><em>Verification</em>: Docker/Compose bootstrap checklist, containerized CTest output, DB validation log, and documented host-native terminal fallback.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>This story refines DevOps increments DEV0, DEV1, DEV2, DEV3, and DEV5.</li>
+<li>Recommended services: <code>dev</code> for toolchain/build/test commands and <code>postgres</code> for the seeded local database.</li>
+<li>Do not add Kubernetes, production images, registry publishing, or deployment automation to v0.1.</li>
+</ul>
+<h4 id="r1-seeded-content-smoke-test">R1. Seeded Content Smoke Test</h4>
+<p>As a developer, I want the prototype to verify that core classes, card types, monsters, equipment, AI cards, and curses exist in the database, So that gameplay failures are caught as content setup problems before the turn loop starts.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given the walkthrough seed SQL has been applied, when the prototype validates content, then it finds all seven card types: <code>MONSTER</code>, <code>TREASURE</code>, <code>CURSE</code>, <code>EVENT</code>, <code>EQUIPMENT</code>, <code>PVP</code>, and <code>AI</code>.</li>
+<li>Given the seeded classes, when the class list is loaded, then at least Backend Developer, Frontend Developer, DevOps Engineer, QA Engineer, Security Engineer, and AI Engineer are available.</li>
+<li>Given seeded cards, when deck construction starts, then the engine can classify Monster/AI cards as encounter threats, Curse cards as immediate encounters, and Equipment cards as treasure rewards.</li>
+<li><em>Verification</em>: Repository/content test that fails with a readable missing-content message.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>This story prevents the early prototype from silently starting with an empty deck.</li>
+<li>AI cards in v0.1 may behave like monsters unless a specific AI rule resolver is later added.</li>
+</ul>
+<h4 id="r2-deterministic-encounter-deck">R2. Deterministic Encounter Deck</h4>
+<p>As a game engine, I want a reproducible Encounter deck made from monsters, AI threats, and curses, So that the &quot;Kick Open The Backlog&quot; phase can be tested without networking or manual setup.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given loaded cards and a fixed seed, when the Encounter deck is built and shuffled, then repeated test runs produce the same draw order.</li>
+<li>Given a Monster or AI threat is drawn, when it is revealed, then combat begins with the card&#x27;s configured <code>monster_power</code>, <code>reward_levels</code>, and <code>reward_treasures</code>.</li>
+<li>Given a Curse is drawn, when it is revealed, then it resolves immediately and moves to discard.</li>
+<li>Given the Encounter deck is empty, when a draw is requested, then the Encounter discard pile is reshuffled into a new draw pile using the active RNG seed stream.</li>
+<li><em>Verification</em>: Unit test with fixed seed and card-count assertions.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Encounter deck candidates for v0.1: <code>Null Pointer Exception</code>, <code>Legacy Monolith</code>, <code>Production Outage</code>, <code>The Singularity</code>, <code>Hallucinated Function</code>, <code>Infinite Agent Loop</code>, <code>Autonomous Junior Developer</code>, <code>Broken CI</code>, <code>Scope Creep</code>, and <code>Context Window Exceeded</code>.</li>
+<li>The Singularity should remain rare and dangerous. Use a low quantity or place it late in dedicated scripted tests so it does not dominate every early playtest.</li>
+</ul>
+<h4 id="r3-deterministic-treasure-deck">R3. Deterministic Treasure Deck</h4>
+<p>As a game engine, I want a reproducible Treasure deck made from equipment rewards, So that winning combat produces visible long-term progression.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given loaded equipment cards and a fixed seed, when the Treasure deck is built and shuffled, then repeated test runs produce the same draw order.</li>
+<li>Given a player wins combat with <code>reward_treasures &gt; 0</code>, when rewards are resolved, then that many Treasure cards are drawn into the player&#x27;s hand.</li>
+<li>Given a player equips a card, when Power is recalculated, then the equipment&#x27;s <code>power_bonus</code> is included.</li>
+<li>Given a Treasure deck is empty, when a reward draw is requested, then the Treasure discard pile is reshuffled into the draw pile.</li>
+<li><em>Verification</em>: Unit test proving reward draw count, hand count, and Power changes.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Initial equipment target: <code>ThinkPad</code>, <code>Linux Mastery</code>, <code>PostgreSQL Expertise</code>, and <code>Emacs Mastery</code>.</li>
+<li>Do not add equipment slot limits in the first refinement unless the hand/equipment system becomes trivial to exploit during playtest.</li>
+</ul>
+<h4 id="r4-first-combat-resolver">R4. First Combat Resolver</h4>
+<p>As a player, I want monster fights to resolve consistently using Level, class bonus, equipment, and temporary modifiers, So that progression feels fair and debuggable.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given Player Power is greater than or equal to Monster Power, when combat resolves, then the player wins.</li>
+<li>Given a win, when rewards are applied, then the player gains the configured levels and treasure draws.</li>
+<li>Given a loss, when bad stuff is applied, then the prototype applies a deterministic fallback penalty if the card has no custom bad-stuff resolver.</li>
+<li>Given a player reaches Level 10 from combat rewards, when the reward step completes, then the match ends immediately.</li>
+<li><em>Verification</em>: Scripted combat tests for win, loss, and Level 10 victory.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Default bad stuff for v0.1: lose 1 Level, minimum Level 1.</li>
+<li><code>Production Outage</code> can remain a high-power midgame threat; <code>The Singularity</code> is an endgame boss and should not be expected to be defeated early.</li>
+<li>Keep rule callbacks simple and named by card identity or rule key. Avoid hidden random penalties during the first prototype.</li>
+</ul>
+<h4 id="r5-first-curse-resolvers">R5. First Curse Resolvers</h4>
+<p>As a player, I want curses to create immediate, readable setbacks, So that the Encounter deck is not only combat.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given <code>Broken CI</code> is drawn, when it resolves, then the affected player skips their next combat opportunity and the next revealed monster is discarded without rewards.</li>
+<li>Given <code>Scope Creep</code> is drawn, when it resolves, then the next monster fought by that player gains +5 temporary Power.</li>
+<li>Given <code>Context Window Exceeded</code> is drawn, when it resolves, then the affected player discards half their hand rounded down.</li>
+<li>Given a curse has resolved, when the game log updates, then the player can see the curse name and effect summary.</li>
+<li><em>Verification</em>: Unit tests for each seeded curse resolver.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Curse state should be explicit and short-lived: <code>skip_next_combat</code> and <code>next_monster_power_bonus</code> are enough for v0.1.</li>
+<li>Do not create stacking technical-debt systems yet; that belongs in a later balance pass.</li>
+</ul>
+<h4 id="r6-bot-personality-baseline">R6. Bot Personality Baseline</h4>
+<p>As a solo player, I want bots to behave predictably but not passively, So that local playtests exercise cooperation and sabotage.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given a bot has equipment in hand, when its turn reaches the play/equip step, then it equips the highest Power item available.</li>
+<li>Given a bot is in combat and can win, when combat resolves, then it fights without asking for help.</li>
+<li>Given a bot is losing by 3 Power or less, when help is available, then it requests help from the strongest non-active player.</li>
+<li>Given the human player is in combat and would win by 2 Power or less, when a bot sabotage check passes, then the bot applies a simple temporary +2 Monster Power modifier for v0.1.</li>
+<li>Given all bot choices use the match seed, when the same match is replayed, then bot choices repeat.</li>
+<li><em>Verification</em>: Simulation test where a full seeded match completes without manual input.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Bot names for the first prototype: <code>Legacy Maintainer</code> and <code>Prompt Intern</code>.</li>
+<li>Bot behavior should be intentionally simple. The goal is to exercise game states, not create a clever opponent yet.</li>
+<li>Card-driven PvP sabotage should wait until PvP cards are seeded and rule keys exist.</li>
+</ul>
+<h4 id="r7-terminal-playtest-loop">R7. Terminal Playtest Loop</h4>
+<p>As a player, I want the NCurses UI to show only the decisions needed for the current phase, So that the first playable build is understandable in a terminal.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given it is the human player&#x27;s turn, when the Start Turn phase begins, then the UI shows current Level, Power, Influence, hand size, equipment, bot summaries, and recent log entries.</li>
+<li>Given the player kicks open the backlog, when an encounter appears, then the Battle Area displays card name, type, Power if relevant, rewards, and active modifiers.</li>
+<li>Given the player has playable equipment in hand, when the Play/Equip step is available, then the UI allows selecting a card by stable menu index.</li>
+<li>Given a bot takes an action, when the action resolves, then the game log records the bot action in plain language.</li>
+<li><em>Verification</em>: Manual playtest checklist plus one non-interactive render smoke test if feasible.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Favor clarity over decoration in v0.1. The joke should come from card names and logs, not from a crowded layout.</li>
+<li>Suggested log tone: short satirical messages such as <code>Prompt Intern equipped ThinkPad. Finally, a real machine.</code></li>
+</ul>
+<h4 id="r8-release-candidate-readiness-gate">R8. Release Candidate Readiness Gate</h4>
+<p>As a product owner, I want a single release-readiness gate for the v0.1 prototype, So that &quot;playable&quot; means reproducible, validated, and manually checked rather than just running once locally.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given the v0.1 candidate is ready for review, when the release gate starts, then <code>make clean</code>, <code>make build</code>, and <code>make test</code> pass.</li>
+<li>Given Docker/Compose is available, when the release gate starts on the recommended isolated path, then <code>make docker-build</code>, <code>make docker-test</code>, <code>make docker-db-up</code>, <code>make docker-db-seed</code>, and <code>make docker-test-db</code> pass or produce actionable diagnostics.</li>
+<li>Given the local PostgreSQL workflow is available, when seed validation runs, then the schema and seed SQL produce required card types, classes, Encounter deck membership, Treasure deck membership, and positive deck quantities.</li>
+<li>Given a fixed simulation seed, when the non-interactive simulation runs, then it completes a match and saves a transcript containing seed, winner, turn count, bot actions, combat results, curse effects, level gains, and final event.</li>
+<li>Given a human playtester runs the NCurses client, when the manual checklist is completed, then notes capture seed, terminal size, resize behavior, visible stats, battle panel correctness, stable hand indexes, bot logs, and terminal cleanup on exit.</li>
+<li>Given architecture boundaries are reviewed, when v0.1 is accepted, then domain/application tests still run without PostgreSQL or NCurses and no production socket, pthread worker pool, account, ranking, achievement runtime, cloud deployment, or required JSONB event persistence has entered the release.</li>
+<li><em>Verification</em>: v0.1 release checklist from the DevOps refinement guide plus manual playtest notes.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>This story consumes DevOps increments DEV5, DEV6, DEV7, and DEV8.</li>
+<li>R8 is a product gate, not a new gameplay mechanic. If this gate fails, fix reproducibility, validation, or observability before adding more cards or rules.</li>
+<li>A release candidate can skip DB adapter tests only if the DB adapter story is explicitly not part of that candidate. The full v0.1 target should include them.</li>
+<li>The release gate should prefer Docker/Compose for dependency-isolated verification, then use host-native manual NCurses playtest to catch terminal behavior that containers may not faithfully represent.</li>
+</ul>
+<h4 id="r9-cross-specialist-source-of-truth-review-gate">R9. Cross-Specialist Source-of-Truth Review Gate</h4>
+<p>As a product owner, I want every specialist refinement to be reviewed against the domain-first engineering principle, So that the final v0.1 backlog does not drift into tactical ceremony or tooling-first delivery.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given a new technical proposal is added, when it is reviewed, then it names the domain capability, gameplay rule, operational learning, or delivery risk it serves.</li>
+<li>Given a tactical pattern is proposed, when the backlog accepts it, then the team can explain why current domain complexity requires it.</li>
+<li>Given Docker/Compose, CMake, CTest, SQL, repositories, or CI gates are added, when they are accepted, then they preserve Clean Architecture boundaries and improve deterministic feedback.</li>
+<li>Given a specialist refinement changes scope, when the Product Manager updates the backlog, then the final backlog links the specialist review and reflects the updated priority, dependency, and release gate.</li>
+<li><em>Verification</em>: Cross-specialist review checklist against <code>software_engineering_principles.html</code>, updated final backlog, and no protected source-tree edits.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>R9 is the standing governance gate for mentor-driven planning changes.</li>
+<li>This gate should run after specialist reviews and before adding implementation work to v0.1.</li>
+<li>If a tool or pattern cannot name the domain learning it protects, defer it.</li>
+</ul>
+<section data-section id="section-deferred-from-first-refinement">
+<h3 id="deferred-from-first-refinement">Deferred From First Refinement</h3>
+<ul>
+<li>Real multiplayer sockets and server/client synchronization.</li>
+<li>Persistent accounts, rankings, achievements, and match history.</li>
+<li>Trading and negotiation beyond simple help requests.</li>
+<li>Full equipment slot rules.</li>
+<li>Complex class-specific abilities beyond base Power bonuses.</li>
+<li>Deep Influence economy.</li>
+<li>Large card expansion, rarity balancing, and AI-specific chain reactions.</li>
+<li>Spectator mode, reconnect support, and production deployment concerns.</li>
+<li>Cloud deployment, Kubernetes, production secrets platforms, connection pooling, production image publishing, and required JSONB event persistence.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-architecture-refinement-pass-clean-v0-1-boundaries">
+<h2 id="architecture-refinement-pass-clean-v0-1-boundaries">Architecture Refinement Pass: Clean v0.1 Boundaries</h2>
+<p>The v0.1 prototype is local and NCurses-driven, but it should still be shaped like the later server-authoritative game. The terminal UI should submit player intentions, the application layer should coordinate use cases, the domain layer should own game state and rules, and infrastructure should be the only layer that knows about PostgreSQL, <code>libpq</code>, terminal libraries, files, or operating-system details.</p>
+<section data-section id="section-dependency-rule-for-v0-1">
+<h3 id="dependency-rule-for-v0-1">Dependency Rule For v0.1</h3>
+<pre><code>
+client/ncurses
+    -&gt; application/use_cases
+        -&gt; domain/model + domain/rules
+        -&gt; application/ports
+            &lt;- infrastructure/postgresql
+            &lt;- infrastructure/random
+</code></pre>
+<ul>
+<li><strong>Domain</strong>: Pure C17 game model, value types, rule functions, deterministic state transitions, and invariant checks.</li>
+<li><strong>Application</strong>: Match setup, turn orchestration, bot orchestration, input-command handling, repository ports, and output snapshots.</li>
+<li><strong>Infrastructure</strong>: PostgreSQL queries, seeded content loading, random seed source, persistence adapters, and any future socket adapter.</li>
+<li><strong>Client</strong>: NCurses rendering and keyboard input only. It must not calculate combat outcomes, mutate match state directly, or query PostgreSQL.</li>
+<li><strong>Shared</strong>: Defer protocol structs until v0.2 networking unless a type is genuinely needed by both client and server.</li>
+</ul>
+<section data-section id="section-architectural-guardrails">
+<h3 id="architectural-guardrails">Architectural Guardrails</h3>
+<ul>
+<li>Domain headers must not include <code>libpq-fe.h</code>, <code>ncurses.h</code>, POSIX socket headers, or application service headers.</li>
+<li>Application services may call domain functions and application ports, but must not issue SQL or render terminal panels.</li>
+<li>Infrastructure adapters must convert database rows into application/domain data structures before returning data.</li>
+<li>Client code receives read-only snapshots or copied view models from application services.</li>
+<li>All match mutations go through explicit application commands such as start match, kick backlog, play card, equip card, request help, resolve bot turn, and end turn.</li>
+<li>Every command result should include both updated state and log events so the UI does not need to infer what happened.</li>
+<li>Allocation ownership must be written into each public header: creator allocates, caller frees, borrowed views are marked <code>const</code>, and adapter-returned lists have matching free functions.</li>
+</ul>
+<section data-section id="section-refined-architecture-stories">
+<h3 id="refined-architecture-stories">Refined Architecture Stories</h3>
+<h4 id="a1-layered-build-targets">A1. Layered Build Targets</h4>
+<p>As a developer, I want separate build targets for domain, application, infrastructure, and client modules, So that forbidden dependencies fail early instead of spreading through the codebase.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given the CMake project is configured, when domain sources are compiled, then they only link against the C standard library.</li>
+<li>Given application sources are compiled, when they include headers, then they may include domain and application port headers but not PostgreSQL or NCurses headers.</li>
+<li>Given infrastructure sources are compiled, when PostgreSQL support is enabled, then only the infrastructure target links <code>libpq</code>.</li>
+<li>Given client sources are compiled, when NCurses support is enabled, then only the client target links NCurses.</li>
+<li><em>Verification</em>: Build target review plus a dependency smoke test that fails if forbidden headers are included in domain/application.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Suggested targets: <code>dtd_domain</code>, <code>dtd_application</code>, <code>dtd_infrastructure_db</code>, <code>dtd_client_ncurses</code>, and <code>dtd_tests</code>.</li>
+<li>Keep the first CMake setup small, but preserve target boundaries from day one.</li>
+</ul>
+<h4 id="a2-domain-model-boundary">A2. Domain Model Boundary</h4>
+<p>As a developer, I want pure domain structures for cards, decks, players, matches, turns, and rule results, So that game rules can be tested without PostgreSQL, NCurses, or future networking.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given a domain test creates a match from in-memory card and class definitions, when turns are resolved, then no database or UI dependency is required.</li>
+<li>Given a player stat changes, when invariants are checked, then Level cannot fall below 1 and cannot exceed 10.</li>
+<li>Given Power is recalculated, when equipment and temporary modifiers are applied, then the formula is deterministic and side-effect free.</li>
+<li>Given a rule function returns a result, when application receives it, then the result includes enough event data to describe the outcome in the log.</li>
+<li><em>Verification</em>: Pure unit tests for match creation, Power calculation, Level bounds, and combat resolution.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Domain rule functions should prefer explicit inputs and output structs over hidden global state.</li>
+<li>Do not put SQL IDs at the center of rule logic. A card may carry a stable definition id for lookup, but rules should operate on card properties and rule keys.</li>
+</ul>
+<h4 id="a3-application-ports-for-content-loading">A3. Application Ports For Content Loading</h4>
+<p>As a developer, I want repository ports declared at the application boundary, So that the game service can load cards and classes without depending on PostgreSQL.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given the application starts a local match, when it needs card and class definitions, then it calls a content repository port.</li>
+<li>Given tests run without PostgreSQL, when a fake repository is provided, then the same match setup use case can execute.</li>
+<li>Given infrastructure implements the port, when database rows are fetched, then <code>libpq</code> types do not escape the infrastructure adapter.</li>
+<li>Given repository calls fail, when the application receives the error, then it returns a startup failure instead of constructing an empty match.</li>
+<li><em>Verification</em>: Application test using a fake content repository and infrastructure test for PostgreSQL row mapping.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Prefer an application port such as <code>content_repository</code> over a domain-level <code>db_connection</code>.</li>
+<li>The port should return content definitions, not database connection handles.</li>
+<li>This refines the earlier <code>domain/repositories/card_repository.h</code> suggestion: keep pure data definitions accessible to domain/application, but keep connection lifecycle and SQL details in infrastructure.</li>
+</ul>
+<h4 id="a4-match-service-command-boundary">A4. Match Service Command Boundary</h4>
+<p>As a player, I want each UI action to map to a small application command, So that validation and state mutation remain server-authoritative even in the local prototype.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given the NCurses UI captures a key press, when the player selects an action, then the UI sends a command to the application service instead of mutating match state directly.</li>
+<li>Given a command is invalid for the current phase, when the application handles it, then it returns an error result and leaves match state unchanged.</li>
+<li>Given a command succeeds, when the application handles it, then it returns a state snapshot and ordered log events.</li>
+<li>Given bot turns are resolved, when application invokes bot logic, then bot commands pass through the same validation path as human commands.</li>
+<li><em>Verification</em>: Command tests for valid action, invalid phase, state unchanged on failure, and bot command parity.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Useful first commands: <code>START_LOCAL_MATCH</code>, <code>KICK_BACKLOG</code>, <code>EQUIP_CARD</code>, <code>PLAY_CARD</code>, <code>REQUEST_HELP</code>, <code>RESOLVE_COMBAT</code>, <code>END_TURN</code>, and <code>RESOLVE_BOT_TURN</code>.</li>
+<li>This command boundary becomes the natural network protocol boundary in v0.2.</li>
+</ul>
+<h4 id="a5-snapshot-based-ui-boundary">A5. Snapshot-Based UI Boundary</h4>
+<p>As a developer, I want the NCurses client to render snapshots instead of owning game state, So that the UI remains replaceable and cannot drift from authoritative rules.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given the match state changes, when the application returns a snapshot, then the UI renders only data present in that snapshot.</li>
+<li>Given the UI displays a hand, when the player selects an item, then the UI sends the stable card instance/index supplied by the snapshot.</li>
+<li>Given combat is active, when the UI displays Power and rewards, then those values come from the application snapshot rather than local recalculation.</li>
+<li>Given the terminal is resized or redrawn, when rendering repeats, then no domain mutation occurs.</li>
+<li><em>Verification</em>: UI smoke test using a static snapshot and application tests proving snapshots reflect state after commands.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Snapshot fields should be compact: active player, phase, player summaries, visible encounter, hand view, equipment view, available actions, and recent log entries.</li>
+<li>The UI can format text, but it should not decide game legality.</li>
+</ul>
+<h4 id="a6-deterministic-randomness-boundary">A6. Deterministic Randomness Boundary</h4>
+<p>As a developer, I want randomness isolated behind an explicit seedable component, So that shuffles, bot choices, and simulations are reproducible.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given a match starts with seed <code>S</code>, when decks are shuffled and bots make choices, then repeated runs produce the same ordered events.</li>
+<li>Given domain rules need a random value, when they execute, then the value is passed in or produced by an injected RNG owned by application state.</li>
+<li>Given tests provide a fixed RNG sequence, when edge cases are simulated, then outcomes are stable.</li>
+<li>Given the UI starts a casual local game, when no seed is supplied, then application creates a seed and records it in the match log.</li>
+<li><em>Verification</em>: Full-match simulation with fixed seed and identical event transcript.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Avoid calls to <code>rand()</code> inside rule functions.</li>
+<li>Store the active seed and RNG state in the match/application state so bugs can be replayed.</li>
+</ul>
+<h4 id="a7-error-and-event-result-shape">A7. Error And Event Result Shape</h4>
+<p>As a developer, I want command results to use explicit status codes and event logs, So that the prototype is debuggable without mixing UI text into rules.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given a command succeeds, when the application returns, then the result includes status success, updated snapshot, and zero or more domain events.</li>
+<li>Given a command fails, when the application returns, then the result includes a typed error and does not require the UI to inspect internal state.</li>
+<li>Given a combat or curse resolves, when events are emitted, then each event has a stable type and structured payload.</li>
+<li>Given the UI renders logs, when it receives events, then it may format them into player-facing text without changing their meaning.</li>
+<li><em>Verification</em>: Command result tests for success, invalid action, repository failure, and event ordering.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Early event types: <code>MATCH_STARTED</code>, <code>TURN_STARTED</code>, <code>CARD_DRAWN</code>, <code>CURSE_RESOLVED</code>, <code>COMBAT_STARTED</code>, <code>COMBAT_WON</code>, <code>COMBAT_LOST</code>, <code>CARD_EQUIPPED</code>, <code>BOT_ACTION</code>, and <code>MATCH_ENDED</code>.</li>
+<li>Event payloads can be simple structs in v0.1; JSONB persistence can be added later by infrastructure.</li>
+</ul>
+<h4 id="a8-memory-ownership-contract">A8. Memory Ownership Contract</h4>
+<p>As a C17 developer, I want every public interface to state allocation and ownership rules, So that the prototype avoids leaks, double frees, and dangling pointers as modules split apart.</p>
+<p><strong>Acceptance Criteria</strong></p>
+<ul>
+<li>Given a create/init function allocates memory, when the caller is done, then a matching destroy/free function exists.</li>
+<li>Given a function returns borrowed state, when the pointer is exposed, then it is <code>const</code> and documented as invalid after the next mutation.</li>
+<li>Given infrastructure returns loaded content arrays, when application consumes them, then ownership transfer and cleanup are explicit.</li>
+<li>Given tests run under a leak checker where available, when match simulations complete, then no reachable allocations remain from match/deck/player lifecycle.</li>
+<li><em>Verification</em>: Header review checklist plus lifecycle tests for match creation/destruction and repository result cleanup.</li>
+</ul>
+<p><strong>Design Notes</strong></p>
+<ul>
+<li>Prefer opaque structs for long-lived services and clear value structs for small domain data.</li>
+<li>Avoid returning pointers into resizable internal buffers unless the lifetime is very clearly constrained.</li>
+</ul>
+<section data-section id="section-architecture-deferred-from-v0-1">
+<h3 id="architecture-deferred-from-v0-1">Architecture Deferred From v0.1</h3>
+<ul>
+<li>TCP server process and packet routing.</li>
+<li>Shared binary protocol structs.</li>
+<li>Authentication, matchmaking, rankings, and account persistence.</li>
+<li>PostgreSQL match-event persistence beyond optional adapter tests.</li>
+<li>Threading and connection pooling.</li>
+<li>Reconnect support and client/server state reconciliation.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-epic-1-project-scaffolding-cmake-build">
+<h2 id="epic-1-project-scaffolding-cmake-build">🛠️ Epic 1: Project Scaffolding &amp; CMake Build</h2>
+<ul>
+<li><strong>Outcome</strong>: Compilation environment configured with CMake, wrapped in a Makefile, and integrated with CTest.</li>
+<li><strong>Scope</strong>: Project folder structure (<code>domain/</code>, <code>application/</code>, <code>infrastructure/</code>, <code>client/</code>, <code>shared/</code>), CMake configuration, Makefile wrapper, and dummy test case.</li>
+<li><strong>Out of scope</strong>: Network server/client sockets (deferred to v0.2).</li>
+<li><strong>Dependencies</strong>: Local C toolchain, CMake.</li>
+<li><strong>Risks</strong>: Cross-platform differences in GCC versions or flags.</li>
+</ul>
+<section data-section id="section-user-story">
+<h3 id="user-story">User Story</h3>
+<p>As a developer, I want a clean C17 build system and folder hierarchy, So that I can compile files cleanly and execute unit tests reliably.</p>
+<section data-section id="section-acceptance-criteria">
+<h3 id="acceptance-criteria">Acceptance Criteria</h3>
+<ul>
+<li>Given a clean workspace, when I run <code>make build</code>, then the project compiles with <code>-std=c17</code> and flags <code>-Wall -Wextra -Werror -pedantic</code>.</li>
+<li>Given compiled binaries, when I run <code>make test</code>, then the unit tests execute via CTest and output status.</li>
+<li><em>Verification</em>: Run <code>make build</code> and <code>make test</code> from terminal.</li>
+</ul>
+<section data-section id="section-implementation-notes">
+<h3 id="implementation-notes">Implementation Notes</h3>
+<ul>
+<li><strong>Suggested layer</strong>: Root level <code>CMakeLists.txt</code> and <code>Makefile</code>.</li>
+<li><strong>Data impact</strong>: None.</li>
+<li><strong>Protocol impact</strong>: None.</li>
+<li><strong>Test impact</strong>: Introduce initial test runner.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-epic-2-clean-architecture-postgresql-repository">
+<h2 id="epic-2-clean-architecture-postgresql-repository">🗄️ Epic 2: Clean Architecture PostgreSQL Repository</h2>
+<ul>
+<li><strong>Outcome</strong>: Data-driven cards and classes retrieved dynamically from a local PostgreSQL database.</li>
+<li><strong>Scope</strong>: Application-layer content repository port (<code>application/ports/</code>), infrastructure database adapter using <code>libpq</code> (<code>infrastructure/db/</code>), row-to-domain mapping, and schema loading.</li>
+<li><strong>Out of scope</strong>: Connection pooling, dynamic cloud deployments.</li>
+<li><strong>Dependencies</strong>: PostgreSQL client library (<code>libpq</code>), configured local PostgreSQL database initialized with the walkthrough SQL scripts.</li>
+<li><strong>Risks</strong>: DB connections blocking or failing due to local configuration errors.</li>
+</ul>
+<section data-section id="section-user-story-2">
+<h3 id="user-story-2">User Story</h3>
+<p>As a player, I want my game classes and cards to load from the PostgreSQL database, So that the card rules, stats, and metadata are data-driven rather than hardcoded.</p>
+<section data-section id="section-acceptance-criteria-2">
+<h3 id="acceptance-criteria-2">Acceptance Criteria</h3>
+<ul>
+<li>Given an initialized PostgreSQL database with seeded card definitions, when the prototype starts, then the infrastructure adapter connects via <code>libpq</code> and the application service receives card types and cards through the content repository port.</li>
+<li>Given active classes in the database, when a player selects a class, then the application service receives its description and base power bonuses without exposing database connection details.</li>
+<li><em>Verification</em>: Database fetch tests comparing loaded in-memory data to table records.</li>
+</ul>
+<section data-section id="section-implementation-notes-2">
+<h3 id="implementation-notes-2">Implementation Notes</h3>
+<ul>
+<li><strong>Suggested layer</strong>: <code>application/ports/content_repository.h</code>, <code>infrastructure/db/postgresql_content_repository.c</code>.</li>
+<li><strong>Data impact</strong>: Direct queries on <code>card_definitions</code>, <code>classes</code>, and <code>card_types</code>.</li>
+<li><strong>Protocol impact</strong>: None.</li>
+<li><strong>Test impact</strong>: Mock tests and local database retrieval validation.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-epic-3-in-memory-card-deck-engine">
+<h2 id="epic-3-in-memory-card-deck-engine">🎴 Epic 3: In-Memory Card &amp; Deck Engine</h2>
+<ul>
+<li><strong>Outcome</strong>: In-memory management of cards, including drawing, shuffling, and discarding.</li>
+<li><strong>Scope</strong>: Card structure representations, Deck buffers, shuffling algorithm (Fisher-Yates), discard piles, draw queues, and configured deck quantities from loaded content.</li>
+<li><strong>Out of scope</strong>: Distributed card synchronization over networking (deferred to v0.2).</li>
+<li><strong>Dependencies</strong>: Database repository data fetch (Epic 2).</li>
+<li><strong>Risks</strong>: Memory leaks on dynamic card allocations.</li>
+</ul>
+<section data-section id="section-user-story-3">
+<h3 id="user-story-3">User Story</h3>
+<p>As a game engine, I want to manage card decks, shuffle them, and handle draws/discards, So that the card game rules can progress randomly and fairly.</p>
+<section data-section id="section-acceptance-criteria-3">
+<h3 id="acceptance-criteria-3">Acceptance Criteria</h3>
+<ul>
+<li>Given a deck built from configured card quantities, when I call <code>deck_shuffle()</code>, then the cards are randomly ordered using a seed.</li>
+<li>Given a deck, when a player draws a card, then the deck size decreases by 1 and the card is added to the player&#x27;s hand.</li>
+<li>Given an empty deck, when a draw is requested, then the discard pile is shuffled back into the draw deck.</li>
+<li><em>Verification</em>: CTest unit testing verifying shuffle randomness and card counts.</li>
+</ul>
+<section data-section id="section-implementation-notes-3">
+<h3 id="implementation-notes-3">Implementation Notes</h3>
+<ul>
+<li><strong>Suggested layer</strong>: <code>domain/deck.c</code>, <code>domain/card.c</code>.</li>
+<li><strong>Data impact</strong>: Loads data into structures representing cards.</li>
+<li><strong>Protocol impact</strong>: None.</li>
+<li><strong>Test impact</strong>: Shuffling and draw-count state assertions.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-epic-4-turn-loop-stats-engine">
+<h2 id="epic-4-turn-loop-stats-engine">🔄 Epic 4: Turn Loop &amp; Stats Engine</h2>
+<ul>
+<li><strong>Outcome</strong>: Deterministic game engine handling the turn phases, card battles, stats, and rule effects.</li>
+<li><strong>Scope</strong>: Core turn steps (Start Turn -&gt; Backlog Draw -&gt; Battle/Resolution -&gt; Play cards/Equipment -&gt; End Turn), player stats (Level, Power, Influence), hardcoded callback resolvers for card rules.</li>
+<li><strong>Out of scope</strong>: Multiplayer networking, complex trading mechanics.</li>
+<li><strong>Dependencies</strong>: Card engine (Epic 3), DB integration (Epic 2).</li>
+<li><strong>Risks</strong>: Complex gameplay edge cases causing invalid states (e.g. negative levels or power overflows).</li>
+</ul>
+<section data-section id="section-user-story-4">
+<h3 id="user-story-4">User Story</h3>
+<p>As a player, I want to take turns, play equipment cards, fight monsters, and face curses, So that I can level up to Level 10 and try to win the game.</p>
+<section data-section id="section-acceptance-criteria-4">
+<h3 id="acceptance-criteria-4">Acceptance Criteria</h3>
+<ul>
+<li>Given the start of a turn, when the player &quot;kicks open the backlog&quot; (draws an encounter), then it resolves immediately if it is a Curse, or triggers combat if it is a Monster.</li>
+<li>Given a combat phase, when the player&#x27;s Power is equal to or greater than the monster&#x27;s Power, then the player wins, gains the configured reward levels, and draws the configured Treasure cards.</li>
+<li>Given a combat phase, when the player&#x27;s Power is lower than the monster&#x27;s, then the player loses and suffers the &quot;Bad Stuff&quot; listed on the card.</li>
+<li>Given a Curse (e.g., &quot;Context Window Exceeded&quot;), when drawn, then the engine executes its callback (e.g. discarding half of the player&#x27;s hand).</li>
+<li><em>Verification</em>: Unit tests simulating sequential mock matches and asserting player stats.</li>
+</ul>
+<section data-section id="section-implementation-notes-4">
+<h3 id="implementation-notes-4">Implementation Notes</h3>
+<ul>
+<li><strong>Suggested layer</strong>: <code>domain/game_rules.c</code>, <code>domain/player.c</code>, <code>application/game_service.c</code>.</li>
+<li><strong>Data impact</strong>: Reads card rules metadata.</li>
+<li><strong>Protocol impact</strong>: None.</li>
+<li><strong>Test impact</strong>: Automated gameplay turn scripts asserting Level and Power tracking.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-epic-5-automated-mock-opponent-bots">
+<h2 id="epic-5-automated-mock-opponent-bots">🤖 Epic 5: Automated Mock Opponent Bots</h2>
+<ul>
+<li><strong>Outcome</strong>: Automated computer-controlled bots to play alongside the player locally.</li>
+<li><strong>Scope</strong>: Basic AI decision state machine (e.g., bot decides to equip items, help or sabotage the player, or fight monsters using simple thresholds).</li>
+<li><strong>Out of scope</strong>: Advanced neural network or LLM integration (pure rule-based decisions).</li>
+<li><strong>Dependencies</strong>: Turn Loop engine (Epic 4).</li>
+<li><strong>Risks</strong>: Bots getting stuck in infinite choice loops or blocking turn transitions.</li>
+</ul>
+<section data-section id="section-user-story-5">
+<h3 id="user-story-5">User Story</h3>
+<p>As a solo player, I want computer-controlled bots to take turns and interact during my combat, So that I can test the multiplayer aspects of helping/sabotaging without networking code.</p>
+<section data-section id="section-acceptance-criteria-5">
+<h3 id="acceptance-criteria-5">Acceptance Criteria</h3>
+<ul>
+<li>Given a bot&#x27;s turn, when the bot kicks open the backlog, then the bot automatically resolves combat or suffers bad stuff.</li>
+<li>Given the player&#x27;s combat, when the bot holds a sabotage card, then there is a probability the bot plays it to increase the monster&#x27;s power.</li>
+<li>Given a game state, when a bot reaches Level 10, then the game declares the bot the winner and halts.</li>
+<li><em>Verification</em>: Simulation test verifying that a bot-driven match completes from start to finish.</li>
+</ul>
+<section data-section id="section-implementation-notes-5">
+<h3 id="implementation-notes-5">Implementation Notes</h3>
+<ul>
+<li><strong>Suggested layer</strong>: <code>application/bot_ai.c</code>.</li>
+<li><strong>Data impact</strong>: Fetches default player metrics.</li>
+<li><strong>Protocol impact</strong>: None.</li>
+<li><strong>Test impact</strong>: Full simulation test suite.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-epic-6-ncurses-multi-panel-cli-layout">
+<h2 id="epic-6-ncurses-multi-panel-cli-layout">📺 Epic 6: NCurses Multi-Panel CLI Layout</h2>
+<ul>
+<li><strong>Outcome</strong>: Immersive and structured multi-panel terminal display using the NCurses library.</li>
+<li><strong>Scope</strong>: NCurses initialization, panel rendering (Header stats panel, Battle Arena panel, player hand inventory panel, bots overview panel, game log/feed panel), and keyboard menu inputs.</li>
+<li><strong>Out of scope</strong>: GUI/web interface (console NCurses layout only).</li>
+<li><strong>Dependencies</strong>: Turn Loop engine (Epic 4), NCurses package.</li>
+<li><strong>Risks</strong>: Terminal resize crashes, incorrect panel drawing overlap.</li>
+</ul>
+<section data-section id="section-user-story-6">
+<h3 id="user-story-6">User Story</h3>
+<p>As a player, I want a structured multi-window terminal screen that shows my stats, hand, combat, logs, and bot states simultaneously, So that I can play the game easily with visual updates instead of scrolling terminal text.</p>
+<section data-section id="section-acceptance-criteria-6">
+<h3 id="acceptance-criteria-6">Acceptance Criteria</h3>
+<ul>
+<li>Given a game start, when the NCurses UI loads, then it displays panels for Stats, Hand, Battle Area, Log Feed, and Bot Status.</li>
+<li>Given a turn update, when stats or hand sizes change, then the respective panels refresh instantly to show current values.</li>
+<li>Given menu prompts, when the user naviges with arrow keys or numbers, then the selected action resolves in the game engine.</li>
+<li><em>Verification</em>: Manual interactive playtest verifying UI responsiveness and crash-free resizing.</li>
+</ul>
+<section data-section id="section-implementation-notes-6">
+<h3 id="implementation-notes-6">Implementation Notes</h3>
+<ul>
+<li><strong>Suggested layer</strong>: <code>client/ncurses_ui.c</code>.</li>
+<li><strong>Data impact</strong>: Reads game stats and log payloads.</li>
+<li><strong>Protocol impact</strong>: None.</li>
+<li><strong>Test impact</strong>: Manual visualization verification checks.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-epic-7-local-devops-release-readiness">
+<h2 id="epic-7-local-devops-release-readiness">⚙️ Epic 7: Local DevOps &amp; Release Readiness</h2>
+<ul>
+<li><strong>Outcome</strong>: A reproducible local delivery loop and review governance model for the v0.1 prototype, covering Docker/Compose dependency isolation, build, fast tests, seed database setup, content validation, optional DB adapter tests, fixed-seed simulation artifacts, manual NCurses playtest evidence, cross-specialist source-of-truth review, and release readiness.</li>
+<li><strong>Scope</strong>: Docker/Compose bootstrap path, host-native fallback path, local prerequisite checklist, Make command contract, CMake/CTest workflow expectations, PostgreSQL seed lifecycle, <code>.env.example</code> guidance, artifact/log conventions, fixed-seed transcript expectations, cross-specialist review checklist, and v0.1 release checklist.</li>
+<li><strong>Out of scope</strong>: Cloud deployment, Kubernetes, production service orchestration, connection pooling, production secrets management, production image publishing, mandatory JSONB event persistence, and TCP server/client operations.</li>
+<li><strong>Dependencies</strong>: Epic 1 for the Make/CMake surface, Epic 2 for database-backed content validation, Epic 3-5 for deterministic simulation, and Epic 6 for manual terminal playtest evidence.</li>
+<li><strong>Risks</strong>: Treating DevOps as either optional paperwork or premature production infrastructure. A second risk is over-containerizing the NCurses playtest path and missing terminal behavior that is easier to validate on the host. A third risk is applying tactical DDD, repositories, Docker, or Clean Architecture as ceremony before domain language is clear. The intended scope is local dependency isolation, reproducibility, domain clarity, and release confidence only.</li>
+</ul>
+<section data-section id="section-user-story-7">
+<h3 id="user-story-7">User Story</h3>
+<p>As a developer and product owner, I want v0.1 to have a clear local build/test/seed/simulate/playtest release gate, So that the team can distinguish a genuinely reproducible prototype from a one-off local demo.</p>
+<section data-section id="section-acceptance-criteria-7">
+<h3 id="acceptance-criteria-7">Acceptance Criteria</h3>
+<ul>
+<li>Given a developer has local prerequisites installed, when they follow the documented workflow, then they can run <code>make build</code> and <code>make test</code> without requiring PostgreSQL or interactive NCurses.</li>
+<li>Given Docker is installed, when a new contributor follows the recommended workflow, then they can run build/test/DB validation through Docker/Compose without installing native PostgreSQL, <code>libpq</code>, or NCurses development packages directly on the host.</li>
+<li>Given PostgreSQL is configured for local validation, when they run the DB workflow, then seed SQL is applied in order and required content/deck checks produce readable pass/fail output.</li>
+<li>Given Compose starts the local PostgreSQL service, when DB validation runs, then the development container can apply seed SQL and execute adapter tests through the same repository boundary used by the host-native path.</li>
+<li>Given a fixed simulation seed, when the non-interactive simulation exists and runs, then it saves a transcript artifact with seed, winner, turn count, and ordered major events.</li>
+<li>Given the NCurses client is manually playtested, when the checklist is complete, then the release notes include seed, terminal size, resize result, panel correctness, log visibility, and terminal cleanup result.</li>
+<li>Given v0.1 release readiness is reviewed, when the gate passes, then deferred production operations remain out of scope.</li>
+<li>Given specialist refinements change the plan, when the Product Manager updates the backlog, then the final backlog includes the cross-specialist source-of-truth review result.</li>
+<li><em>Verification</em>: DevOps release checklist, CTest output, DB validation log, fixed-seed simulation transcript, and manual terminal playtest notes.</li>
+</ul>
+<section data-section id="section-implementation-notes-7">
+<h3 id="implementation-notes-7">Implementation Notes</h3>
+<ul>
+<li><strong>Suggested layer</strong>: Project-level support docs, root-level Make/CMake workflow, Docker/Compose templates, local <code>.env.example</code>, and CI template documentation. Do not place DevOps implementation inside domain/application/client rule logic.</li>
+<li><strong>Data impact</strong>: Validates seed SQL and deck membership; does not require match-event persistence.</li>
+<li><strong>Protocol impact</strong>: None for v0.1. Command/result transcript shape should remain useful for future v0.2 protocol work.</li>
+<li><strong>Test impact</strong>: Separates fast domain/application tests from optional PostgreSQL adapter tests and manual NCurses checks.</li>
+</ul>
+</section>
+</section>
+</section>
+</section>
+</article></main></div><script>
+(function(){const search=document.querySelector('[data-search]');const toggle=document.querySelector('[data-toggle-sections]');const sections=[...document.querySelectorAll('[data-section]')];document.querySelectorAll('li').forEach(li=>{if(/Given|Verification|checklist|Acceptance Criteria|make |seed|test/i.test(li.textContent)){li.title='Click to mark this planning item during review';li.style.cursor='pointer';li.addEventListener('click',()=>li.classList.toggle('done'));}});if(search){search.addEventListener('input',()=>{const q=search.value.trim().toLowerCase();sections.forEach(s=>s.classList.toggle('section-hidden',q&&!s.textContent.toLowerCase().includes(q)));});}if(toggle){toggle.addEventListener('click',()=>{const collapsed=document.body.dataset.collapsed==='true';document.body.dataset.collapsed=String(!collapsed);sections.forEach(section=>{const first=section.querySelector('h2,h3');if(!first)return;[...section.children].forEach(child=>{if(child!==first)child.hidden=!collapsed;});});toggle.textContent=collapsed?'Collapse Sections':'Expand Sections';});}})();
+</script></body></html>

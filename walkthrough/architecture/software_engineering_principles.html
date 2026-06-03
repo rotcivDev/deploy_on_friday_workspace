@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Software Engineering Source of Truth</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; --code:#101828; --code-ink:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1050px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15,23,42,.05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { margin-top:1.5em; border-top:1px solid var(--line); padding-top:1em; }
+    a { color:var(--accent); }
+    code { background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:var(--code); color:var(--code-ink); padding:16px; border-radius:8px; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:9px 10px; vertical-align:top; }
+    th { background:#ecfdf5; text-align:left; }
+    .callout { border-left:4px solid var(--accent); background:#ecfdf5; padding:14px 16px; border-radius:6px; margin:18px 0; }
+    .warning { border-left-color:var(--warn); background:#fff7ed; }
+    .toolbar { display:grid; gap:10px; margin-bottom:18px; }
+    .toolbar input,.toolbar button { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px 10px; font:inherit; background:white; }
+    .toolbar button { cursor:pointer; color:white; background:var(--accent); border-color:var(--accent); }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    .hidden { display:none; }
+    li.done { opacity:.62; text-decoration:line-through; }
+    @media (max-width:860px) { .page-shell{display:block;} aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);} main{padding:20px 14px 48px;} article{padding:22px;} }
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input id="filter" type="search" placeholder="Filter principle sections">
+      <button id="toggle" type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#principle">Principle</a>
+      <a href="#decision-order">Decision Order</a>
+      <a href="#implications">Implications</a>
+      <a href="#tests">Decision Tests</a>
+      <a href="#anti-patterns">Anti-Patterns</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <h1>Software Engineering Source of Truth</h1>
+      <p>This document defines the architecture principle that all technical approaches and decisions for <strong>Dungeon of Technical Debt</strong> must satisfy.</p>
+
+      <section data-section id="principle">
+        <h2>Principle</h2>
+        <div class="callout">
+          <strong>The domain is the source of truth. Strategic understanding comes before tactical structure.</strong>
+          <p>Every technical decision must first explain which domain capability, business/gameplay rule, player outcome, or team communication problem it serves. Code structure, Clean Architecture layers, Docker, CMake, repositories, entities, value objects, SQL schemas, and protocol shapes are tools. They are justified only when they make the domain clearer, safer, more testable, or easier to evolve.</p>
+        </div>
+        <p>For this project, "business" means the actual product domain: the game experience, player progression, card/content rules, match lifecycle, release constraints, and the language shared by designers, engineers, database, DevOps, and product mentors.</p>
+      </section>
+
+      <section data-section id="decision-order">
+        <h2>Decision Order</h2>
+        <ol>
+          <li><strong>Understand the domain.</strong> Name the gameplay/business capability, user story, rule, invariant, or operational need.</li>
+          <li><strong>Map the boundary.</strong> Decide which context owns the language and behavior: gameplay rules, match orchestration, content loading, persistence, terminal rendering, runtime environment, or release readiness.</li>
+          <li><strong>Choose the simplest tactical shape.</strong> Apply entities, value objects, repositories, services, adapters, Docker, CI gates, or SQL structure only when they support the mapped boundary.</li>
+          <li><strong>Protect feedback loops.</strong> Make the decision testable through CTest, SQL validation, fixed-seed simulation, manual terminal playtest, or release checklist evidence.</li>
+          <li><strong>Revisit when the domain changes.</strong> Refactor structure when learning invalidates the previous model.</li>
+        </ol>
+      </section>
+
+      <section data-section id="implications">
+        <h2>Implications For This Project</h2>
+        <table>
+          <thead><tr><th>Area</th><th>Principle Applied</th></tr></thead>
+          <tbody>
+            <tr><td>DDD</td><td>Strategic DDD is mandatory: ubiquitous language, bounded contexts, and domain mapping. Tactical DDD patterns are optional and must be earned by complexity.</td></tr>
+            <tr><td>Clean Architecture</td><td>Clean Architecture is tactical/operational. It protects dependency direction, but it must reflect domain boundaries instead of inventing them.</td></tr>
+            <tr><td>Domain Layer</td><td>Domain code owns deterministic game rules and invariants, not PostgreSQL IDs, UI behavior, Docker concerns, or infrastructure details.</td></tr>
+            <tr><td>Application Layer</td><td>Application services coordinate domain use cases and ports. They exist to preserve business flow and command authority, not to become a generic service bucket.</td></tr>
+            <tr><td>Database</td><td>PostgreSQL stores content and future persistence in ways that match domain language. Schema design follows the content model and match lifecycle.</td></tr>
+            <tr><td>DevOps</td><td>Docker/Compose isolates dependencies because reproducible feedback serves product learning. It is not a production architecture decision for v0.1.</td></tr>
+            <tr><td>Frontend/Client</td><td>The NCurses client renders snapshots and sends intentions. It does not own rules because player-facing truth comes from the domain/application model.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-section id="tests">
+        <h2>Decision Tests</h2>
+        <p>Before accepting any technical approach, answer these questions:</p>
+        <ul>
+          <li>What domain capability or product risk does this decision serve?</li>
+          <li>Which bounded context owns the language and behavior?</li>
+          <li>Can the domain expert, designer, or product owner understand the terms used in the model?</li>
+          <li>Is this tactical pattern required by current complexity, or is it ceremony copied from a template?</li>
+          <li>Does this preserve deterministic rules, server-authoritative command flow, and testable feedback?</li>
+          <li>Can it be verified with a concrete gate: unit test, SQL validation, fixed-seed transcript, Docker/Compose check, or manual playtest?</li>
+        </ul>
+      </section>
+
+      <section data-section id="anti-patterns">
+        <h2>Anti-Patterns</h2>
+        <div class="callout warning">
+          <p>Do not start with tactical DDD templates, repository boilerplate, Docker topology, database tables, or folder structures and then force the domain to fit them.</p>
+        </div>
+        <ul>
+          <li>Adding aggregates, entities, value objects, or repositories before the language and boundaries are understood.</li>
+          <li>Using Clean Architecture as a folder ritual instead of a dependency and ownership discipline.</li>
+          <li>Letting infrastructure convenience change domain rules or test boundaries.</li>
+          <li>Containerizing complexity that has not yet been understood.</li>
+          <li>Accepting a technical decision that cannot name the gameplay, business, or learning outcome it protects.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  const filter = document.getElementById('filter');
+  const toggle = document.getElementById('toggle');
+  const sections = [...document.querySelectorAll('[data-section]')];
+  filter.addEventListener('input', () => {
+    const q = filter.value.trim().toLowerCase();
+    sections.forEach(section => section.classList.toggle('hidden', q && !section.textContent.toLowerCase().includes(q)));
+  });
+  toggle.addEventListener('click', () => {
+    const collapsed = document.body.dataset.collapsed === 'true';
+    document.body.dataset.collapsed = String(!collapsed);
+    sections.forEach(section => [...section.children].forEach((child, index) => { if (index > 0) child.hidden = !collapsed; }));
+    toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+  });
+  document.querySelectorAll('li').forEach(li => {
+    li.title = 'Click to mark reviewed';
+    li.addEventListener('click', () => li.classList.toggle('done'));
+  });
+</script>
+</body>
+</html>

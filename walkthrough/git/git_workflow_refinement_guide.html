@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Git Workflow Refinement Guide: v0.1 Prototype</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1100px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15,23,42,.05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { border-top:1px solid var(--line); padding-top:1.1em; margin-top:1.4em; }
+    a { color:var(--accent); }
+    code { background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:#101828; color:#e5edf8; padding:16px; border-radius:8px; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; }
+    th { background:#ecfdf5; text-align:left; }
+    .toolbar { display:grid; gap:10px; margin-bottom:18px; }
+    .toolbar input,.toolbar button { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px 10px; font:inherit; background:white; }
+    .toolbar button { cursor:pointer; color:white; background:var(--accent); border-color:var(--accent); }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    .card { border:1px solid var(--line); border-radius:8px; padding:14px 16px; margin:14px 0; background:#fbfdff; }
+    .badge { display:inline-block; padding:2px 8px; border-radius:999px; background:#ecfdf5; color:#065f46; font-size:.85rem; }
+    .hidden { display:none; }
+    li.done { opacity:.62; text-decoration:line-through; }
+    @media (max-width:860px) { .page-shell{display:block;} aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);} main{padding:20px 14px 48px;} article{padding:22px;} }
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input id="filter" type="search" placeholder="Filter Git topics">
+      <button id="toggle" type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#summary">Summary</a>
+      <a href="#scope">Scope</a>
+      <a href="#increments">Git Increments</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#checklist">Readiness Checklist</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="badge">Git Specialist HTML refinement</p>
+      <h1>Git Workflow Refinement Guide: v0.1 Prototype</h1>
+      <p>This guide aligns repository hygiene with the HTML walkthrough migration and the v0.1 delivery plan. It is a support artifact only and does not require edits under protected production source directories.</p>
+
+      <section data-section id="summary">
+        <h2>1. Review Summary</h2>
+        <div class="card"><strong>Second Review: Source-of-Truth Alignment.</strong> Git workflow should make domain decisions traceable. Documentation migrations, backlog changes, Docker/Compose updates, and architecture decisions should be committed in reviewable slices with Conventional Commit messages that name the product/domain reason, not just the tool changed.</div>
+        <p>The repository now treats human-facing walkthrough documents as HTML artifacts. Git hygiene should make that format easy to review while preserving executable support files such as SQL seeds in their native form.</p>
+        <div class="card">
+          <strong>Recommendation:</strong> use focused <code>docs:</code> commits for documentation migrations, keep generated HTML and removed Markdown in the same review, and verify that no source-tree files under <code>domain/</code>, <code>application/</code>, <code>infrastructure/</code>, <code>server/</code>, <code>client/</code>, or <code>shared/</code> are touched by mentorship tasks.
+        </div>
+      </section>
+
+      <section data-section id="scope">
+        <h2>2. v0.1 Git Scope</h2>
+        <h3>In Scope</h3>
+        <ul>
+          <li>Repository status review before and after documentation migrations.</li>
+          <li>Conventional Commit guidance for HTML walkthrough work.</li>
+          <li>Review checklist for removed stale Markdown files.</li>
+          <li>Guidance for ignoring local artifacts such as <code>.env</code>, <code>build/</code>, and generated simulation logs when needed.</li>
+        </ul>
+        <h3>Out Of Scope</h3>
+        <ul>
+          <li>Destructive Git operations without explicit approval.</li>
+          <li>Reverting unrelated user or agent work.</li>
+          <li>Modifying protected production source directories.</li>
+        </ul>
+      </section>
+
+      <section data-section id="increments">
+        <h2>3. Git Increments</h2>
+        <table>
+          <thead><tr><th>Increment</th><th>Outcome</th><th>Verification</th></tr></thead>
+          <tbody>
+            <tr><td>GIT0</td><td>Confirm worktree status and identify unrelated changes before migration.</td><td><code>git status --short</code></td></tr>
+            <tr><td>GIT1</td><td>Keep HTML migration atomic: generated HTML, updated registries, and removed stale Markdown reviewed together.</td><td>Diff review</td></tr>
+            <tr><td>GIT2</td><td>Use Conventional Commits for documentation-only changes.</td><td>Suggested title: <code>docs(walkthrough): migrate mentor refinements to html</code></td></tr>
+            <tr><td>GIT3</td><td>Protect local secrets and generated runtime artifacts.</td><td>Ignore review for <code>.env</code>, build outputs, and local artifacts</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section data-section id="workflow">
+        <h2>4. Suggested Review Workflow</h2>
+        <pre><code>git status --short
+git diff --stat
+git diff -- walkthrough AGENTS.md .agent/skills
+rg -n "\.md" walkthrough AGENTS.md .agent/skills
+rg --files walkthrough | sort</code></pre>
+        <p>Do not run destructive cleanup commands for unrelated files. If stale Markdown files under <code>walkthrough/</code> are intentionally removed, verify that matching <code>.html</code> files exist first.</p>
+      </section>
+
+      <section data-section id="checklist">
+        <h2>5. Readiness Checklist</h2>
+        <ul>
+          <li>All human-facing walkthrough refinement guides are HTML.</li>
+          <li>SQL seed templates remain SQL.</li>
+          <li>AGENTS registry links point to HTML walkthrough files.</li>
+          <li>Mentor profiles mention the HTML walkthrough output policy.</li>
+          <li>Product Manager backlog HTML was compiled after the role refinements.</li>
+          <li>No protected production source directories were modified.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  const filter = document.getElementById('filter');
+  const toggle = document.getElementById('toggle');
+  const sections = [...document.querySelectorAll('[data-section]')];
+  filter.addEventListener('input', () => {
+    const q = filter.value.trim().toLowerCase();
+    sections.forEach(section => section.classList.toggle('hidden', q && !section.textContent.toLowerCase().includes(q)));
+  });
+  toggle.addEventListener('click', () => {
+    const collapsed = document.body.dataset.collapsed === 'true';
+    document.body.dataset.collapsed = String(!collapsed);
+    sections.forEach(section => [...section.children].forEach((child, index) => { if (index > 0) child.hidden = !collapsed; }));
+    toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+  });
+  document.querySelectorAll('li').forEach(li => {
+    li.title = 'Click to mark complete during review';
+    li.addEventListener('click', () => li.classList.toggle('done'));
+  });
+</script>
+</body>
+</html>

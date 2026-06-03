@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gameplay Backlog Refinement Guide: v0.1 Prototype</title>
+  <style>
+:root {
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --ink: #17202a;
+  --muted: #637083;
+  --line: #d8dee9;
+  --accent: #0f766e;
+  --accent-2: #b45309;
+  --code-bg: #101828;
+  --code-ink: #e5edf8;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--bg);
+}
+.page-shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+  padding: 24px 18px;
+  border-right: 1px solid var(--line);
+  background: #eef2f7;
+}
+main { padding: 32px min(5vw, 64px) 72px; }
+article {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: clamp(24px, 4vw, 48px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+h1, h2, h3, h4 { line-height: 1.2; margin: 1.4em 0 0.55em; letter-spacing: 0; }
+h1 { margin-top: 0; font-size: clamp(2rem, 4vw, 3rem); }
+h2 { border-top: 1px solid var(--line); padding-top: 1.1em; font-size: 1.55rem; }
+h3 { font-size: 1.2rem; color: #143a36; }
+h4 { font-size: 1.05rem; color: #3a2d12; }
+p, ul, ol, table, pre { margin: 0.85em 0; }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.25em 0; }
+a { color: var(--accent); text-decoration-thickness: 0.08em; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  background: #edf2f7;
+  border: 1px solid #d9e2ec;
+  border-radius: 4px;
+  padding: 0.05em 0.3em;
+}
+pre {
+  overflow-x: auto;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #1f2937;
+}
+pre code { background: transparent; border: 0; color: inherit; padding: 0; }
+table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--line); padding: 8px 10px; vertical-align: top; }
+th { background: #ecfdf5; text-align: left; }
+blockquote { border-left: 4px solid var(--accent-2); margin: 1em 0; padding: 0.25em 1em; background: #fff7ed; color: #4a2f12; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
+.toc-title { font-weight: 700; margin-bottom: 12px; }
+.toc a { display: block; padding: 6px 0; color: #334155; text-decoration: none; font-size: 0.92rem; }
+.toc a:hover { color: var(--accent); }
+.toolbar { display: grid; gap: 10px; margin-bottom: 18px; }
+.toolbar input, .toolbar button {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px 10px;
+  font: inherit;
+  background: white;
+}
+.toolbar button { cursor: pointer; color: white; background: var(--accent); border-color: var(--accent); }
+.meta { color: var(--muted); font-size: 0.95rem; margin-top: -0.5rem; }
+.section-hidden { display: none; }
+mark { background: #fef3c7; padding: 0 0.15em; }
+.back-home { display: inline-block; margin-bottom: 18px; color: var(--accent); }
+@media (max-width: 860px) {
+  .page-shell { display: block; }
+  aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  main { padding: 20px 14px 48px; }
+  article { padding: 22px; }
+}
+</style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a class="back-home" href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter sections">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <div class="toc-title">Contents</div>
+    <nav class="toc"><a style="padding-left:0px" href="#gameplay-backlog-refinement-guide-v0-1-prototype">Gameplay Backlog Refinement Guide: v0.1 Prototype</a>
+<a style="padding-left:10px" href="#1-backlog-review-summary">1. Backlog Review Summary</a>
+<a style="padding-left:10px" href="#2-v0-1-gameplay-scope">2. v0.1 Gameplay Scope</a>
+<a style="padding-left:20px" href="#in-scope">In Scope</a>
+<a style="padding-left:20px" href="#out-of-scope-for-v0-1">Out Of Scope For v0.1</a>
+<a style="padding-left:10px" href="#3-backlog-alignment-findings">3. Backlog Alignment Findings</a>
+<a style="padding-left:20px" href="#finding-1-r2-needs-a-designed-encounter-curve">Finding 1: R2 Needs A Designed Encounter Curve</a>
+<a style="padding-left:20px" href="#finding-2-r3-needs-treasure-pacing-targets">Finding 2: R3 Needs Treasure Pacing Targets</a>
+<a style="padding-left:20px" href="#finding-3-r4-needs-a-default-bad-stuff-table">Finding 3: R4 Needs A Default Bad-Stuff Table</a>
+<a style="padding-left:20px" href="#finding-4-r5-curse-effects-are-good-but-need-expiry-rules">Finding 4: R5 Curse Effects Are Good But Need Expiry Rules</a>
+<a style="padding-left:20px" href="#finding-5-r6-bots-need-personality-rules-not-intelligence">Finding 5: R6 Bots Need Personality Rules, Not Intelligence</a>
+<a style="padding-left:10px" href="#4-increment-plan">4. Increment Plan</a>
+<a style="padding-left:20px" href="#gd0-seeded-content-design-audit">GD0. Seeded Content Design Audit</a>
+<a style="padding-left:20px" href="#gd1-encounter-and-treasure-pacing">GD1. Encounter And Treasure Pacing</a>
+<a style="padding-left:20px" href="#gd2-combat-and-reward-balance">GD2. Combat And Reward Balance</a>
+<a style="padding-left:20px" href="#gd3-curse-and-temporary-modifier-rules">GD3. Curse And Temporary Modifier Rules</a>
+<a style="padding-left:20px" href="#gd4-bot-behavior-baseline">GD4. Bot Behavior Baseline</a>
+<a style="padding-left:20px" href="#gd5-terminal-playtest-script">GD5. Terminal Playtest Script</a>
+<a style="padding-left:10px" href="#5-suggested-v0-1-balance-targets">5. Suggested v0.1 Balance Targets</a>
+<a style="padding-left:10px" href="#6-suggested-low-power-support-cards">6. Suggested Low-Power Support Cards</a>
+<a style="padding-left:10px" href="#7-log-tone-guide">7. Log Tone Guide</a>
+<a style="padding-left:10px" href="#8-playtest-note-template">8. Playtest Note Template</a></nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Generated as a self-contained HTML walkthrough. Click acceptance/checklist items to mark review progress.</p>
+<section data-section id="section-gameplay-backlog-refinement-guide-v0-1-prototype">
+<h1 id="gameplay-backlog-refinement-guide-v0-1-prototype">Gameplay Backlog Refinement Guide: v0.1 Prototype</h1>
+<p>This document evaluates the gameplay and content design impact of <a href="../architecture/kickoff_backlog.html">walkthrough/architecture/kickoff_backlog.html</a> and refines the game-design work into increments for the v0.1 Root Prototype.</p>
+<p>This is a mentorship and support artifact. It does not require agents to edit production source directories.</p>
+<hr>
+</section>
+<section data-section id="section-1-backlog-review-summary">
+<h2 id="1-backlog-review-summary">1. Backlog Review Summary</h2>
+<div class="callout"><strong>Second Review: Source-of-Truth Alignment.</strong> Gameplay design is the clearest expression of the domain language in v0.1. Card names, encounter bands, bot personalities, curse states, rewards, and playtest metrics should drive implementation terminology. Do not add tactical structures or content abstractions until the rule, player-facing meaning, and playtest signal are clear.</div>
+<p>The kickoff backlog has the right playable target: one human, two deterministic bots, seeded cards, visible logs, and a complete race from Level 1 to Level 10. The design risk is that the first playable slice could become technically complete but not meaningfully playable if the content curve is not constrained.</p>
+<p>The current v0.1 card set is funny and on-theme, but it is not yet a balanced progression set:</p>
+<ul>
+<li>Early characters start around 3 to 5 Power: Level 1 plus class base bonus.</li>
+<li><code>Null Pointer Exception</code> at Power 2 is the only guaranteed early win.</li>
+<li><code>Legacy Monolith</code> at Power 10, AI threats at Power 12 to 22, <code>Production Outage</code> at Power 22, and <code>The Singularity</code> at Power 50 are mostly midgame or scripted-test threats.</li>
+<li>Starting with two Treasure cards may accelerate Power if the player draws equipment immediately, but the game still needs deterministic fixture decks that prove progression without relying on luck.</li>
+</ul>
+<p>The design refinement should therefore add clear balance bands, scripted validation scenarios, bot behavior limits, and playtest metrics before adding more card categories or class abilities.</p>
+<hr>
+</section>
+<section data-section id="section-2-v0-1-gameplay-scope">
+<h2 id="2-v0-1-gameplay-scope">2. v0.1 Gameplay Scope</h2>
+<section data-section id="section-in-scope">
+<h3 id="in-scope">In Scope</h3>
+<ul>
+<li>A deterministic three-player local match: one human and two bots.</li>
+<li>A Level 1 to Level 10 progression race.</li>
+<li>Encounter cards: monsters, AI threats treated as monster-like threats, and immediate curses.</li>
+<li>Treasure rewards: equipment cards with persistent Power bonuses.</li>
+<li>Simple help and sabotage modifiers.</li>
+<li>Short, readable turn logs with satirical software-engineering tone.</li>
+<li>Minimal class differentiation through base Power only.</li>
+<li>Fixed-seed playtest scripts that prove early, mid, late, win, and loss scenarios.</li>
+</ul>
+<section data-section id="section-out-of-scope-for-v0-1">
+<h3 id="out-of-scope-for-v0-1">Out Of Scope For v0.1</h3>
+<ul>
+<li>Full PvP card play.</li>
+<li>Trading and negotiation economies.</li>
+<li>Equipment slot limits.</li>
+<li>Deep Influence interactions.</li>
+<li>Class-specific active abilities.</li>
+<li>AI chain reactions or multi-card combo effects.</li>
+<li>Large expansion content.</li>
+<li>Persistent match achievements and rankings.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+<section data-section id="section-3-backlog-alignment-findings">
+<h2 id="3-backlog-alignment-findings">3. Backlog Alignment Findings</h2>
+<section data-section id="section-finding-1-r2-needs-a-designed-encounter-curve">
+<h3 id="finding-1-r2-needs-a-designed-encounter-curve">Finding 1: R2 Needs A Designed Encounter Curve</h3>
+<p>R2 defines the Encounter deck, but the current candidates need balance bands so deterministic tests do not repeatedly produce unwinnable early turns.</p>
+<p>Recommended v0.1 encounter bands:</p>
+<table><thead><tr>
+<th>Band</th>
+<th>Power</th>
+<th>Purpose</th>
+<th>Current Cards</th>
+</tr></thead><tbody>
+<tr>
+<td>Tutorial</td>
+<td>1-5</td>
+<td>First wins, first reward draw, first combat log</td>
+<td><code>Null Pointer Exception</code></td>
+</tr>
+<tr>
+<td>Early</td>
+<td>6-9</td>
+<td>Pressure after one equipment card</td>
+<td>Needs 1-2 more support cards or scripted low-power variants</td>
+</tr>
+<tr>
+<td>Mid</td>
+<td>10-15</td>
+<td>First meaningful help requests</td>
+<td><code>Legacy Monolith</code>, <code>Hallucinated Function</code>, <code>Infinite Agent Loop</code></td>
+</tr>
+<tr>
+<td>Late</td>
+<td>16-25</td>
+<td>Requires equipment, level gains, or help</td>
+<td><code>Production Outage</code>, <code>Autonomous Junior Developer</code></td>
+</tr>
+<tr>
+<td>Boss</td>
+<td>40+</td>
+<td>Scripted danger or rare endgame spike</td>
+<td><code>The Singularity</code></td>
+</tr>
+</tbody></table>
+<p>Design recommendation:</p>
+<ul>
+<li>Keep <code>The Singularity</code> rare or scripted.</li>
+<li>Do not let the early shuffled deck contain too many Power 12+ threats before the player has equipment.</li>
+<li>Add low-power support encounters in a later content increment if the first playtest stalls.</li>
+</ul>
+<section data-section id="section-finding-2-r3-needs-treasure-pacing-targets">
+<h3 id="finding-2-r3-needs-treasure-pacing-targets">Finding 2: R3 Needs Treasure Pacing Targets</h3>
+<p>R3 correctly uses equipment as Treasure, but it needs a pacing rule so Power growth is visible without making every fight trivial.</p>
+<p>Recommended v0.1 equipment curve:</p>
+<table><thead><tr>
+<th>Card</th>
+<th>Power Bonus</th>
+<th>Design Role</th>
+</tr></thead><tbody>
+<tr>
+<td><code>ThinkPad</code></td>
+<td>+2</td>
+<td>First visible upgrade</td>
+</tr>
+<tr>
+<td><code>Linux Mastery</code></td>
+<td>+3</td>
+<td>Early-mid stabilizer</td>
+</tr>
+<tr>
+<td><code>PostgreSQL Expertise</code></td>
+<td>+4</td>
+<td>Midgame enabler</td>
+</tr>
+<tr>
+<td><code>Emacs Mastery</code></td>
+<td>+6</td>
+<td>Late swing item</td>
+</tr>
+</tbody></table>
+<p>Design recommendation:</p>
+<ul>
+<li>Starting Treasure cards are acceptable for v0.1, but tests should also cover a no-equipment early fight.</li>
+<li>Do not add equipment slots yet.</li>
+<li>If every bot equips <code>Emacs Mastery</code> too early in fixed-seed simulations, reduce its deck quantity instead of adding a complex slot system.</li>
+</ul>
+<section data-section id="section-finding-3-r4-needs-a-default-bad-stuff-table">
+<h3 id="finding-3-r4-needs-a-default-bad-stuff-table">Finding 3: R4 Needs A Default Bad-Stuff Table</h3>
+<p>R4 specifies a deterministic fallback penalty: lose 1 Level, minimum Level 1. That is good, but named high-impact cards should have readable bad stuff in the design guide even if the first implementation uses fallback behavior.</p>
+<p>Recommended v0.1 bad stuff:</p>
+<table><thead><tr>
+<th>Encounter</th>
+<th>Bad Stuff</th>
+</tr></thead><tbody>
+<tr>
+<td><code>Null Pointer Exception</code></td>
+<td>Lose 1 Level, minimum Level 1</td>
+</tr>
+<tr>
+<td><code>Legacy Monolith</code></td>
+<td>Lose 1 Level and discard 1 random card if available</td>
+</tr>
+<tr>
+<td><code>Production Outage</code></td>
+<td>Lose 2 Levels, minimum Level 1</td>
+</tr>
+<tr>
+<td><code>Hallucinated Function</code></td>
+<td>Discard 1 Treasure card from hand if available</td>
+</tr>
+<tr>
+<td><code>Infinite Agent Loop</code></td>
+<td>Skip the next Play/Equip step</td>
+</tr>
+<tr>
+<td><code>Autonomous Junior Developer</code></td>
+<td>Discard 1 equipped item if available, otherwise lose 1 Level</td>
+</tr>
+<tr>
+<td><code>The Singularity</code></td>
+<td>Lose 3 Levels, minimum Level 1</td>
+</tr>
+</tbody></table>
+<p>Implementation can still begin with the fallback penalty, but the backlog should reserve these named effects as the first balance refinement after the combat resolver works.</p>
+<section data-section id="section-finding-4-r5-curse-effects-are-good-but-need-expiry-rules">
+<h3 id="finding-4-r5-curse-effects-are-good-but-need-expiry-rules">Finding 4: R5 Curse Effects Are Good But Need Expiry Rules</h3>
+<p>The three seeded curses are appropriate for the first prototype. The important refinement is to make their lifetime explicit.</p>
+<p>Recommended curse state:</p>
+<table><thead><tr>
+<th>Curse</th>
+<th>State</th>
+<th>Expiry</th>
+</tr></thead><tbody>
+<tr>
+<td><code>Broken CI</code></td>
+<td><code>skip_next_combat = true</code></td>
+<td>Clears after the next revealed monster or AI threat is discarded</td>
+</tr>
+<tr>
+<td><code>Scope Creep</code></td>
+<td><code>next_monster_power_bonus += 5</code></td>
+<td>Clears after the next combat starts</td>
+</tr>
+<tr>
+<td><code>Context Window Exceeded</code></td>
+<td>No lasting state</td>
+<td>Resolves immediately</td>
+</tr>
+</tbody></table>
+<p>Design recommendation:</p>
+<ul>
+<li>Do not stack <code>Broken CI</code>; drawing it again while active should refresh the same flag.</li>
+<li><code>Scope Creep</code> can stack only if the implementation already supports additive modifiers cleanly. Otherwise, cap it at +5 for v0.1.</li>
+</ul>
+<section data-section id="section-finding-5-r6-bots-need-personality-rules-not-intelligence">
+<h3 id="finding-5-r6-bots-need-personality-rules-not-intelligence">Finding 5: R6 Bots Need Personality Rules, Not Intelligence</h3>
+<p>The backlog already says bots should be predictable. The design layer should make each bot&#x27;s behavior distinct enough to create useful playtests without adding complex AI.</p>
+<p>Recommended v0.1 bots:</p>
+<table><thead><tr>
+<th>Bot</th>
+<th>Personality</th>
+<th>Equip Rule</th>
+<th>Help Rule</th>
+<th>Sabotage Rule</th>
+</tr></thead><tbody>
+<tr>
+<td><code>Legacy Maintainer</code></td>
+<td>Defensive, conservative</td>
+<td>Equip highest Power item</td>
+<td>Helps if active player is losing by 2 or less</td>
+<td>Sabotages only if human would reach Level 10</td>
+</tr>
+<tr>
+<td><code>Prompt Intern</code></td>
+<td>Chaotic, opportunistic</td>
+<td>Equip first available item</td>
+<td>Helps if it gains Treasure from the deal</td>
+<td>Sabotages if human would win by 2 or less</td>
+</tr>
+</tbody></table>
+<p>Design recommendation:</p>
+<ul>
+<li>Use deterministic thresholds and seeded tie-breakers.</li>
+<li>Keep bot choices explainable in one log sentence.</li>
+<li>Do not require bots to understand every future card type.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-4-increment-plan">
+<h2 id="4-increment-plan">4. Increment Plan</h2>
+<section data-section id="section-gd0-seeded-content-design-audit">
+<h3 id="gd0-seeded-content-design-audit">GD0. Seeded Content Design Audit</h3>
+<p>Outcome: confirm that seeded content supports a playable Level 1 to Level 10 race.</p>
+<p>Scope:</p>
+<ul>
+<li>Review current monster, AI, curse, and equipment cards.</li>
+<li>Assign every encounter to a power band.</li>
+<li>Identify missing early-game support cards.</li>
+<li>Flag any card that should be rare, scripted, or deferred.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Every v0.1 card has a design role.</li>
+<li><code>The Singularity</code> is marked rare or scripted.</li>
+<li>At least one fixed-seed scenario can produce an early player win.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Balance table review against seed data.</li>
+<li>Manual review of R2 and R3 deck quantities.</li>
+</ul>
+<section data-section id="section-gd1-encounter-and-treasure-pacing">
+<h3 id="gd1-encounter-and-treasure-pacing">GD1. Encounter And Treasure Pacing</h3>
+<p>Outcome: make the first shuffled decks produce testable progression.</p>
+<p>Scope:</p>
+<ul>
+<li>Define Encounter deck quantity targets by power band.</li>
+<li>Define Treasure deck quantity targets by equipment bonus.</li>
+<li>Keep early progression possible without needing complex class abilities.</li>
+<li>Create one &quot;scripted tutorial fixture&quot; draw order for deterministic tests.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>The first three turns in the tutorial fixture include at least one beatable encounter.</li>
+<li>A player can gain Treasure before facing Power 12+ threats in at least one fixed-seed test.</li>
+<li>Boss-tier threats do not dominate early playtests.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Fixed-seed deck transcript review.</li>
+<li>Full match simulation target: one match ends before turn 40.</li>
+</ul>
+<section data-section id="section-gd2-combat-and-reward-balance">
+<h3 id="gd2-combat-and-reward-balance">GD2. Combat And Reward Balance</h3>
+<p>Outcome: make combat outcomes readable, fair, and quick enough for terminal play.</p>
+<p>Scope:</p>
+<ul>
+<li>Lock v0.1 combat rule: player Power greater than or equal to monster Power wins.</li>
+<li>Use fallback bad stuff first, then named bad stuff as the next refinement.</li>
+<li>Confirm reward levels and reward treasures create steady Level 10 pressure.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>A win clearly grants configured levels and treasure draws.</li>
+<li>A loss never drops Level below 1.</li>
+<li>A Level 10 reward ends the match immediately.</li>
+<li>Named bad-stuff effects are documented even if not implemented in the first resolver.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Scripted win, loss, and Level 10 tests.</li>
+<li>Manual playtest notes for whether turns feel stalled.</li>
+</ul>
+<section data-section id="section-gd3-curse-and-temporary-modifier-rules">
+<h3 id="gd3-curse-and-temporary-modifier-rules">GD3. Curse And Temporary Modifier Rules</h3>
+<p>Outcome: keep setbacks clear without creating hidden state.</p>
+<p>Scope:</p>
+<ul>
+<li>Define expiry rules for every seeded curse.</li>
+<li>Define how temporary monster bonuses appear in logs and snapshots.</li>
+<li>Prevent long-lived penalty stacks from taking over v0.1.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Each curse can be explained in one sentence.</li>
+<li>Each curse has an explicit expiry.</li>
+<li>The UI log can display curse resolution without inspecting private rule state.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Unit test design notes for each curse.</li>
+<li>Playtest checklist for visible curse logs.</li>
+</ul>
+<section data-section id="section-gd4-bot-behavior-baseline">
+<h3 id="gd4-bot-behavior-baseline">GD4. Bot Behavior Baseline</h3>
+<p>Outcome: make local solo tests exercise help and sabotage without unpredictable bot play.</p>
+<p>Scope:</p>
+<ul>
+<li>Assign <code>Legacy Maintainer</code> and <code>Prompt Intern</code> personality rules.</li>
+<li>Define deterministic equip, help, and sabotage thresholds.</li>
+<li>Keep all bot actions valid through the same command boundary as human actions.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Bots equip available items.</li>
+<li>Bots ask for help only under a simple threshold.</li>
+<li>Bots can sabotage the human in a visible, bounded way.</li>
+<li>Replaying the same seed produces the same bot decisions.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Full-match simulation transcript.</li>
+<li>Log review for bot action clarity.</li>
+</ul>
+<section data-section id="section-gd5-terminal-playtest-script">
+<h3 id="gd5-terminal-playtest-script">GD5. Terminal Playtest Script</h3>
+<p>Outcome: make the first manual playtest evaluate game feel, not just whether the program runs.</p>
+<p>Scope:</p>
+<ul>
+<li>Define a short checklist for a human playtester.</li>
+<li>Track progression speed, confusing logs, dead turns, and runaway leaders.</li>
+<li>Capture which cards felt too weak, too punishing, or too frequent.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>A tester can understand the current phase and available action from the terminal state.</li>
+<li>A tester sees at least one combat win, one loss or curse, one equipment play, one bot action, and one Level gain within the first 10 turns.</li>
+<li>A match can complete without adding new rules mid-playtest.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Manual playtest notes with seed, winner, turn count, and balance observations.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-5-suggested-v0-1-balance-targets">
+<h2 id="5-suggested-v0-1-balance-targets">5. Suggested v0.1 Balance Targets</h2>
+<p>Use these as review targets, not hard production rules:</p>
+<table><thead><tr>
+<th>Metric</th>
+<th>Target</th>
+</tr></thead><tbody>
+<tr>
+<td>Match length</td>
+<td>20 to 40 total turns</td>
+</tr>
+<tr>
+<td>First player Level gain</td>
+<td>By turn 3 to 5</td>
+</tr>
+<tr>
+<td>First equipment play</td>
+<td>By turn 1 to 3</td>
+</tr>
+<tr>
+<td>First help or sabotage event</td>
+<td>By turn 8 to 15</td>
+</tr>
+<tr>
+<td>Average early encounter Power</td>
+<td>2 to 8</td>
+</tr>
+<tr>
+<td>Midgame encounter Power</td>
+<td>10 to 15</td>
+</tr>
+<tr>
+<td>Late encounter Power</td>
+<td>16 to 25</td>
+</tr>
+<tr>
+<td>Boss encounter frequency</td>
+<td>Rare or scripted</td>
+</tr>
+<tr>
+<td>Dead turns</td>
+<td>No more than 2 in a row for the human</td>
+</tr>
+</tbody></table>
+<p>If a fixed-seed match misses these targets, adjust content quantities or scripted fixtures before adding new mechanics.</p>
+<hr>
+</section>
+<section data-section id="section-6-suggested-low-power-support-cards">
+<h2 id="6-suggested-low-power-support-cards">6. Suggested Low-Power Support Cards</h2>
+<p>Only add these if GD0 or GD1 shows the current seed set stalls too often. They are design candidates, not required implementation work.</p>
+<table><thead><tr>
+<th>Card</th>
+<th>Type</th>
+<th>Power</th>
+<th>Rewards</th>
+<th>Purpose</th>
+</tr></thead><tbody>
+<tr>
+<td><code>Missing Semicolon</code></td>
+<td><code>MONSTER</code></td>
+<td>3</td>
+<td>1 Treasure</td>
+<td>Early win and joke clarity</td>
+</tr>
+<tr>
+<td><code>Flaky Unit Test</code></td>
+<td><code>MONSTER</code></td>
+<td>6</td>
+<td>1 Level, 1 Treasure</td>
+<td>Bridge from tutorial to midgame</td>
+</tr>
+<tr>
+<td><code>Merge Conflict</code></td>
+<td><code>MONSTER</code></td>
+<td>8</td>
+<td>1 Level, 1 Treasure</td>
+<td>First help-request pressure</td>
+</tr>
+<tr>
+<td><code>Rubber Duck</code></td>
+<td><code>EQUIPMENT</code></td>
+<td>+1</td>
+<td>None</td>
+<td>Filler Treasure, gentle ramp</td>
+</tr>
+<tr>
+<td><code>Stack Overflow Tab</code></td>
+<td><code>EQUIPMENT</code></td>
+<td>+2</td>
+<td>None</td>
+<td>Early stabilizer</td>
+</tr>
+</tbody></table>
+<p>Keep the first playable slice small. Add at most two low-power encounters before expanding the catalog further.</p>
+<hr>
+</section>
+<section data-section id="section-7-log-tone-guide">
+<h2 id="7-log-tone-guide">7. Log Tone Guide</h2>
+<p>Logs should be short, concrete, and funny because the terminal UI has limited room.</p>
+<p>Recommended style:</p>
+<pre><code class="language-text">
+Legacy Maintainer equipped PostgreSQL Expertise. The schema has opinions now.
+Prompt Intern sabotaged the fight. The monster gained +2 Power from &quot;one small prompt tweak.&quot;
+Broken CI resolved. Your next combat gets skipped while everyone blames YAML.
+Scope Creep resolved. The next monster gains +5 Power and a steering committee.
+Context Window Exceeded resolved. Half your hand vanished into summarization.
+</code></pre>
+<p>Avoid long jokes in logs. Put longer jokes in card descriptions instead.</p>
+<hr>
+</section>
+<section data-section id="section-8-playtest-note-template">
+<h2 id="8-playtest-note-template">8. Playtest Note Template</h2>
+<pre><code class="language-text">
+Seed:
+Winner:
+Winning level path:
+Total turns:
+First Level gain turn:
+First equipment turn:
+First bot interaction turn:
+Most confusing rule/log:
+Cards that felt too weak:
+Cards that felt too punishing:
+Dead-turn streaks:
+Recommended next balance change:
+</code></pre>
+<p>Use this after GD5 to decide whether the next increment should adjust card quantities, add low-power support cards, tune bot thresholds, or refine curse severity.</p>
+</section>
+    </article>
+  </main>
+</div>
+<script>
+(function () {
+  const search = document.querySelector('[data-search]');
+  const toggle = document.querySelector('[data-toggle-sections]');
+  const sections = Array.from(document.querySelectorAll('[data-section]'));
+  const checks = Array.from(document.querySelectorAll('li'))
+    .filter(li => /\bGiven\b|\bVerification\b|checklist|Acceptance criteria/i.test(li.textContent));
+  checks.forEach((li, index) => {
+    li.dataset.checkItem = String(index);
+    li.addEventListener('click', () => li.classList.toggle('done'));
+    li.style.cursor = 'pointer';
+    li.title = 'Click to mark this planning item during review';
+  });
+  const style = document.createElement('style');
+  style.textContent = 'li.done{opacity:.62;text-decoration:line-through;}';
+  document.head.appendChild(style);
+  if (search) {
+    search.addEventListener('input', () => {
+      const q = search.value.trim().toLowerCase();
+      sections.forEach(section => {
+        section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+      });
+    });
+  }
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const collapsed = document.body.dataset.collapsed === 'true';
+      document.body.dataset.collapsed = String(!collapsed);
+      sections.forEach(section => {
+        const first = section.querySelector('h2, h3');
+        if (!first) return;
+        Array.from(section.children).forEach(child => {
+          if (child !== first) child.hidden = !collapsed;
+        });
+      });
+      toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+    });
+  }
+})();
+</script>
+</body>
+</html>

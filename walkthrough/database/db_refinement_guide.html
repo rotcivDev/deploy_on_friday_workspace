@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Database Backlog Refinement Guide: v0.1 Prototype</title>
+  <style>
+:root {
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --ink: #17202a;
+  --muted: #637083;
+  --line: #d8dee9;
+  --accent: #0f766e;
+  --accent-2: #b45309;
+  --code-bg: #101828;
+  --code-ink: #e5edf8;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--bg);
+}
+.page-shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+  padding: 24px 18px;
+  border-right: 1px solid var(--line);
+  background: #eef2f7;
+}
+main { padding: 32px min(5vw, 64px) 72px; }
+article {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: clamp(24px, 4vw, 48px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+h1, h2, h3, h4 { line-height: 1.2; margin: 1.4em 0 0.55em; letter-spacing: 0; }
+h1 { margin-top: 0; font-size: clamp(2rem, 4vw, 3rem); }
+h2 { border-top: 1px solid var(--line); padding-top: 1.1em; font-size: 1.55rem; }
+h3 { font-size: 1.2rem; color: #143a36; }
+h4 { font-size: 1.05rem; color: #3a2d12; }
+p, ul, ol, table, pre { margin: 0.85em 0; }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.25em 0; }
+a { color: var(--accent); text-decoration-thickness: 0.08em; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  background: #edf2f7;
+  border: 1px solid #d9e2ec;
+  border-radius: 4px;
+  padding: 0.05em 0.3em;
+}
+pre {
+  overflow-x: auto;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #1f2937;
+}
+pre code { background: transparent; border: 0; color: inherit; padding: 0; }
+table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--line); padding: 8px 10px; vertical-align: top; }
+th { background: #ecfdf5; text-align: left; }
+blockquote { border-left: 4px solid var(--accent-2); margin: 1em 0; padding: 0.25em 1em; background: #fff7ed; color: #4a2f12; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
+.toc-title { font-weight: 700; margin-bottom: 12px; }
+.toc a { display: block; padding: 6px 0; color: #334155; text-decoration: none; font-size: 0.92rem; }
+.toc a:hover { color: var(--accent); }
+.toolbar { display: grid; gap: 10px; margin-bottom: 18px; }
+.toolbar input, .toolbar button {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px 10px;
+  font: inherit;
+  background: white;
+}
+.toolbar button { cursor: pointer; color: white; background: var(--accent); border-color: var(--accent); }
+.meta { color: var(--muted); font-size: 0.95rem; margin-top: -0.5rem; }
+.section-hidden { display: none; }
+mark { background: #fef3c7; padding: 0 0.15em; }
+.back-home { display: inline-block; margin-bottom: 18px; color: var(--accent); }
+@media (max-width: 860px) {
+  .page-shell { display: block; }
+  aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  main { padding: 20px 14px 48px; }
+  article { padding: 22px; }
+}
+</style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a class="back-home" href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter sections">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <div class="toc-title">Contents</div>
+    <nav class="toc"><a style="padding-left:0px" href="#database-backlog-refinement-guide-v0-1-prototype">Database Backlog Refinement Guide: v0.1 Prototype</a>
+<a style="padding-left:10px" href="#1-backlog-review-summary">1. Backlog Review Summary</a>
+<a style="padding-left:10px" href="#2-v0-1-database-scope">2. v0.1 Database Scope</a>
+<a style="padding-left:20px" href="#in-scope">In Scope</a>
+<a style="padding-left:20px" href="#out-of-scope-for-v0-1">Out Of Scope For v0.1</a>
+<a style="padding-left:10px" href="#3-backlog-alignment-findings">3. Backlog Alignment Findings</a>
+<a style="padding-left:20px" href="#finding-1-r1-needs-a-seed-validation-contract">Finding 1: R1 Needs A Seed Validation Contract</a>
+<a style="padding-left:20px" href="#finding-2-r2-and-r3-need-deck-membership-seeds">Finding 2: R2 And R3 Need Deck Membership Seeds</a>
+<a style="padding-left:20px" href="#finding-3-repository-shape-should-match-a3">Finding 3: Repository Shape Should Match A3</a>
+<a style="padding-left:20px" href="#finding-4-jsonb-event-persistence-should-stay-deferred">Finding 4: JSONB Event Persistence Should Stay Deferred</a>
+<a style="padding-left:10px" href="#4-increment-plan">4. Increment Plan</a>
+<a style="padding-left:20px" href="#db0-schema-and-seed-baseline-review">DB0. Schema And Seed Baseline Review</a>
+<a style="padding-left:20px" href="#db1-deck-composition-seed-template">DB1. Deck Composition Seed Template</a>
+<a style="padding-left:20px" href="#db2-content-repository-contract">DB2. Content Repository Contract</a>
+<a style="padding-left:20px" href="#db3-startup-content-gate">DB3. Startup Content Gate</a>
+<a style="padding-left:20px" href="#db4-optional-event-persistence-spike">DB4. Optional Event Persistence Spike</a>
+<a style="padding-left:10px" href="#5-suggested-support-sql-template-for-db1">5. Suggested Support SQL Template For DB1</a>
+<a style="padding-left:10px" href="#6-repository-port-guidance">6. Repository Port Guidance</a>
+<a style="padding-left:10px" href="#7-jsonb-event-guidance-for-later-increments">7. JSONB Event Guidance For Later Increments</a>
+<a style="padding-left:10px" href="#8-local-validation-checklist">8. Local Validation Checklist</a></nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Generated as a self-contained HTML walkthrough. Click acceptance/checklist items to mark review progress.</p>
+<section data-section id="section-database-backlog-refinement-guide-v0-1-prototype">
+<h1 id="database-backlog-refinement-guide-v0-1-prototype">Database Backlog Refinement Guide: v0.1 Prototype</h1>
+<p>This document evaluates the database impact of <a href="../architecture/kickoff_backlog.html">walkthrough/architecture/kickoff_backlog.html</a> and refines the database work into increments for the v0.1 Root Prototype.</p>
+<p>This is a mentorship and support artifact. It does not require agents to edit production source directories.</p>
+<hr>
+</section>
+<section data-section id="section-1-backlog-review-summary">
+<h2 id="1-backlog-review-summary">1. Backlog Review Summary</h2>
+<div class="callout"><strong>Second Review: Source-of-Truth Alignment.</strong> The database model must follow the domain language: card definitions, classes, deck membership, content validation, and later match events. PostgreSQL tables and repository ports are tactical choices that serve content loading and validation. Avoid designing persistence around generic DDD templates, account tables, rankings, or event sourcing until the v0.1 gameplay and match lifecycle require them.</div>
+<p>The kickoff backlog is directionally sound for a local, playable v0.1 prototype: seeded PostgreSQL content feeds an in-memory match, while the domain and application layers keep deterministic game behavior outside the database.</p>
+<p>The database plan needs three refinements before implementation starts:</p>
+<ul>
+<li>Keep v0.1 database access focused on content loading: card types, classes, card definitions, decks, and deck membership.</li>
+<li>Move repository guidance to the application boundary. The kickoff backlog correctly refines the older <code>domain/repositories/card_repository.h</code> idea into an application port such as <code>application/ports/content_repository.h</code>.</li>
+<li>Add explicit deck composition data. The current schema has <code>decks</code> and <code>deck_cards</code>, but the seed files create deck names without linking cards into Encounter and Treasure draw piles.</li>
+</ul>
+<p>Persistent accounts, rankings, achievements, inventory, and match history already exist in the schema as future-facing tables, but the kickoff backlog defers them from the first playable refinement. Do not let those tables expand v0.1 scope.</p>
+<hr>
+</section>
+<section data-section id="section-2-v0-1-database-scope">
+<h2 id="2-v0-1-database-scope">2. v0.1 Database Scope</h2>
+<section data-section id="section-in-scope">
+<h3 id="in-scope">In Scope</h3>
+<ul>
+<li>Validate seeded <code>card_types</code> include <code>MONSTER</code>, <code>TREASURE</code>, <code>CURSE</code>, <code>EVENT</code>, <code>EQUIPMENT</code>, <code>PVP</code>, and <code>AI</code>.</li>
+<li>Validate seeded <code>classes</code> include the six starting classes listed in R1.</li>
+<li>Load card definitions needed by R1, R2, R3, R4, and R5.</li>
+<li>Load deck definitions and <code>deck_cards.quantity</code> values for deterministic Encounter and Treasure deck construction.</li>
+<li>Provide clear startup failures when required content is missing.</li>
+<li>Provide SQL validation queries and fixture expectations for repository/content tests.</li>
+</ul>
+<section data-section id="section-out-of-scope-for-v0-1">
+<h3 id="out-of-scope-for-v0-1">Out Of Scope For v0.1</h3>
+<ul>
+<li>Persisting full match history.</li>
+<li>Writing <code>game_events</code> during normal play.</li>
+<li>Account authentication, password handling, rankings, achievements, and player inventory updates.</li>
+<li>Connection pooling, migrations automation, or deployment automation.</li>
+<li>Querying PostgreSQL during each turn. The match should load content at startup and then run in memory.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+<section data-section id="section-3-backlog-alignment-findings">
+<h2 id="3-backlog-alignment-findings">3. Backlog Alignment Findings</h2>
+<section data-section id="section-finding-1-r1-needs-a-seed-validation-contract">
+<h3 id="finding-1-r1-needs-a-seed-validation-contract">Finding 1: R1 Needs A Seed Validation Contract</h3>
+<p>R1 asks for a seeded content smoke test. The database plan should make this a first-class startup gate, not a loose manual check.</p>
+<p>Recommended validation:</p>
+<pre><code class="language-sql">
+SELECT name
+FROM card_types
+ORDER BY name;
+
+SELECT name
+FROM classes
+ORDER BY name;
+
+SELECT ct.name AS card_type, COUNT(*) AS card_count
+FROM card_definitions cd
+JOIN card_types ct ON ct.id = cd.card_type_id
+GROUP BY ct.name
+ORDER BY ct.name;
+</code></pre>
+<p>Acceptance target:</p>
+<ul>
+<li>All seven card types exist.</li>
+<li>All six starting classes exist.</li>
+<li>At least one <code>MONSTER</code>, <code>AI</code>, <code>CURSE</code>, and <code>EQUIPMENT</code> card exists.</li>
+<li>Startup fails with a readable missing-content message if any required group is empty.</li>
+</ul>
+<section data-section id="section-finding-2-r2-and-r3-need-deck-membership-seeds">
+<h3 id="finding-2-r2-and-r3-need-deck-membership-seeds">Finding 2: R2 And R3 Need Deck Membership Seeds</h3>
+<p>The schema supports deck composition through <code>deck_cards</code>, but <code>02_seed_core_data.sql</code> currently creates only deck records. <code>03_seed_cards.sql</code> creates card definitions, but does not assign cards to decks.</p>
+<p>Recommended v0.1 deck mapping:</p>
+<ul>
+<li><code>Core Monster Deck</code>: <code>MONSTER</code>, <code>AI</code>, and <code>CURSE</code> cards used as the Encounter deck.</li>
+<li><code>Treasure Deck</code>: <code>EQUIPMENT</code> cards used as rewards.</li>
+<li><code>Curse Deck</code>: optional in v0.1 unless a separate curse-only test deck is useful.</li>
+<li><code>AI Chaos Deck</code>: optional in v0.1 unless AI cards need a separate expansion fixture.</li>
+</ul>
+<p>Recommended validation:</p>
+<pre><code class="language-sql">
+SELECT d.name AS deck_name, ct.name AS card_type, cd.name AS card_name, dc.quantity
+FROM deck_cards dc
+JOIN decks d ON d.id = dc.deck_id
+JOIN card_definitions cd ON cd.id = dc.card_definition_id
+JOIN card_types ct ON ct.id = cd.card_type_id
+ORDER BY d.name, ct.name, cd.name;
+</code></pre>
+<p>Acceptance target:</p>
+<ul>
+<li>Encounter deck has all R2 candidate threats and curses.</li>
+<li>Treasure deck has the initial R3 equipment target: <code>ThinkPad</code>, <code>Linux Mastery</code>, <code>PostgreSQL Expertise</code>, and <code>Emacs Mastery</code>.</li>
+<li>Every <code>deck_cards.quantity</code> is positive.</li>
+</ul>
+<section data-section id="section-finding-3-repository-shape-should-match-a3">
+<h3 id="finding-3-repository-shape-should-match-a3">Finding 3: Repository Shape Should Match A3</h3>
+<p>The database adapter should implement an application port, not a domain repository and not a domain-visible database connection.</p>
+<p>Recommended shape:</p>
+<pre><code class="language-text">
+application/ports/content_repository.h
+    declares content loading operations and plain result structs
+
+infrastructure/db/postgresql_content_repository.c
+    owns libpq connection lifecycle, SQL, and row mapping
+
+domain/
+    receives card/class definitions as plain values only
+</code></pre>
+<p>The application port should return content definitions and typed errors. It should not return <code>PGconn</code>, <code>PGresult</code>, SQL strings, or infrastructure-owned row buffers.</p>
+<section data-section id="section-finding-4-jsonb-event-persistence-should-stay-deferred">
+<h3 id="finding-4-jsonb-event-persistence-should-stay-deferred">Finding 4: JSONB Event Persistence Should Stay Deferred</h3>
+<p>A7 correctly says event payloads can be simple structs in v0.1 and JSONB persistence can be added later. The existing <code>game_events</code> table and GIN index are useful for v0.2+ but should not become part of the first playable slice unless the user explicitly chooses an event-persistence spike.</p>
+<p>Recommended v0.1 posture:</p>
+<ul>
+<li>Keep <code>game_events</code> schema documented and available.</li>
+<li>Do not require runtime writes to <code>game_events</code>.</li>
+<li>Use the application/domain event structs for logs and deterministic replay tests.</li>
+<li>Add JSONB persistence only after the local turn loop is playable.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-4-increment-plan">
+<h2 id="4-increment-plan">4. Increment Plan</h2>
+<section data-section id="section-db0-schema-and-seed-baseline-review">
+<h3 id="db0-schema-and-seed-baseline-review">DB0. Schema And Seed Baseline Review</h3>
+<p>Outcome: confirm the walkthrough SQL files can initialize a local database without relying on production code.</p>
+<p>Scope:</p>
+<ul>
+<li>Apply <code>01_schema.sql</code>, <code>02_seed_core_data.sql</code>, <code>03_seed_cards.sql</code>, and <code>04_seed_achievements.sql</code>.</li>
+<li>Run the R1 validation queries.</li>
+<li>Record missing content or schema mismatches in this guide or a follow-up support note.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Schema loads cleanly.</li>
+<li>Core card types and classes are present.</li>
+<li>Card definition counts match the R1 expectations.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Manual <code>psql</code> run or local database smoke test.</li>
+</ul>
+<section data-section id="section-db1-deck-composition-seed-template">
+<h3 id="db1-deck-composition-seed-template">DB1. Deck Composition Seed Template</h3>
+<p>Outcome: make R2 and R3 possible by defining deck membership and quantities.</p>
+<p>Scope:</p>
+<ul>
+<li>Add a support SQL template, suggested as <code>walkthrough/database/05_seed_deck_cards.sql</code>, or extend the existing seed guide with deck membership inserts.</li>
+<li>Link Encounter deck cards to <code>Core Monster Deck</code>.</li>
+<li>Link equipment cards to <code>Treasure Deck</code>.</li>
+<li>Keep quantities explicit so deterministic tests can assert deck size.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li><code>Core Monster Deck</code> contains the R2 candidate threats and curses.</li>
+<li><code>Treasure Deck</code> contains the R3 equipment cards.</li>
+<li>No <code>deck_cards</code> row has <code>quantity &lt;= 0</code>.</li>
+<li>Running the seed twice should not create duplicate membership rows. Use <code>ON CONFLICT</code> where appropriate.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Query <code>deck_cards</code> by deck and card type.</li>
+<li>Assert expected deck sizes before in-memory shuffling starts.</li>
+</ul>
+<section data-section id="section-db2-content-repository-contract">
+<h3 id="db2-content-repository-contract">DB2. Content Repository Contract</h3>
+<p>Outcome: define the data returned by the database adapter before production implementation.</p>
+<p>Scope:</p>
+<ul>
+<li>Document an application port for content loading.</li>
+<li>Include operations for loading classes, all cards, and cards by deck.</li>
+<li>Define ownership expectations for returned arrays.</li>
+<li>Define typed failures for missing content, database unavailable, and row mapping errors.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Application receives plain card/class/deck definition structs.</li>
+<li>Infrastructure keeps <code>libpq</code> types private.</li>
+<li>Repository startup failure prevents an empty match from starting.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Fake repository test for application match setup.</li>
+<li>Database adapter mapping test against the walkthrough seed data.</li>
+</ul>
+<section data-section id="section-db3-startup-content-gate">
+<h3 id="db3-startup-content-gate">DB3. Startup Content Gate</h3>
+<p>Outcome: fail fast when local content is incomplete.</p>
+<p>Scope:</p>
+<ul>
+<li>Validate required card types, classes, deck names, deck membership, and minimum counts before match creation.</li>
+<li>Treat AI cards as encounter threats for v0.1 unless a later rule resolver separates them.</li>
+<li>Return readable diagnostic messages such as <code>missing deck card: Treasure Deck -&gt; ThinkPad</code>.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Empty or partially seeded databases do not start a match.</li>
+<li>Valid walkthrough seed data passes.</li>
+<li>Validation does not require persistent player accounts or match history.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Content smoke test with valid seed data.</li>
+<li>Negative tests with missing card type, missing class, missing deck card, and zero quantity.</li>
+</ul>
+<section data-section id="section-db4-optional-event-persistence-spike">
+<h3 id="db4-optional-event-persistence-spike">DB4. Optional Event Persistence Spike</h3>
+<p>Outcome: prepare for v0.2 persistence without blocking v0.1.</p>
+<p>Scope:</p>
+<ul>
+<li>Document mapping from application event structs to <code>game_events.payload</code>.</li>
+<li>Keep writes optional behind an infrastructure adapter.</li>
+<li>Use <code>match_id</code> and JSONB payload indexes already present in <code>01_schema.sql</code>.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Event persistence can be disabled for local v0.1 tests.</li>
+<li>If enabled, event writes are append-only and do not affect game rule outcomes.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Insert/replay smoke test only if the user chooses this spike.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-5-suggested-support-sql-template-for-db1">
+<h2 id="5-suggested-support-sql-template-for-db1">5. Suggested Support SQL Template For DB1</h2>
+<p>The user can turn this into <code>walkthrough/database/05_seed_deck_cards.sql</code> when ready.</p>
+<pre><code class="language-sql">
+BEGIN;
+
+INSERT INTO deck_cards (deck_id, card_definition_id, quantity)
+SELECT d.id, cd.id, 2
+FROM decks d
+JOIN card_definitions cd ON cd.name IN (
+    &#x27;Null Pointer Exception&#x27;,
+    &#x27;Legacy Monolith&#x27;,
+    &#x27;Production Outage&#x27;,
+    &#x27;Hallucinated Function&#x27;,
+    &#x27;Infinite Agent Loop&#x27;,
+    &#x27;Autonomous Junior Developer&#x27;,
+    &#x27;Broken CI&#x27;,
+    &#x27;Scope Creep&#x27;,
+    &#x27;Context Window Exceeded&#x27;
+)
+WHERE d.name = &#x27;Core Monster Deck&#x27;
+ON CONFLICT (deck_id, card_definition_id)
+DO UPDATE SET quantity = EXCLUDED.quantity;
+
+INSERT INTO deck_cards (deck_id, card_definition_id, quantity)
+SELECT d.id, cd.id, 1
+FROM decks d
+JOIN card_definitions cd ON cd.name = &#x27;The Singularity&#x27;
+WHERE d.name = &#x27;Core Monster Deck&#x27;
+ON CONFLICT (deck_id, card_definition_id)
+DO UPDATE SET quantity = EXCLUDED.quantity;
+
+INSERT INTO deck_cards (deck_id, card_definition_id, quantity)
+SELECT d.id, cd.id, 2
+FROM decks d
+JOIN card_definitions cd ON cd.name IN (
+    &#x27;ThinkPad&#x27;,
+    &#x27;Linux Mastery&#x27;,
+    &#x27;PostgreSQL Expertise&#x27;,
+    &#x27;Emacs Mastery&#x27;
+)
+WHERE d.name = &#x27;Treasure Deck&#x27;
+ON CONFLICT (deck_id, card_definition_id)
+DO UPDATE SET quantity = EXCLUDED.quantity;
+
+COMMIT;
+</code></pre>
+<p>This keeps <code>The Singularity</code> rare while making the rest of the Encounter deck repeatable enough for deterministic tests.</p>
+<hr>
+</section>
+<section data-section id="section-6-repository-port-guidance">
+<h2 id="6-repository-port-guidance">6. Repository Port Guidance</h2>
+<p>Use this as a design target for the user-created application port. The exact C names can change to match local conventions.</p>
+<pre><code class="language-c">
+typedef struct {
+    int id;
+    char name[50];
+} content_card_type_t;
+
+typedef struct {
+    int id;
+    char name[100];
+    char description[512];
+    int base_power_bonus;
+} content_class_t;
+
+typedef struct {
+    int id;
+    int card_type_id;
+    char card_type_name[50];
+    char name[150];
+    char description[512];
+    int power_bonus;
+    int monster_power;
+    int reward_levels;
+    int reward_treasures;
+    char rarity[20];
+    char expansion[100];
+    int deck_quantity;
+} content_card_definition_t;
+
+typedef enum {
+    CONTENT_OK = 0,
+    CONTENT_ERR_DB_UNAVAILABLE,
+    CONTENT_ERR_QUERY_FAILED,
+    CONTENT_ERR_MISSING_REQUIRED_CONTENT,
+    CONTENT_ERR_OUT_OF_MEMORY
+} content_result_code_t;
+</code></pre>
+<p>Recommended operations:</p>
+<pre><code class="language-text">
+load_classes()
+load_all_card_definitions()
+load_deck_cards(deck_name)
+validate_required_v0_1_content()
+free_content_result()
+</code></pre>
+<p>Ownership rule:</p>
+<ul>
+<li>Infrastructure allocates result arrays.</li>
+<li>Application frees result arrays through a matching repository free function.</li>
+<li>Domain never owns or sees database handles.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-7-jsonb-event-guidance-for-later-increments">
+<h2 id="7-jsonb-event-guidance-for-later-increments">7. JSONB Event Guidance For Later Increments</h2>
+<p>The existing <code>game_events</code> table is a good future fit for replay and analytics:</p>
+<pre><code class="language-sql">
+CREATE INDEX idx_events_match
+ON game_events(match_id);
+
+CREATE INDEX idx_events_payload
+ON game_events
+USING GIN(payload);
+</code></pre>
+<p>Use JSONB when v0.2+ needs persisted logs like:</p>
+<pre><code class="language-json">
+{
+  &quot;turn&quot;: 4,
+  &quot;actor&quot;: &quot;Prompt Intern&quot;,
+  &quot;card&quot;: &quot;Broken CI&quot;,
+  &quot;effect&quot;: &quot;skip_next_combat&quot;
+}
+</code></pre>
+<p>For v0.1, keep event payloads in memory and let the terminal log render application/domain events from the command result.</p>
+<hr>
+</section>
+<section data-section id="section-8-local-validation-checklist">
+<h2 id="8-local-validation-checklist">8. Local Validation Checklist</h2>
+<p>Use this checklist to validate DB0 and DB1 locally:</p>
+<pre><code class="language-bash">
+createdb dungeons_devs
+psql -v ON_ERROR_STOP=1 -d dungeons_devs -f walkthrough/database/01_schema.sql
+psql -v ON_ERROR_STOP=1 -d dungeons_devs -f walkthrough/database/02_seed_core_data.sql
+psql -v ON_ERROR_STOP=1 -d dungeons_devs -f walkthrough/database/03_seed_cards.sql
+psql -v ON_ERROR_STOP=1 -d dungeons_devs -f walkthrough/database/04_seed_achievements.sql
+</code></pre>
+<p>After DB1 exists, apply the deck membership seed:</p>
+<pre><code class="language-bash">
+psql -v ON_ERROR_STOP=1 -d dungeons_devs -f walkthrough/database/05_seed_deck_cards.sql
+</code></pre>
+<p>Then run the validation queries from section 3. The expected result is a complete content catalog and non-empty Encounter and Treasure deck membership before the application builds any in-memory deck.</p>
+</section>
+    </article>
+  </main>
+</div>
+<script>
+(function () {
+  const search = document.querySelector('[data-search]');
+  const toggle = document.querySelector('[data-toggle-sections]');
+  const sections = Array.from(document.querySelectorAll('[data-section]'));
+  const checks = Array.from(document.querySelectorAll('li'))
+    .filter(li => /\bGiven\b|\bVerification\b|checklist|Acceptance criteria/i.test(li.textContent));
+  checks.forEach((li, index) => {
+    li.dataset.checkItem = String(index);
+    li.addEventListener('click', () => li.classList.toggle('done'));
+    li.style.cursor = 'pointer';
+    li.title = 'Click to mark this planning item during review';
+  });
+  const style = document.createElement('style');
+  style.textContent = 'li.done{opacity:.62;text-decoration:line-through;}';
+  document.head.appendChild(style);
+  if (search) {
+    search.addEventListener('input', () => {
+      const q = search.value.trim().toLowerCase();
+      sections.forEach(section => {
+        section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+      });
+    });
+  }
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const collapsed = document.body.dataset.collapsed === 'true';
+      document.body.dataset.collapsed = String(!collapsed);
+      sections.forEach(section => {
+        const first = section.querySelector('h2, h3');
+        if (!first) return;
+        Array.from(section.children).forEach(child => {
+          if (child !== first) child.hidden = !collapsed;
+        });
+      });
+      toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+    });
+  }
+})();
+</script>
+</body>
+</html>

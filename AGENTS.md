@@ -8,9 +8,10 @@ Welcome to the **Dungeon of Technical Debt** Agent Hub. This file acts as a cent
 To keep the learning experience hands-on and ensure code quality, the following rules apply to all AI agents:
 
 > [!IMPORTANT]
-> **1. Code Implementation Block**: Agents **cannot** write or modify files in the main production codebase (`domain/`, `application/`, `infrastructure/`, `server/`, `client/`, or `shared/`) directly.
-> **2. Designers & Architects**: Can create design specifications, documentation files, templates, and creative descriptions.
-> **3. Engineers (Systems & DB)**: Can produce support materials, API guides, configuration templates, and coding examples (standalone), but must never modify the primary codebase files.
+> **1. Tech Project Source Tree Is Read-Only**: Agents **cannot** write or modify files in the main production codebase (`domain/`, `application/`, `infrastructure/`, `server/`, `client/`, or `shared/`) directly.
+> **2. Project-Level Docs Are Writable**: Agents may freely create and update repository-level documentation and support artifacts outside the protected source tree, including root `README.md` files, `docs/`, `walkthrough/`, plans, guides, templates, and diagram files such as `.html`, `.drawio`, `.puml`, and `.mermaid`.
+> **3. Designers & Architects**: Can create design specifications, documentation files, templates, creative descriptions, and diagrams.
+> **4. Engineers (Systems, DB & DevOps)**: Can produce support materials, API guides, configuration templates, SQL templates, CI/CD templates, environment guides, deployment plans, test plans, standalone coding examples, and implementation walkthroughs, but must never modify the primary codebase files.
 
 ---
 
@@ -45,6 +46,16 @@ Codex may create or modify:
 * SQL schema or seed templates under support/documentation paths.
 * Prompt files and mentor instructions.
 * Git support files when acting as the Git Specialist.
+* DevOps support files outside the protected source tree, such as CI/CD templates, environment guides, runbooks, deployment plans, and service topology diagrams.
+* Guides, plans, and diagram files stored outside the protected source tree.
+
+Human-facing documents under `walkthrough/` must be written as `.html` files instead of Markdown. These HTML walkthrough files may include inline CSS and small inline JavaScript snippets for local, dependency-free demonstrations such as filters, checklists, accordions, state diagrams, or event examples. Keep executable support files in their native formats, such as `.sql` for database seeds.
+
+### Software Engineering Source Of Truth
+
+All technical approaches and decisions in this workspace must follow the principle in [walkthrough/architecture/software_engineering_principles.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/software_engineering_principles.html): **the domain is the source of truth, and strategic understanding comes before tactical structure**.
+
+Clean Architecture, tactical DDD patterns, Docker/Compose, CMake, database repositories, protocol layouts, and CI gates are implementation tools. Use them only when they clarify the domain, protect a domain boundary, improve deterministic feedback, or reduce delivery risk. Do not start from tactical patterns and force the game/product domain to fit them.
 
 Codex must not directly write production implementation files in:
 
@@ -55,7 +66,7 @@ Codex must not directly write production implementation files in:
 * `client/`
 * `shared/`
 
-When the user asks for implementation, provide a patch plan, pseudocode, standalone examples, or step-by-step mentorship instead of editing those directories.
+Treat the tech project source tree as read-only. When the user asks for implementation, provide a patch plan, pseudocode, standalone examples, diagrams, or step-by-step mentorship instead of editing those directories.
 
 ### Approval and Network Rules
 
@@ -92,6 +103,7 @@ The following skills are placed in the project root [`.agent/skills/`](file:///h
 | **Senior Game Designer** | [`game-designer`](file:///home/msratso/workspaces/c_dev/.agent/skills/game-designer/SKILL.md) | Game balancing, cards, level milestones, lore, and engineering satire. |
 | **Senior Systems Programmer** | [`systems-programmer`](file:///home/msratso/workspaces/c_dev/.agent/skills/systems-programmer/SKILL.md) | POSIX sockets, pthreads thread-safety, CMake builds, binary packet layouts. |
 | **PostgreSQL Architect** | [`db-architect`](file:///home/msratso/workspaces/c_dev/.agent/skills/db-architect/SKILL.md) | Database tables, indexes, event logging using JSONB/GIN, DDL template migrations. |
+| **Game Industry DevOps Principal Engineer** | [`devops-principal-engineer`](file:///home/msratso/workspaces/c_dev/.agent/skills/devops-principal-engineer/SKILL.md) | Local environments, CI/CD, runtime services, deployment topology, secrets, observability, release gates. |
 | **Git Specialist** | [`git-specialist`](file:///home/msratso/workspaces/c_dev/.agent/skills/git-specialist/SKILL.md) | Git operations, branching strategy, Conventional Commits, ignore/attribute configurations. |
 | **Project Manager / Product Owner** | [`project-manager-owner`](file:///home/msratso/workspaces/c_dev/.agent/skills/project-manager-owner/SKILL.md) | Discovery, phased roadmaps, backlog creation, MVP slicing, incremental releases, themed extensions. |
 
@@ -104,7 +116,10 @@ When agents generate documents, specs, examples, or templates, they must be regi
 ### 🎨 Creative & Design Docs (Architects & Designers)
 *   **[dungeons_and_devs/README.md](file:///home/msratso/workspaces/c_dev/dungeons_and_devs/README.md)**: Original project overview, game mechanics, and lore.
 *   **[dungeons_and_devs_prompt.md](file:///home/msratso/workspaces/c_dev/dungeons_and_devs_prompt.md)**: Codex-ready project prompt and mentor operating brief.
-*   **[walkthrough/architecture/kickoff_backlog.md](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/kickoff_backlog.md)**: Product backlog for the v0.1 Root Prototype.
+*   **[walkthrough/architecture/kickoff_backlog.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/kickoff_backlog.html)**: Product backlog for the v0.1 Root Prototype, compiled last by the Project Manager / Product Owner.
+*   **[walkthrough/architecture/software_engineering_principles.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/software_engineering_principles.html)**: Source-of-truth engineering principle: domain understanding before tactical structure.
+*   **[walkthrough/architecture/lead_architecture_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/lead_architecture_refinement_guide.html)**: Lead architecture synthesis of team backlog refinements, dependency boundaries, and unified increment order.
+*   **[walkthrough/design/gameplay_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/design/gameplay_refinement_guide.html)**: Gameplay/content backlog refinement, v0.1 balance targets, bot behavior, and playtest plan.
 *   *(Add future design files here)*
 
 ### 📝 Support Materials, Guides & Examples (Engineers)
@@ -112,8 +127,10 @@ When agents generate documents, specs, examples, or templates, they must be regi
 *   **[walkthrough/database/02_seed_core_data.sql](file:///home/msratso/workspaces/c_dev/walkthrough/database/02_seed_core_data.sql)**: Core lookup/metadata seed SQL.
 *   **[walkthrough/database/03_seed_cards.sql](file:///home/msratso/workspaces/c_dev/walkthrough/database/03_seed_cards.sql)**: Card seed template.
 *   **[walkthrough/database/04_seed_achievements.sql](file:///home/msratso/workspaces/c_dev/walkthrough/database/04_seed_achievements.sql)**: Achievements seed template.
-*   **[walkthrough/database/db_refinement_guide.md](file:///home/msratso/workspaces/c_dev/walkthrough/database/db_refinement_guide.md)**: Database architecture design refinement spec for v0.1.
-*   **[walkthrough/testing/systems_refinement_guide.md](file:///home/msratso/workspaces/c_dev/walkthrough/testing/systems_refinement_guide.md)**: Systems architecture compile, run and tests guide for v0.1.
+*   **[walkthrough/database/db_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/database/db_refinement_guide.html)**: Database architecture design refinement spec for v0.1.
+*   **[walkthrough/devops/devops_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/devops/devops_refinement_guide.html)**: DevOps refinement guide for local environment, Make workflow, CI gates, database lifecycle, runtime topology, and v0.1 release readiness.
+*   **[walkthrough/git/git_workflow_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/git/git_workflow_refinement_guide.html)**: Git workflow and repository hygiene refinement guide for HTML walkthrough migration and v0.1 delivery.
+*   **[walkthrough/testing/systems_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/testing/systems_refinement_guide.html)**: Systems architecture compile, run and tests guide for v0.1.
 *   *(Add future programming guides or standalone code examples here)*
 
 ---

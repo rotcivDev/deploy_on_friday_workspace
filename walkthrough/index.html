@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Support Material and Walkthrough Hub</title><style>
+:root{--bg:#f7f8fb;--panel:#fff;--ink:#17202a;--muted:#637083;--line:#d8dee9;--accent:#0f766e;--accent2:#b45309;--codebg:#101828;--codeink:#e5edf8}*{box-sizing:border-box}body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;color:var(--ink);background:var(--bg)}.page-shell{display:grid;grid-template-columns:minmax(220px,280px) minmax(0,1fr);min-height:100vh}aside{position:sticky;top:0;height:100vh;overflow:auto;padding:24px 18px;border-right:1px solid var(--line);background:#eef2f7}main{padding:32px min(5vw,64px) 72px}article{max-width:1120px;margin:0 auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:clamp(24px,4vw,48px);box-shadow:0 8px 24px rgba(15,23,42,.05)}h1,h2,h3,h4{line-height:1.2;margin:1.4em 0 .55em;letter-spacing:0}h1{margin-top:0;font-size:clamp(2rem,4vw,3rem)}h2{border-top:1px solid var(--line);padding-top:1.1em;font-size:1.55rem}h3{font-size:1.2rem;color:#143a36}a{color:var(--accent)}p,ul,ol,table,pre{margin:.85em 0}ul,ol{padding-left:1.4rem}li{margin:.25em 0}code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;background:#edf2f7;border:1px solid #d9e2ec;border-radius:4px;padding:.05em .3em}pre{overflow-x:auto;background:var(--codebg);color:var(--codeink);padding:16px;border-radius:8px;border:1px solid #1f2937}pre code{background:transparent;border:0;color:inherit;padding:0}table{width:100%;border-collapse:collapse;display:block;overflow-x:auto}th,td{border:1px solid var(--line);padding:8px 10px;vertical-align:top}th{background:#ecfdf5;text-align:left}blockquote{border-left:4px solid var(--accent2);margin:1em 0;padding:.25em 1em;background:#fff7ed;color:#4a2f12}hr{border:0;border-top:1px solid var(--line);margin:2rem 0}.toolbar{display:grid;gap:10px;margin-bottom:18px}.toolbar input,.toolbar button{width:100%;border:1px solid var(--line);border-radius:6px;padding:9px 10px;font:inherit;background:white}.toolbar button{cursor:pointer;color:white;background:var(--accent);border-color:var(--accent)}.toc a{display:block;padding:6px 0;color:#334155;text-decoration:none;font-size:.92rem}.meta{color:var(--muted);font-size:.95rem;margin-top:-.5rem}.section-hidden{display:none}li.done{opacity:.62;text-decoration:line-through}@media(max-width:860px){.page-shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}article{padding:22px}}
+</style></head>
+<body><div class="page-shell"><aside><a href="index.html">Walkthrough Index</a><div class="toolbar"><input data-search type="search" placeholder="Filter sections"><button data-toggle-sections type="button">Collapse Sections</button></div><nav class="toc"><a style="padding-left:0px" href="#support-material-and-walkthrough-hub">Support Material and Walkthrough Hub</a>
+<a style="padding-left:10px" href="#folder-structure">📂 Folder Structure</a>
+<a style="padding-left:10px" href="#1-database-walkthrough-database">💾 1. Database (walkthrough/database/)</a>
+<a style="padding-left:10px" href="#2-design-walkthrough-design">🎮 2. Design (walkthrough/design/)</a>
+<a style="padding-left:10px" href="#3-devops-walkthrough-devops">⚙️ 3. DevOps (walkthrough/devops/)</a>
+<a style="padding-left:10px" href="#4-git-walkthrough-git">🧾 4. Git (walkthrough/git/)</a>
+<a style="padding-left:10px" href="#5-networking-walkthrough-networking">🌐 5. Networking (walkthrough/networking/)</a>
+<a style="padding-left:10px" href="#6-architecture-walkthrough-architecture">📐 6. Architecture (walkthrough/architecture/)</a>
+<a style="padding-left:10px" href="#7-testing-build-walkthrough-testing">🧪 7. Testing &amp;amp; Build (walkthrough/testing/)</a></nav></aside><main><article><p class="meta">Self-contained HTML walkthrough. Use the filter and click checklist items during review.</p>
+<section data-section id="section-support-material-and-walkthrough-hub">
+<h1 id="support-material-and-walkthrough-hub">Support Material and Walkthrough Hub</h1>
+<p>This directory acts as the central archive for all agent-generated guides, examples, standalone templates, and specifications. It is structured into distinct categories to organize different types of technical help files.</p>
+<blockquote>[!IMPORTANT]</blockquote>
+<blockquote><strong>Strict Code Boundaries</strong>: No files in this walkthrough tree are part of the production execution environment. They are purely educational guides, seeds, and design specs to assist in manual implementation.</blockquote>
+<hr>
+</section>
+<section data-section id="section-folder-structure">
+<h2 id="folder-structure">📂 Folder Structure</h2>
+<pre><code>
+walkthrough/
+├── database/          # Database DDLs, schema structure, seeds, and migrations templates
+├── design/            # Gameplay balance, content specs, card design, and playtest guides
+├── devops/            # Local environment, CI gates, release readiness, and runtime topology
+├── git/               # Repository hygiene, branch workflow, and commit guidance
+├── networking/        # Networking protocols, serialization guides, socket examples
+├── architecture/      # Clean architecture guidelines, layer patterns, UML/structure specs
+└── testing/           # Make / CMake guides, CTest suites, unit testing templates
+</code></pre>
+<hr>
+</section>
+<section data-section id="section-1-database-walkthrough-database">
+<h2 id="1-database-walkthrough-database">💾 1. Database (<code>walkthrough/database/</code>)</h2>
+<p>Contains SQL templates and schemas to configure PostgreSQL:</p>
+<ul>
+<li><strong><a href="database/01_schema.sql">01_schema.sql</a></strong>: Production-ready core database schema definitions.</li>
+<li><strong><a href="database/02_seed_core_data.sql">02_seed_core_data.sql</a></strong>: Lookup tables seed (classes, core decks).</li>
+<li><strong><a href="database/03_seed_cards.sql">03_seed_cards.sql</a></strong>: Default encounter, treasure, equipment, curse, and AI cards.</li>
+<li><strong><a href="database/04_seed_achievements.sql">04_seed_achievements.sql</a></strong>: Core achievement lookup seeds.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-2-design-walkthrough-design">
+<h2 id="2-design-walkthrough-design">🎮 2. Design (<code>walkthrough/design/</code>)</h2>
+<p>Reserved for gameplay balance, card design, content specs, and playtest support documents:</p>
+<ul>
+<li><strong><a href="design/gameplay_refinement_guide.html">gameplay_refinement_guide.html</a></strong>: v0.1 gameplay/content backlog refinement, balance targets, bot behavior, and playtest plan.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-3-devops-walkthrough-devops">
+<h2 id="3-devops-walkthrough-devops">⚙️ 3. DevOps (<code>walkthrough/devops/</code>)</h2>
+<p>Reserved for local environment setup, CI/CD planning, runtime topology, release gates, and operational-readiness support documents:</p>
+<ul>
+<li><strong><a href="devops/devops_refinement_guide.html">devops_refinement_guide.html</a></strong>: v0.1 DevOps backlog refinement, Make workflow, database lifecycle, CI gates, runtime topology, and release readiness.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-4-git-walkthrough-git">
+<h2 id="4-git-walkthrough-git">🧾 4. Git (<code>walkthrough/git/</code>)</h2>
+<p>Reserved for repository hygiene, branch workflow, commit guidance, and release-review support documents:</p>
+<ul>
+<li><strong><a href="git/git_workflow_refinement_guide.html">git_workflow_refinement_guide.html</a></strong>: v0.1 Git workflow and repository hygiene refinement guide for HTML walkthrough migration and delivery readiness.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-5-networking-walkthrough-networking">
+<h2 id="5-networking-walkthrough-networking">🌐 5. Networking (<code>walkthrough/networking/</code>)</h2>
+<p>Reserved for packet layouts, binary protocol guidelines, and socket programming support documents:</p>
+<ul>
+<li><em>(Future guides on custom binary packet layouts, socket state machines, and serialization snippets go here)</em></li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-6-architecture-walkthrough-architecture">
+<h2 id="6-architecture-walkthrough-architecture">📐 6. Architecture (<code>walkthrough/architecture/</code>)</h2>
+<p>Reserved for domain separation diagrams, Clean Architecture tutorials, and coupling rules:</p>
+<ul>
+<li><strong><a href="architecture/kickoff_backlog.html">kickoff_backlog.html</a></strong>: v0.1 Root Prototype backlog and initial architecture refinement.</li>
+<li><strong><a href="architecture/software_engineering_principles.html">software_engineering_principles.html</a></strong>: Source-of-truth engineering principle: domain understanding before tactical structure.</li>
+<li><strong><a href="architecture/lead_architecture_refinement_guide.html">lead_architecture_refinement_guide.html</a></strong>: Lead architecture synthesis of team refinement plans, dependency boundaries, and unified increment order.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-7-testing-build-walkthrough-testing">
+<h2 id="7-testing-build-walkthrough-testing">🧪 7. Testing &amp; Build (<code>walkthrough/testing/</code>)</h2>
+<p>Reserved for unit testing templates, Make/CMake setup guides, and environment scripts:</p>
+<ul>
+<li><strong><a href="testing/systems_refinement_guide.html">systems_refinement_guide.html</a></strong>: v0.1 systems backlog refinement, layered CMake targets, CTest matrix, memory ownership, deterministic RNG, and NCurses smoke guidance.</li>
+</ul>
+</section>
+</article></main></div><script>
+(function(){const search=document.querySelector('[data-search]');const toggle=document.querySelector('[data-toggle-sections]');const sections=[...document.querySelectorAll('[data-section]')];document.querySelectorAll('li').forEach(li=>{if(/Given|Verification|checklist|Acceptance Criteria|make |seed|test/i.test(li.textContent)){li.title='Click to mark this planning item during review';li.style.cursor='pointer';li.addEventListener('click',()=>li.classList.toggle('done'));}});if(search){search.addEventListener('input',()=>{const q=search.value.trim().toLowerCase();sections.forEach(s=>s.classList.toggle('section-hidden',q&&!s.textContent.toLowerCase().includes(q)));});}if(toggle){toggle.addEventListener('click',()=>{const collapsed=document.body.dataset.collapsed==='true';document.body.dataset.collapsed=String(!collapsed);sections.forEach(section=>{const first=section.querySelector('h2,h3');if(!first)return;[...section.children].forEach(child=>{if(child!==first)child.hidden=!collapsed;});});toggle.textContent=collapsed?'Collapse Sections':'Expand Sections';});}})();
+</script></body></html>

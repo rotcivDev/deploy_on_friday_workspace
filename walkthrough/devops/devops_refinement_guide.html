@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DevOps Backlog Refinement Guide: v0.1 Prototype</title>
+  <style>
+:root {
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --ink: #17202a;
+  --muted: #637083;
+  --line: #d8dee9;
+  --accent: #0f766e;
+  --accent-2: #b45309;
+  --code-bg: #101828;
+  --code-ink: #e5edf8;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--bg);
+}
+.page-shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+  padding: 24px 18px;
+  border-right: 1px solid var(--line);
+  background: #eef2f7;
+}
+main { padding: 32px min(5vw, 64px) 72px; }
+article {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: clamp(24px, 4vw, 48px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+h1, h2, h3, h4 { line-height: 1.2; margin: 1.4em 0 0.55em; letter-spacing: 0; }
+h1 { margin-top: 0; font-size: clamp(2rem, 4vw, 3rem); }
+h2 { border-top: 1px solid var(--line); padding-top: 1.1em; font-size: 1.55rem; }
+h3 { font-size: 1.2rem; color: #143a36; }
+h4 { font-size: 1.05rem; color: #3a2d12; }
+p, ul, ol, table, pre { margin: 0.85em 0; }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.25em 0; }
+a { color: var(--accent); text-decoration-thickness: 0.08em; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  background: #edf2f7;
+  border: 1px solid #d9e2ec;
+  border-radius: 4px;
+  padding: 0.05em 0.3em;
+}
+pre {
+  overflow-x: auto;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #1f2937;
+}
+pre code { background: transparent; border: 0; color: inherit; padding: 0; }
+table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--line); padding: 8px 10px; vertical-align: top; }
+th { background: #ecfdf5; text-align: left; }
+blockquote { border-left: 4px solid var(--accent-2); margin: 1em 0; padding: 0.25em 1em; background: #fff7ed; color: #4a2f12; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
+.toc-title { font-weight: 700; margin-bottom: 12px; }
+.toc a { display: block; padding: 6px 0; color: #334155; text-decoration: none; font-size: 0.92rem; }
+.toc a:hover { color: var(--accent); }
+.toolbar { display: grid; gap: 10px; margin-bottom: 18px; }
+.toolbar input, .toolbar button {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px 10px;
+  font: inherit;
+  background: white;
+}
+.toolbar button { cursor: pointer; color: white; background: var(--accent); border-color: var(--accent); }
+.meta { color: var(--muted); font-size: 0.95rem; margin-top: -0.5rem; }
+.section-hidden { display: none; }
+mark { background: #fef3c7; padding: 0 0.15em; }
+.back-home { display: inline-block; margin-bottom: 18px; color: var(--accent); }
+@media (max-width: 860px) {
+  .page-shell { display: block; }
+  aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  main { padding: 20px 14px 48px; }
+  article { padding: 22px; }
+}
+</style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a class="back-home" href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter sections">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <div class="toc-title">Contents</div>
+    <nav class="toc"><a style="padding-left:0px" href="#devops-backlog-refinement-guide-v0-1-prototype">DevOps Backlog Refinement Guide: v0.1 Prototype</a>
+<a style="padding-left:10px" href="#1-reviewed-inputs">1. Reviewed Inputs</a>
+<a style="padding-left:10px" href="#2-devops-review-summary">2. DevOps Review Summary</a>
+<a style="padding-left:10px" href="#3-v0-1-devops-scope">3. v0.1 DevOps Scope</a>
+<a style="padding-left:20px" href="#in-scope">In Scope</a>
+<a style="padding-left:20px" href="#out-of-scope-for-v0-1">Out Of Scope For v0.1</a>
+<a style="padding-left:10px" href="#4-backlog-alignment-findings">4. Backlog Alignment Findings</a>
+<a style="padding-left:20px" href="#finding-1-a1-and-sp0-need-a-reproducible-command-surface">Finding 1: A1 And SP0 Need A Reproducible Command Surface</a>
+<a style="padding-left:20px" href="#finding-2-r1-db0-db1-and-db3-need-a-local-db-lifecycle">Finding 2: R1, DB0, DB1, And DB3 Need A Local DB Lifecycle</a>
+<a style="padding-left:20px" href="#finding-3-deterministic-simulation-should-become-a-ci-artifact">Finding 3: Deterministic Simulation Should Become A CI Artifact</a>
+<a style="padding-left:20px" href="#finding-4-ci-must-enforce-architecture-boundaries-not-collapse-them">Finding 4: CI Must Enforce Architecture Boundaries, Not Collapse Them</a>
+<a style="padding-left:20px" href="#finding-5-configuration-needs-to-be-explicit-before-runtime-growth">Finding 5: Configuration Needs To Be Explicit Before Runtime Growth</a>
+<a style="padding-left:20px" href="#finding-6-v0-1-readiness-is-build-test-seed-playtest-not-deployment">Finding 6: v0.1 Readiness Is Build/Test/Seed/Playtest, Not Deployment</a>
+<a style="padding-left:10px" href="#5-devops-increment-plan">5. DevOps Increment Plan</a>
+<a style="padding-left:20px" href="#dev0-local-environment-contract">DEV0. Local Environment Contract</a>
+<a style="padding-left:20px" href="#dev1-make-driven-workflow-surface">DEV1. Make-Driven Workflow Surface</a>
+<a style="padding-left:20px" href="#dev2-seed-database-lifecycle-gate">DEV2. Seed Database Lifecycle Gate</a>
+<a style="padding-left:20px" href="#dev3-ci-boundary-gate-design">DEV3. CI Boundary Gate Design</a>
+<a style="padding-left:20px" href="#dev4-deterministic-simulation-artifact-plan">DEV4. Deterministic Simulation Artifact Plan</a>
+<a style="padding-left:20px" href="#dev5-runtime-topology-and-configuration">DEV5. Runtime Topology And Configuration</a>
+<a style="padding-left:20px" href="#dev6-observability-and-debugging-baseline">DEV6. Observability And Debugging Baseline</a>
+<a style="padding-left:20px" href="#dev7-v0-1-release-readiness-checklist">DEV7. v0.1 Release Readiness Checklist</a>
+<a style="padding-left:20px" href="#dev8-deferred-v0-2-operations-review">DEV8. Deferred v0.2 Operations Review</a>
+<a style="padding-left:10px" href="#6-devops-mapping-to-unified-increment-order">6. DevOps Mapping To Unified Increment Order</a>
+<a style="padding-left:10px" href="#7-local-runtime-topology">7. Local Runtime Topology</a>
+<a style="padding-left:10px" href="#8-suggested-ci-gate-template">8. Suggested CI Gate Template</a>
+<a style="padding-left:10px" href="#9-configuration-checklist">9. Configuration Checklist</a>
+<a style="padding-left:10px" href="#10-v0-1-release-checklist">10. v0.1 Release Checklist</a></nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Generated as a self-contained HTML walkthrough. Click acceptance/checklist items to mark review progress.</p>
+<section data-section id="section-devops-backlog-refinement-guide-v0-1-prototype">
+<h1 id="devops-backlog-refinement-guide-v0-1-prototype">DevOps Backlog Refinement Guide: v0.1 Prototype</h1>
+<p>This document evaluates the v0.1 backlog and the existing team refinement guides from the DevOps and infrastructure-readiness perspective. It turns the architecture, systems, database, and gameplay increments into a reproducible local build/test/run plan for the <strong>Dungeon of Technical Debt</strong> Root Prototype.</p>
+<p>This is a mentorship and support artifact. It does not require agents to edit production source directories.</p>
+<hr>
+</section>
+<section data-section id="section-1-reviewed-inputs">
+<h2 id="1-reviewed-inputs">1. Reviewed Inputs</h2>
+<p>This DevOps pass reviewed:</p>
+<ul>
+<li><a href="../architecture/kickoff_backlog.html">kickoff_backlog.html</a>: R1-R7 playable prototype stories and A1-A8 architecture guardrails.</li>
+<li><a href="../architecture/lead_architecture_refinement_guide.html">lead_architecture_refinement_guide.html</a>: unified increment order AR0-AR8.</li>
+<li><a href="../design/gameplay_refinement_guide.html">gameplay_refinement_guide.html</a>: fixed-seed playtest, balance targets, bot rules, and terminal playtest notes.</li>
+<li><a href="../database/db_refinement_guide.html">db_refinement_guide.html</a>: seed validation, deck membership, repository port, and deferred JSONB persistence.</li>
+<li><a href="../testing/systems_refinement_guide.html">systems_refinement_guide.html</a>: layered CMake targets, Make wrapper, deterministic RNG, CTest matrix, memory checks, and NCurses smoke path.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-2-devops-review-summary">
+<h2 id="2-devops-review-summary">2. DevOps Review Summary</h2>
+<div class="callout"><strong>Second Review: Source-of-Truth Alignment.</strong> DevOps serves the domain by making learning reproducible. Docker/Compose should now be the recommended first-time path for dependency isolation, but it remains a local feedback tool, not the v0.1 production architecture. Compose services, Make targets, CI gates, seed validation, and artifacts must protect domain tests, content validation, and fixed-seed simulations without collapsing architecture boundaries.</div>
+<p>The team plans are aligned around a local-first prototype: a C17/CTest build, PostgreSQL-seeded content, deterministic in-memory match simulation, and an NCurses client that renders application snapshots.</p>
+<p>The DevOps risk is operational drift: if setup, seed loading, test selection, and release checks stay informal, each increment can appear complete on one machine while failing on another. The v0.1 plan needs a documented local environment contract and a small CI-style gate sequence before runtime complexity grows.</p>
+<p>DevOps recommendation:</p>
+<ul>
+<li>Make <code>make</code> the single day-to-day interface for configure, build, unit tests, optional DB tests, run, and cleanup.</li>
+<li>Keep normal tests independent of PostgreSQL and NCurses where the architecture requires it.</li>
+<li>Treat database seed validation as a startup and test gate, not a manual afterthought.</li>
+<li>Capture fixed seeds, simulation transcripts, logs, and failure output as debugging artifacts.</li>
+<li>Keep v0.1 local-only. Do not introduce cloud deployment, Kubernetes, production networking, connection pools, or secrets platforms before the local deterministic loop is stable.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-3-v0-1-devops-scope">
+<h2 id="3-v0-1-devops-scope">3. v0.1 DevOps Scope</h2>
+<section data-section id="section-in-scope">
+<h3 id="in-scope">In Scope</h3>
+<ul>
+<li>Local development prerequisites for C17, CMake, Make, CTest, PostgreSQL client/server or local service, <code>libpq</code>, NCurses, and optional leak-check tooling.</li>
+<li>Make-driven workflow design for configure, build, test, database seed setup, DB adapter tests, fixed-seed simulation, NCurses run, and cleanup.</li>
+<li>CI gate design that preserves Clean Architecture boundaries.</li>
+<li>Local database lifecycle guidance for applying walkthrough SQL and validating required content.</li>
+<li><code>.env.example</code> guidance for local DSNs, seeds, terminal mode flags, and log paths.</li>
+<li>Runtime topology documentation for the local binary, optional PostgreSQL service, test database, logs, and artifacts.</li>
+<li>Release/readiness checklist for the v0.1 Root Prototype.</li>
+</ul>
+<section data-section id="section-out-of-scope-for-v0-1">
+<h3 id="out-of-scope-for-v0-1">Out Of Scope For v0.1</h3>
+<ul>
+<li>Cloud deployment.</li>
+<li>Kubernetes or production orchestration.</li>
+<li>Container-only development as a required path.</li>
+<li>Secrets managers beyond local environment variables and ignored <code>.env</code> files.</li>
+<li>Production observability stacks.</li>
+<li>PostgreSQL connection pooling.</li>
+<li>TCP server/client runtime deployment.</li>
+<li>JSONB event persistence as a required release gate.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+<section data-section id="section-4-backlog-alignment-findings">
+<h2 id="4-backlog-alignment-findings">4. Backlog Alignment Findings</h2>
+<section data-section id="section-finding-1-a1-and-sp0-need-a-reproducible-command-surface">
+<h3 id="finding-1-a1-and-sp0-need-a-reproducible-command-surface">Finding 1: A1 And SP0 Need A Reproducible Command Surface</h3>
+<p>The systems plan correctly recommends CMake targets wrapped by Make. DevOps should formalize the day-to-day commands so contributors do not need to remember raw CMake, CTest, or <code>psql</code> invocations.</p>
+<p>Recommended command contract:</p>
+<pre><code class="language-text">
+make configure
+make build
+make test
+make test-db
+make db-reset
+make db-seed
+make db-validate
+make simulate
+make run
+make clean
+</code></pre>
+<p>Acceptance target:</p>
+<ul>
+<li><code>make test</code> runs fast domain/application tests without requiring PostgreSQL or NCurses interaction.</li>
+<li><code>make test-db</code> is explicit and may require local PostgreSQL configuration.</li>
+<li><code>make simulate</code> runs one fixed-seed non-interactive match transcript when AR7 exists.</li>
+<li>No default command installs packages or mutates system services.</li>
+</ul>
+<section data-section id="section-finding-2-r1-db0-db1-and-db3-need-a-local-db-lifecycle">
+<h3 id="finding-2-r1-db0-db1-and-db3-need-a-local-db-lifecycle">Finding 2: R1, DB0, DB1, And DB3 Need A Local DB Lifecycle</h3>
+<p>The database guide defines seed SQL and validation queries. DevOps should package that as a repeatable lifecycle: create or reset a local test database, apply SQL in order, validate content, and leave readable diagnostics.</p>
+<p>Recommended local lifecycle:</p>
+<pre><code class="language-text">
+db-reset:
+    drop and recreate local development database
+
+db-seed:
+    apply 01_schema.sql
+    apply 02_seed_core_data.sql
+    apply 03_seed_cards.sql
+    apply 04_seed_achievements.sql
+    apply 05_seed_deck_cards.sql when created
+
+db-validate:
+    confirm required card types, classes, decks, deck_cards quantities, and minimum content counts
+</code></pre>
+<p>Acceptance target:</p>
+<ul>
+<li>Missing seed content fails before match creation.</li>
+<li>Deck membership validation is available once DB1 adds <code>05_seed_deck_cards.sql</code>.</li>
+<li>DB adapter tests are labeled separately from pure domain/application tests.</li>
+</ul>
+<section data-section id="section-finding-3-deterministic-simulation-should-become-a-ci-artifact">
+<h3 id="finding-3-deterministic-simulation-should-become-a-ci-artifact">Finding 3: Deterministic Simulation Should Become A CI Artifact</h3>
+<p>Gameplay and systems both depend on fixed seeds. DevOps should treat seed values and simulation transcripts as first-class debugging artifacts.</p>
+<p>Recommended artifact capture:</p>
+<pre><code class="language-text">
+artifacts/
+    test-output/
+    simulations/
+        seed-&lt;seed&gt;.log
+    db/
+        validation.log
+    crashes/
+</code></pre>
+<p>Acceptance target:</p>
+<ul>
+<li>Failed simulation output includes the seed.</li>
+<li>A fixed seed produces the same major event sequence.</li>
+<li>The transcript records match start, deck setup, bot choices, combat results, curse effects, level gains, and winner.</li>
+</ul>
+<section data-section id="section-finding-4-ci-must-enforce-architecture-boundaries-not-collapse-them">
+<h3 id="finding-4-ci-must-enforce-architecture-boundaries-not-collapse-them">Finding 4: CI Must Enforce Architecture Boundaries, Not Collapse Them</h3>
+<p>It is convenient to build one all-in executable, but that would hide the architecture risks the lead architect and systems guide identified.</p>
+<p>Recommended CI stages:</p>
+<pre><code class="language-text">
+checkout
+configure
+build layered targets
+run domain tests
+run application tests with fake repositories
+run optional DB adapter tests when PostgreSQL is available
+run optional static/dependency boundary checks
+collect logs and test artifacts
+review v0.1 release checklist
+</code></pre>
+<p>Acceptance target:</p>
+<ul>
+<li>Domain/application tests do not link <code>libpq</code> or NCurses.</li>
+<li>DB adapter tests are opt-in or separately labeled.</li>
+<li>UI smoke checks are isolated from core rule tests.</li>
+<li>Pipeline convenience never moves SQL, terminal rendering, or socket code into the wrong layer.</li>
+</ul>
+<section data-section id="section-finding-5-configuration-needs-to-be-explicit-before-runtime-growth">
+<h3 id="finding-5-configuration-needs-to-be-explicit-before-runtime-growth">Finding 5: Configuration Needs To Be Explicit Before Runtime Growth</h3>
+<p>The first local prototype still has configuration: database DSN, seed, log level, artifact path, optional terminal behavior, and feature spikes. If these are hidden in source, the future v0.2 runtime will inherit avoidable operational debt.</p>
+<p>Recommended <code>.env.example</code> values:</p>
+<pre><code class="language-text">
+DTD_DB_DSN=postgresql://localhost/dungeons_devs
+DTD_MATCH_SEED=12345
+DTD_LOG_LEVEL=info
+DTD_ARTIFACT_DIR=artifacts
+DTD_ENABLE_DB_TESTS=0
+DTD_ENABLE_EVENT_PERSISTENCE=0
+</code></pre>
+<p>Acceptance target:</p>
+<ul>
+<li>Real credentials are never committed.</li>
+<li>Local <code>.env</code> is ignored by Git.</li>
+<li>Event persistence stays disabled by default for v0.1 unless explicitly chosen as a spike.</li>
+</ul>
+<section data-section id="section-finding-6-v0-1-readiness-is-build-test-seed-playtest-not-deployment">
+<h3 id="finding-6-v0-1-readiness-is-build-test-seed-playtest-not-deployment">Finding 6: v0.1 Readiness Is Build/Test/Seed/Playtest, Not Deployment</h3>
+<p>The backlog defers server networking, persistence, accounts, rankings, and production deployment. The release gate should therefore measure reproducibility and playability, not cloud maturity.</p>
+<p>Minimum release gate:</p>
+<pre><code class="language-text">
+make clean
+make build
+make test
+make db-reset
+make db-seed
+make db-validate
+make test-db
+make simulate DTD_MATCH_SEED=&lt;known seed&gt;
+manual NCurses playtest checklist
+architecture boundary checklist
+</code></pre>
+<p>Acceptance target:</p>
+<ul>
+<li>A new contributor can reproduce the prototype from docs and local prerequisites.</li>
+<li>The seed DB produces a non-empty Encounter deck and Treasure deck.</li>
+<li>A fixed-seed simulation completes.</li>
+<li>Manual terminal playtest captures seed, winner, turn count, confusing logs, and resize behavior.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-5-devops-increment-plan">
+<h2 id="5-devops-increment-plan">5. DevOps Increment Plan</h2>
+<section data-section id="section-dev0-local-environment-contract">
+<h3 id="dev0-local-environment-contract">DEV0. Local Environment Contract</h3>
+<p>Outcome: define the host prerequisites and local setup expectations before implementation starts.</p>
+<p>Consumes:</p>
+<ul>
+<li>Architecture AR0.</li>
+<li>Systems SP0.</li>
+<li>Database DB0.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Document required toolchain packages: C17 compiler, CMake, Make, CTest, PostgreSQL, <code>libpq</code>, NCurses, and optional Valgrind or sanitizer support.</li>
+<li>Distinguish build-time dependencies from runtime services.</li>
+<li>Keep package installation manual and platform-specific in docs; do not hide privileged installs behind default Make targets.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>The team can name every local prerequisite for v0.1.</li>
+<li>The normal build path does not require network access or package installation.</li>
+<li>PostgreSQL is documented as a local service for DB tests and seeded startup, not a dependency of pure domain/application tests.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Local environment checklist review.</li>
+<li>First-run setup walkthrough.</li>
+</ul>
+<section data-section id="section-dev1-make-driven-workflow-surface">
+<h3 id="dev1-make-driven-workflow-surface">DEV1. Make-Driven Workflow Surface</h3>
+<p>Outcome: make local commands consistent across build, test, DB, simulation, and run tasks.</p>
+<p>Consumes:</p>
+<ul>
+<li>Systems SP0.</li>
+<li>Architecture AR1.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Define Make targets for configure, build, test, test-db, db-reset, db-seed, db-validate, simulate, run, clean, and ci.</li>
+<li>Keep CMake responsible for target generation.</li>
+<li>Keep CTest responsible for test execution.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li><code>make build</code> and <code>make test</code> are enough for fast local feedback.</li>
+<li><code>make test-db</code> is separate from pure tests.</li>
+<li><code>make ci</code> can compose the non-interactive local gate without launching NCurses.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Dry-run target review.</li>
+<li>Build/test workflow checklist.</li>
+</ul>
+<section data-section id="section-dev2-seed-database-lifecycle-gate">
+<h3 id="dev2-seed-database-lifecycle-gate">DEV2. Seed Database Lifecycle Gate</h3>
+<p>Outcome: make R1 content validation repeatable and failure-oriented.</p>
+<p>Consumes:</p>
+<ul>
+<li>Database DB0, DB1, DB3.</li>
+<li>Kickoff R1.</li>
+<li>Architecture AR2.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Define ordered seed application for walkthrough SQL files.</li>
+<li>Add guidance for the future <code>05_seed_deck_cards.sql</code> support file.</li>
+<li>Capture validation output for required card types, classes, deck membership, and deck quantities.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Empty or partially seeded DBs fail validation.</li>
+<li>Valid walkthrough seed data passes after deck membership exists.</li>
+<li>Validation diagnostics name the missing content group.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Manual <code>psql</code> validation.</li>
+<li>DB adapter smoke test when PostgreSQL is available.</li>
+</ul>
+<section data-section id="section-dev3-ci-boundary-gate-design">
+<h3 id="dev3-ci-boundary-gate-design">DEV3. CI Boundary Gate Design</h3>
+<p>Outcome: ensure automated checks preserve Clean Architecture target boundaries.</p>
+<p>Consumes:</p>
+<ul>
+<li>Architecture AR1.</li>
+<li>Systems SP0, SP3, SP4, SP5.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Define CI stages for configure, build, unit tests, application tests, optional DB tests, optional UI smoke, and artifact collection.</li>
+<li>Require DB tests to be labeled or separately invoked.</li>
+<li>Keep the NCurses client out of non-interactive core gates except for build and optional layout smoke.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Core tests run without PostgreSQL and NCurses interaction.</li>
+<li>DB failures do not mask domain/application regressions.</li>
+<li>Artifacts include CTest output and fixed-seed simulation logs.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>CI checklist review.</li>
+<li>Local <code>make ci</code> dry-run once implementation exists.</li>
+</ul>
+<section data-section id="section-dev4-deterministic-simulation-artifact-plan">
+<h3 id="dev4-deterministic-simulation-artifact-plan">DEV4. Deterministic Simulation Artifact Plan</h3>
+<p>Outcome: make reproducible gameplay failures easy to investigate.</p>
+<p>Consumes:</p>
+<ul>
+<li>Gameplay GD1, GD4, GD5.</li>
+<li>Systems SP1, SP3.</li>
+<li>Architecture AR3, AR5, AR7.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Define the simulation command contract.</li>
+<li>Capture seed, event transcript, winner, turn count, and failure diagnostics.</li>
+<li>Keep transcripts local and text-based for v0.1.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>A failed simulation reports the seed and last processed command/event.</li>
+<li>A passing simulation can be compared across runs by major event sequence.</li>
+<li>Bot actions and deck order are reproducible for the same seed.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Fixed-seed simulation test.</li>
+<li>Transcript review.</li>
+</ul>
+<section data-section id="section-dev5-runtime-topology-and-configuration">
+<h3 id="dev5-runtime-topology-and-configuration">DEV5. Runtime Topology And Configuration</h3>
+<p>Outcome: document the local runtime without introducing premature server infrastructure.</p>
+<p>Consumes:</p>
+<ul>
+<li>Architecture AR2, AR6, AR8.</li>
+<li>Database DB4.</li>
+<li>Systems SP5, SP6.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Document local process/service boundaries.</li>
+<li>Define environment variables for DSN, seed, logs, artifact path, and optional spikes.</li>
+<li>Keep future server/client topology as notes only.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Local game runtime is a terminal client plus application/domain code and optional PostgreSQL content loading.</li>
+<li>No v0.1 runtime requires sockets, pthread worker pools, or production service discovery.</li>
+<li>Event persistence is disabled unless explicitly enabled as a spike.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Runtime topology review.</li>
+<li><code>.env.example</code> review when created.</li>
+</ul>
+<section data-section id="section-dev6-observability-and-debugging-baseline">
+<h3 id="dev6-observability-and-debugging-baseline">DEV6. Observability And Debugging Baseline</h3>
+<p>Outcome: provide enough logs and artifacts for v0.1 debugging without adding an observability stack.</p>
+<p>Consumes:</p>
+<ul>
+<li>Kickoff A7.</li>
+<li>Gameplay GD5.</li>
+<li>Systems SP3, SP5.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Define local log fields: seed, turn, phase, actor, command, event type, card, result, level, power, error code.</li>
+<li>Keep logs readable and line-oriented.</li>
+<li>Capture DB validation logs, CTest output, simulation transcripts, and manual playtest notes.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Every match transcript starts with the seed.</li>
+<li>Command failures include typed error codes.</li>
+<li>Manual playtest notes use the gameplay template and include terminal resize behavior.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Log sample review.</li>
+<li>Artifact directory review.</li>
+</ul>
+<section data-section id="section-dev7-v0-1-release-readiness-checklist">
+<h3 id="dev7-v0-1-release-readiness-checklist">DEV7. v0.1 Release Readiness Checklist</h3>
+<p>Outcome: define what &quot;done enough to release the root prototype&quot; means operationally.</p>
+<p>Consumes:</p>
+<ul>
+<li>Architecture AR7.</li>
+<li>Gameplay GD5.</li>
+<li>Systems full test matrix.</li>
+<li>Database DB3.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Build/test/seed/simulation/manual-playtest gate.</li>
+<li>Architecture boundary checklist.</li>
+<li>Known limitations and deferred v0.2 scope.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Fresh local build succeeds.</li>
+<li>Unit and application tests pass.</li>
+<li>DB seed validation passes.</li>
+<li>Fixed-seed full-match simulation completes.</li>
+<li>Manual NCurses playtest completes with notes.</li>
+<li>Deferred networking, persistence, accounts, rankings, achievements, and production deployment remain deferred.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Release checklist sign-off.</li>
+<li>Recorded seed and transcript for the release candidate.</li>
+</ul>
+<section data-section id="section-dev8-deferred-v0-2-operations-review">
+<h3 id="dev8-deferred-v0-2-operations-review">DEV8. Deferred v0.2 Operations Review</h3>
+<p>Outcome: preserve the multiplayer/persistence path without pulling it into v0.1.</p>
+<p>Consumes:</p>
+<ul>
+<li>Architecture AR8.</li>
+<li>Systems SP6.</li>
+<li>Database DB4.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Review future TCP server process boundaries.</li>
+<li>Review future event persistence and backup needs.</li>
+<li>Review future health checks, port configuration, graceful shutdown, and migration plan.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>v0.1 docs identify future operational concerns.</li>
+<li>No v0.1 implementation depends on production deployment machinery.</li>
+<li>The command/result shape remains compatible with future network protocol work.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Documentation review only.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-6-devops-mapping-to-unified-increment-order">
+<h2 id="6-devops-mapping-to-unified-increment-order">6. DevOps Mapping To Unified Increment Order</h2>
+<table><thead><tr>
+<th>Architecture Order</th>
+<th>Lead Increment</th>
+<th>DevOps Contribution</th>
+<th>Gate Added</th>
+</tr></thead><tbody>
+<tr>
+<td>1</td>
+<td>AR0 Architecture Decision Baseline</td>
+<td>DEV0</td>
+<td>Local environment and dependency contract</td>
+</tr>
+<tr>
+<td>2</td>
+<td>AR1 Layered Build And Test Boundary</td>
+<td>DEV1, DEV3</td>
+<td>Make workflow and CI boundary stages</td>
+</tr>
+<tr>
+<td>3</td>
+<td>AR2 Content Contract And Startup Gate</td>
+<td>DEV2</td>
+<td>Seed DB lifecycle and validation</td>
+</tr>
+<tr>
+<td>4</td>
+<td>AR3 Domain Model, Decks, And RNG</td>
+<td>DEV4</td>
+<td>Fixed-seed artifact plan</td>
+</tr>
+<tr>
+<td>5</td>
+<td>AR4 Rule Results, Combat, Curses, Events</td>
+<td>DEV6</td>
+<td>Structured local log/event fields</td>
+</tr>
+<tr>
+<td>6</td>
+<td>AR5 Command Boundary And Bots</td>
+<td>DEV4, DEV6</td>
+<td>Reproducible bot transcript</td>
+</tr>
+<tr>
+<td>7</td>
+<td>AR6 Snapshot-Based NCurses Boundary</td>
+<td>DEV5, DEV6</td>
+<td>UI smoke/manual artifact checklist</td>
+</tr>
+<tr>
+<td>8</td>
+<td>AR7 Playable v0.1 Vertical Slice</td>
+<td>DEV7</td>
+<td>Release readiness gate</td>
+</tr>
+<tr>
+<td>9</td>
+<td>AR8 Deferred v0.2 Readiness Review</td>
+<td>DEV8</td>
+<td>Future ops notes without implementation</td>
+</tr>
+</tbody></table>
+<hr>
+</section>
+<section data-section id="section-7-local-runtime-topology">
+<h2 id="7-local-runtime-topology">7. Local Runtime Topology</h2>
+<pre><code class="language-mermaid">
+flowchart LR
+    DEV[Developer Shell]
+    MAKE[Make Wrapper]
+    CMAKE[CMake/CTest]
+    TESTS[Domain/Application Tests]
+    DBTESTS[DB Adapter Tests]
+    PG[(Local PostgreSQL)]
+    GAME[NCurses Game Binary]
+    ART[Artifacts and Logs]
+
+    DEV --&gt; MAKE
+    MAKE --&gt; CMAKE
+    CMAKE --&gt; TESTS
+    CMAKE --&gt; DBTESTS
+    DBTESTS --&gt; PG
+    MAKE --&gt; GAME
+    GAME --&gt; PG
+    TESTS --&gt; ART
+    DBTESTS --&gt; ART
+    GAME --&gt; ART
+</code></pre>
+<p>Boundary notes:</p>
+<ul>
+<li>Domain/application tests should not require <code>PG</code>.</li>
+<li><code>GAME</code> may load seeded content from <code>PG</code> at startup, then run the match in memory.</li>
+<li><code>ART</code> is local text output for v0.1: CTest output, DB validation logs, simulation transcripts, and manual playtest notes.</li>
+<li>Future TCP server/client processes are not part of this topology.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-8-suggested-ci-gate-template">
+<h2 id="8-suggested-ci-gate-template">8. Suggested CI Gate Template</h2>
+<p>Use this as a design target for future CI configuration. Keep it as documentation until the Git Specialist or DevOps task explicitly creates CI files.</p>
+<pre><code class="language-text">
+stage: configure
+    make configure
+
+stage: build
+    make build
+
+stage: unit-tests
+    make test
+
+stage: db-tests
+    make db-seed
+    make db-validate
+    make test-db
+    condition: local/CI PostgreSQL service is available
+
+stage: simulation
+    make simulate DTD_MATCH_SEED=12345
+    condition: AR7 simulation entry point exists
+
+stage: artifacts
+    collect build/Testing/Temporary/LastTest.log
+    collect artifacts/db/validation.log
+    collect artifacts/simulations/seed-12345.log
+</code></pre>
+<p>Do not make DB tests block early domain/application work until the adapter and local PostgreSQL setup exist. Once AR2/DB3 are implemented, DB validation should become a required gate for playable-release candidates.</p>
+<hr>
+</section>
+<section data-section id="section-9-configuration-checklist">
+<h2 id="9-configuration-checklist">9. Configuration Checklist</h2>
+<p>When configuration templates are created, include these values and keep real secrets out of Git:</p>
+<pre><code class="language-text">
+DTD_DB_DSN
+DTD_MATCH_SEED
+DTD_LOG_LEVEL
+DTD_ARTIFACT_DIR
+DTD_ENABLE_DB_TESTS
+DTD_ENABLE_EVENT_PERSISTENCE
+</code></pre>
+<p>Review questions:</p>
+<pre><code class="language-text">
+Can a developer run unit tests without setting DTD_DB_DSN?
+Does a missing DTD_DB_DSN produce a readable DB test skip or failure?
+Is the match seed logged at startup?
+Is the artifact directory configurable but defaulted locally?
+Is event persistence disabled by default for v0.1?
+Are real credentials excluded from committed files?
+</code></pre>
+<hr>
+</section>
+<section data-section id="section-10-v0-1-release-checklist">
+<h2 id="10-v0-1-release-checklist">10. v0.1 Release Checklist</h2>
+<p>Use this checklist for the first playable prototype candidate:</p>
+<pre><code class="language-text">
+Clean build:
+    make clean
+    make build
+
+Fast tests:
+    make test
+
+Database:
+    make db-reset
+    make db-seed
+    make db-validate
+    make test-db
+
+Simulation:
+    make simulate DTD_MATCH_SEED=12345
+    transcript saved with seed, winner, turn count, and final event
+
+Manual terminal playtest:
+    seed recorded
+    stats panel checked
+    battle panel checked
+    hand selection indexes stable
+    bot actions visible in log
+    curse/combat/equipment events visible
+    terminal resize checked
+    exit restores terminal state
+
+Architecture boundary:
+    domain has no libpq/ncurses/socket/pthread dependency
+    application has no SQL or terminal rendering
+    infrastructure keeps libpq private
+    client renders snapshots and sends commands only
+    DB tests are separated from pure tests
+
+Deferred scope:
+    no TCP server required
+    no pthread worker pool required
+    no account/ranking/achievement runtime required
+    no JSONB event persistence required
+    no cloud deployment required
+</code></pre>
+<p>This is the DevOps definition of ready for v0.1: reproducible local setup, deterministic test evidence, validated seed content, and a playable terminal loop.</p>
+</section>
+    </article>
+  </main>
+</div>
+<script>
+(function () {
+  const search = document.querySelector('[data-search]');
+  const toggle = document.querySelector('[data-toggle-sections]');
+  const sections = Array.from(document.querySelectorAll('[data-section]'));
+  const checks = Array.from(document.querySelectorAll('li'))
+    .filter(li => /\bGiven\b|\bVerification\b|checklist|Acceptance criteria/i.test(li.textContent));
+  checks.forEach((li, index) => {
+    li.dataset.checkItem = String(index);
+    li.addEventListener('click', () => li.classList.toggle('done'));
+    li.style.cursor = 'pointer';
+    li.title = 'Click to mark this planning item during review';
+  });
+  const style = document.createElement('style');
+  style.textContent = 'li.done{opacity:.62;text-decoration:line-through;}';
+  document.head.appendChild(style);
+  if (search) {
+    search.addEventListener('input', () => {
+      const q = search.value.trim().toLowerCase();
+      sections.forEach(section => {
+        section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+      });
+    });
+  }
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const collapsed = document.body.dataset.collapsed === 'true';
+      document.body.dataset.collapsed = String(!collapsed);
+      sections.forEach(section => {
+        const first = section.querySelector('h2, h3');
+        if (!first) return;
+        Array.from(section.children).forEach(child => {
+          if (child !== first) child.hidden = !collapsed;
+        });
+      });
+      toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+    });
+  }
+})();
+</script>
+</body>
+</html>

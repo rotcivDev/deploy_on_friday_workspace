@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Systems Backlog Refinement Guide: v0.1 Prototype</title>
+  <style>
+:root {
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --ink: #17202a;
+  --muted: #637083;
+  --line: #d8dee9;
+  --accent: #0f766e;
+  --accent-2: #b45309;
+  --code-bg: #101828;
+  --code-ink: #e5edf8;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--bg);
+}
+.page-shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+  padding: 24px 18px;
+  border-right: 1px solid var(--line);
+  background: #eef2f7;
+}
+main { padding: 32px min(5vw, 64px) 72px; }
+article {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: clamp(24px, 4vw, 48px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+h1, h2, h3, h4 { line-height: 1.2; margin: 1.4em 0 0.55em; letter-spacing: 0; }
+h1 { margin-top: 0; font-size: clamp(2rem, 4vw, 3rem); }
+h2 { border-top: 1px solid var(--line); padding-top: 1.1em; font-size: 1.55rem; }
+h3 { font-size: 1.2rem; color: #143a36; }
+h4 { font-size: 1.05rem; color: #3a2d12; }
+p, ul, ol, table, pre { margin: 0.85em 0; }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.25em 0; }
+a { color: var(--accent); text-decoration-thickness: 0.08em; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  background: #edf2f7;
+  border: 1px solid #d9e2ec;
+  border-radius: 4px;
+  padding: 0.05em 0.3em;
+}
+pre {
+  overflow-x: auto;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #1f2937;
+}
+pre code { background: transparent; border: 0; color: inherit; padding: 0; }
+table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--line); padding: 8px 10px; vertical-align: top; }
+th { background: #ecfdf5; text-align: left; }
+blockquote { border-left: 4px solid var(--accent-2); margin: 1em 0; padding: 0.25em 1em; background: #fff7ed; color: #4a2f12; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
+.toc-title { font-weight: 700; margin-bottom: 12px; }
+.toc a { display: block; padding: 6px 0; color: #334155; text-decoration: none; font-size: 0.92rem; }
+.toc a:hover { color: var(--accent); }
+.toolbar { display: grid; gap: 10px; margin-bottom: 18px; }
+.toolbar input, .toolbar button {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px 10px;
+  font: inherit;
+  background: white;
+}
+.toolbar button { cursor: pointer; color: white; background: var(--accent); border-color: var(--accent); }
+.meta { color: var(--muted); font-size: 0.95rem; margin-top: -0.5rem; }
+.section-hidden { display: none; }
+mark { background: #fef3c7; padding: 0 0.15em; }
+.back-home { display: inline-block; margin-bottom: 18px; color: var(--accent); }
+@media (max-width: 860px) {
+  .page-shell { display: block; }
+  aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  main { padding: 20px 14px 48px; }
+  article { padding: 22px; }
+}
+</style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a class="back-home" href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter sections">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <div class="toc-title">Contents</div>
+    <nav class="toc"><a style="padding-left:0px" href="#systems-backlog-refinement-guide-v0-1-prototype">Systems Backlog Refinement Guide: v0.1 Prototype</a>
+<a style="padding-left:10px" href="#1-backlog-review-summary">1. Backlog Review Summary</a>
+<a style="padding-left:10px" href="#2-v0-1-systems-scope">2. v0.1 Systems Scope</a>
+<a style="padding-left:20px" href="#in-scope">In Scope</a>
+<a style="padding-left:20px" href="#out-of-scope-for-v0-1">Out Of Scope For v0.1</a>
+<a style="padding-left:10px" href="#3-backlog-alignment-findings">3. Backlog Alignment Findings</a>
+<a style="padding-left:20px" href="#finding-1-a1-needs-target-level-dependency-enforcement">Finding 1: A1 Needs Target-Level Dependency Enforcement</a>
+<a style="padding-left:20px" href="#finding-2-r2-r3-and-a6-need-a-deterministic-rng-contract">Finding 2: R2, R3, And A6 Need A Deterministic RNG Contract</a>
+<a style="padding-left:20px" href="#finding-3-r4-r5-and-a7-need-structured-result-tests">Finding 3: R4, R5, And A7 Need Structured Result Tests</a>
+<a style="padding-left:20px" href="#finding-4-a8-needs-ownership-rules-before-dynamic-containers-grow">Finding 4: A8 Needs Ownership Rules Before Dynamic Containers Grow</a>
+<a style="padding-left:20px" href="#finding-5-r7-needs-a-non-interactive-ui-smoke-path">Finding 5: R7 Needs A Non-Interactive UI Smoke Path</a>
+<a style="padding-left:10px" href="#4-increment-plan">4. Increment Plan</a>
+<a style="padding-left:20px" href="#sp0-layered-build-skeleton">SP0. Layered Build Skeleton</a>
+<a style="padding-left:20px" href="#sp1-deterministic-rng-and-deck-test-harness">SP1. Deterministic RNG And Deck Test Harness</a>
+<a style="padding-left:20px" href="#sp2-domain-rule-and-state-tests">SP2. Domain Rule And State Tests</a>
+<a style="padding-left:20px" href="#sp3-application-command-boundary-tests">SP3. Application Command Boundary Tests</a>
+<a style="padding-left:20px" href="#sp4-repository-adapter-mapping-tests">SP4. Repository Adapter Mapping Tests</a>
+<a style="padding-left:20px" href="#sp5-snapshot-driven-ncurses-smoke-path">SP5. Snapshot-Driven NCurses Smoke Path</a>
+<a style="padding-left:20px" href="#sp6-deferred-v0-2-protocol-preparation">SP6. Deferred v0.2 Protocol Preparation</a>
+<a style="padding-left:10px" href="#5-cmake-target-template">5. CMake Target Template</a>
+<a style="padding-left:10px" href="#6-makefile-wrapper-template">6. Makefile Wrapper Template</a>
+<a style="padding-left:10px" href="#7-test-matrix">7. Test Matrix</a>
+<a style="padding-left:10px" href="#8-memory-ownership-checklist">8. Memory Ownership Checklist</a>
+<a style="padding-left:10px" href="#9-ncurses-manual-playtest-checklist">9. NCurses Manual Playtest Checklist</a>
+<a style="padding-left:10px" href="#10-v0-2-networking-notes">10. v0.2 Networking Notes</a></nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Generated as a self-contained HTML walkthrough. Click acceptance/checklist items to mark review progress.</p>
+<section data-section id="section-systems-backlog-refinement-guide-v0-1-prototype">
+<h1 id="systems-backlog-refinement-guide-v0-1-prototype">Systems Backlog Refinement Guide: v0.1 Prototype</h1>
+<p>This document evaluates the systems programming impact of <a href="../architecture/kickoff_backlog.html">walkthrough/architecture/kickoff_backlog.html</a> and refines the build, test, memory, deterministic runtime, and terminal-client work into increments for the v0.1 Root Prototype.</p>
+<p>This is a mentorship and support artifact. It does not require agents to edit production source directories.</p>
+<hr>
+</section>
+<section data-section id="section-1-backlog-review-summary">
+<h2 id="1-backlog-review-summary">1. Backlog Review Summary</h2>
+<div class="callout"><strong>Second Review: Source-of-Truth Alignment.</strong> Systems work should make the domain feedback loop fast and trustworthy. C17 APIs, ownership rules, CMake targets, CTest suites, deterministic RNG, and Docker wrappers are valuable only when they preserve domain boundaries and expose reproducible evidence. Avoid building generic systems infrastructure before a domain use case needs it.</div>
+<p>The kickoff backlog correctly shifts the v0.1 prototype toward a local, deterministic, Clean Architecture shape. From a systems perspective, the main risk is not sockets or pthreads yet; those are explicitly deferred. The main risk is accidentally building the prototype as one tangled executable where forbidden dependencies are impossible to detect.</p>
+<p>The systems plan needs four refinements before implementation starts:</p>
+<ul>
+<li>Build targets must enforce the architecture boundary from A1 instead of compiling every source file into one executable.</li>
+<li>Tests must cover deterministic shuffling, command results, lifecycle cleanup, and snapshot rendering without requiring NCurses or PostgreSQL for every test.</li>
+<li>Memory ownership needs a header-level contract before dynamic decks, hands, snapshots, and repository result arrays spread through the code.</li>
+<li>Networking and threaded server work should stay deferred for v0.1, but the command boundary should be shaped so it can become the v0.2 protocol boundary.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-2-v0-1-systems-scope">
+<h2 id="2-v0-1-systems-scope">2. v0.1 Systems Scope</h2>
+<section data-section id="section-in-scope">
+<h3 id="in-scope">In Scope</h3>
+<ul>
+<li>C17 build scaffolding with <code>-std=c17 -Wall -Wextra -Werror -pedantic</code>.</li>
+<li>CMake targets wrapped by <code>make</code> commands.</li>
+<li>Layered build targets for domain, application, infrastructure database adapter, NCurses client, and tests.</li>
+<li>CTest suites for domain rules, deck determinism, command boundaries, repository fakes, and lifecycle cleanup.</li>
+<li>Explicit deterministic RNG guidance for shuffles and bot decisions.</li>
+<li>Memory ownership rules for public interfaces.</li>
+<li>NCurses layout guidance that renders application snapshots and sends commands.</li>
+</ul>
+<section data-section id="section-out-of-scope-for-v0-1">
+<h3 id="out-of-scope-for-v0-1">Out Of Scope For v0.1</h3>
+<ul>
+<li>POSIX socket server/client networking.</li>
+<li>pthread worker pools, connection pools, or lobby concurrency.</li>
+<li>Binary network packet structs.</li>
+<li>Shared protocol serialization.</li>
+<li>Reconnect, spectator mode, and remote synchronization.</li>
+<li>Runtime persistence of match events unless explicitly chosen as a spike.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+<section data-section id="section-3-backlog-alignment-findings">
+<h2 id="3-backlog-alignment-findings">3. Backlog Alignment Findings</h2>
+<section data-section id="section-finding-1-a1-needs-target-level-dependency-enforcement">
+<h3 id="finding-1-a1-needs-target-level-dependency-enforcement">Finding 1: A1 Needs Target-Level Dependency Enforcement</h3>
+<p>The earlier systems guide used a single <code>dungeon_client</code> executable that directly included domain, application, infrastructure, and client sources together. That compiles, but it does not prove the architecture. A1 needs separate libraries so dependency mistakes fail during build review and test setup.</p>
+<p>Recommended target shape:</p>
+<pre><code class="language-text">
+dtd_domain
+    C standard library only
+
+dtd_application
+    links dtd_domain
+
+dtd_infrastructure_db
+    links dtd_application + dtd_domain + libpq
+
+dtd_client_ncurses
+    links dtd_application + dtd_domain + dtd_infrastructure_db + ncurses
+
+dtd_tests_domain
+    links dtd_domain
+
+dtd_tests_application
+    links dtd_application + dtd_domain + fake repositories
+</code></pre>
+<p>Design rule:</p>
+<ul>
+<li>Domain tests must run without PostgreSQL, NCurses, sockets, or filesystem fixtures.</li>
+<li>Application tests should use fake repositories unless the test is specifically an infrastructure adapter test.</li>
+<li>Infrastructure database tests can require local PostgreSQL, but they should be tagged or separated so normal <code>make test</code> can remain fast.</li>
+</ul>
+<section data-section id="section-finding-2-r2-r3-and-a6-need-a-deterministic-rng-contract">
+<h3 id="finding-2-r2-r3-and-a6-need-a-deterministic-rng-contract">Finding 2: R2, R3, And A6 Need A Deterministic RNG Contract</h3>
+<p>The backlog requires deterministic deck order and bot choices. C <code>rand()</code> is not suitable because behavior can differ by platform and hidden global state makes replay difficult.</p>
+<p>Recommended contract:</p>
+<pre><code class="language-text">
+rng_state(seed)
+rng_next_u32(state)
+rng_range(state, upper_bound)
+deck_shuffle(deck, rng_state)
+bot_choose_action(bot, snapshot, rng_state)
+</code></pre>
+<p>Guidance:</p>
+<ul>
+<li>Store RNG state in match/application state.</li>
+<li>Pass the RNG state explicitly to shuffle and bot decisions.</li>
+<li>Never call <code>rand()</code> inside domain rule functions.</li>
+<li>Record the seed in the match log so a failed simulation can be replayed.</li>
+</ul>
+<section data-section id="section-finding-3-r4-r5-and-a7-need-structured-result-tests">
+<h3 id="finding-3-r4-r5-and-a7-need-structured-result-tests">Finding 3: R4, R5, And A7 Need Structured Result Tests</h3>
+<p>Combat, curse, and bot actions should return typed outcomes and event records. If the UI has to infer what happened from mutated state, tests and logs will become brittle.</p>
+<p>Recommended command result shape:</p>
+<pre><code class="language-text">
+status_code
+updated_snapshot
+event_count
+events[]
+error_code
+</code></pre>
+<p>Test target:</p>
+<ul>
+<li>Valid command changes state and emits ordered events.</li>
+<li>Invalid command leaves state unchanged.</li>
+<li>Combat win emits reward events before match-ended events.</li>
+<li>Curse resolution emits a visible event and clears or sets explicit temporary state.</li>
+</ul>
+<section data-section id="section-finding-4-a8-needs-ownership-rules-before-dynamic-containers-grow">
+<h3 id="finding-4-a8-needs-ownership-rules-before-dynamic-containers-grow">Finding 4: A8 Needs Ownership Rules Before Dynamic Containers Grow</h3>
+<p>Decks, hands, discard piles, snapshots, and repository-loaded arrays create several ownership edges. The prototype should document them before implementation.</p>
+<p>Recommended C ownership vocabulary:</p>
+<table><thead><tr>
+<th>Pattern</th>
+<th>Meaning</th>
+</tr></thead><tbody>
+<tr>
+<td><code>create</code> / <code>destroy</code></td>
+<td>Function allocates and caller must eventually destroy</td>
+</tr>
+<tr>
+<td><code>init</code> / <code>deinit</code></td>
+<td>Caller owns storage, function initializes contents</td>
+</tr>
+<tr>
+<td><code>borrow</code></td>
+<td>Pointer valid until the next mutation or destroy</td>
+</tr>
+<tr>
+<td><code>copy</code></td>
+<td>Caller receives independent value or allocated data</td>
+</tr>
+<tr>
+<td><code>free_result</code></td>
+<td>Matching cleanup for adapter-returned arrays</td>
+</tr>
+</tbody></table>
+<p>Header comments should state whether a returned pointer is owned, borrowed, or copied.</p>
+<section data-section id="section-finding-5-r7-needs-a-non-interactive-ui-smoke-path">
+<h3 id="finding-5-r7-needs-a-non-interactive-ui-smoke-path">Finding 5: R7 Needs A Non-Interactive UI Smoke Path</h3>
+<p>NCurses is hard to test in full automation, but R7 asks for at least one non-interactive render smoke test if feasible.</p>
+<p>Recommended approach:</p>
+<ul>
+<li>Keep the UI rendering function snapshot-driven.</li>
+<li>Provide a static snapshot fixture for tests.</li>
+<li>Split layout calculation from actual <code>WINDOW</code> drawing where practical.</li>
+<li>Test the layout calculator without NCurses.</li>
+<li>Keep interactive resize checks as manual playtest items.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-4-increment-plan">
+<h2 id="4-increment-plan">4. Increment Plan</h2>
+<section data-section id="section-sp0-layered-build-skeleton">
+<h3 id="sp0-layered-build-skeleton">SP0. Layered Build Skeleton</h3>
+<p>Outcome: establish build targets that match A1 before real gameplay code grows.</p>
+<p>Scope:</p>
+<ul>
+<li>Define separate CMake library targets for domain, application, infrastructure DB, and client.</li>
+<li>Add a <code>Makefile</code> wrapper for <code>make configure</code>, <code>make build</code>, <code>make test</code>, and <code>make clean</code>.</li>
+<li>Keep PostgreSQL and NCurses linked only by the targets that need them.</li>
+<li>Add a minimal CTest smoke target.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Domain target compiles without <code>libpq</code>, NCurses, pthreads, or socket libraries.</li>
+<li>Application target depends on domain and application ports only.</li>
+<li>Infrastructure DB target is the only target that links <code>libpq</code>.</li>
+<li>Client target is the only target that links NCurses.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li><code>make build</code></li>
+<li><code>make test</code></li>
+<li>Manual target dependency review.</li>
+</ul>
+<section data-section id="section-sp1-deterministic-rng-and-deck-test-harness">
+<h3 id="sp1-deterministic-rng-and-deck-test-harness">SP1. Deterministic RNG And Deck Test Harness</h3>
+<p>Outcome: make R2, R3, and A6 testable on every run.</p>
+<p>Scope:</p>
+<ul>
+<li>Define a small seedable RNG API for deterministic tests.</li>
+<li>Document Fisher-Yates shuffle as the expected deck shuffle algorithm.</li>
+<li>Add tests for repeated shuffle order with the same seed.</li>
+<li>Add tests for discard reshuffle behavior.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Same seed produces the same Encounter and Treasure draw order.</li>
+<li>Different seeds can produce different orders.</li>
+<li>Empty deck reshuffle consumes RNG state deterministically.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>CTest domain deck tests.</li>
+<li>Fixed-seed transcript captured in test output on failure.</li>
+</ul>
+<section data-section id="section-sp2-domain-rule-and-state-tests">
+<h3 id="sp2-domain-rule-and-state-tests">SP2. Domain Rule And State Tests</h3>
+<p>Outcome: prove R4 and R5 without PostgreSQL or NCurses.</p>
+<p>Scope:</p>
+<ul>
+<li>Test Level bounds.</li>
+<li>Test Power calculation.</li>
+<li>Test combat win/loss.</li>
+<li>Test fallback bad stuff.</li>
+<li>Test seeded curse state transitions.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Level never drops below 1 or exceeds 10.</li>
+<li>Power formula matches <code>Level + class base_power_bonus + equipment power_bonus + temporary modifiers</code>.</li>
+<li><code>Broken CI</code>, <code>Scope Creep</code>, and <code>Context Window Exceeded</code> each have deterministic tests.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li><code>dtd_tests_domain</code></li>
+<li>Optional leak-check run where available.</li>
+</ul>
+<section data-section id="section-sp3-application-command-boundary-tests">
+<h3 id="sp3-application-command-boundary-tests">SP3. Application Command Boundary Tests</h3>
+<p>Outcome: prove A4 and A7 before the NCurses client depends on them.</p>
+<p>Scope:</p>
+<ul>
+<li>Create fake content repositories for match startup tests.</li>
+<li>Test command success and invalid-phase failures.</li>
+<li>Test event ordering for card draw, combat, curse, bot action, and match end.</li>
+<li>Test bot commands through the same validation path as human commands.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Invalid commands return typed errors and leave state unchanged.</li>
+<li>Successful commands return updated snapshots and ordered events.</li>
+<li>Bot decisions are deterministic for a fixed seed.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li><code>dtd_tests_application</code></li>
+<li>Full-match simulation test with one fixed seed.</li>
+</ul>
+<section data-section id="section-sp4-repository-adapter-mapping-tests">
+<h3 id="sp4-repository-adapter-mapping-tests">SP4. Repository Adapter Mapping Tests</h3>
+<p>Outcome: prove Epic 2 row mapping without letting PostgreSQL types escape into application/domain code.</p>
+<p>Scope:</p>
+<ul>
+<li>Test row-to-content mapping against the walkthrough seed data.</li>
+<li>Keep <code>PGconn</code> and <code>PGresult</code> private to infrastructure.</li>
+<li>Add cleanup tests for repository result arrays.</li>
+<li>Separate these tests from pure domain/application tests.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Adapter returns plain content structs.</li>
+<li>Missing DB content returns a typed startup failure.</li>
+<li>Result arrays have matching cleanup functions.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Local PostgreSQL adapter test, run explicitly when the database is available.</li>
+<li>Fake repository tests remain available for normal <code>make test</code>.</li>
+</ul>
+<section data-section id="section-sp5-snapshot-driven-ncurses-smoke-path">
+<h3 id="sp5-snapshot-driven-ncurses-smoke-path">SP5. Snapshot-Driven NCurses Smoke Path</h3>
+<p>Outcome: make R7 testable enough without automating a whole terminal session.</p>
+<p>Scope:</p>
+<ul>
+<li>Document snapshot fields required by the UI.</li>
+<li>Split layout calculation from drawing where practical.</li>
+<li>Add a non-interactive static snapshot render or layout smoke test.</li>
+<li>Add a manual resize checklist.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>UI renders application snapshots only.</li>
+<li>UI sends commands and does not mutate match state directly.</li>
+<li>Static snapshot smoke test proves the expected panels can be produced.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Non-interactive layout test where feasible.</li>
+<li>Manual terminal playtest checklist.</li>
+</ul>
+<section data-section id="section-sp6-deferred-v0-2-protocol-preparation">
+<h3 id="sp6-deferred-v0-2-protocol-preparation">SP6. Deferred v0.2 Protocol Preparation</h3>
+<p>Outcome: keep v0.1 local while preserving a clean path to future networking.</p>
+<p>Scope:</p>
+<ul>
+<li>Treat application commands as the future network protocol shape.</li>
+<li>Avoid putting NCurses-only concepts in command/result structs.</li>
+<li>Do not introduce socket headers or binary packet layouts in v0.1 production code.</li>
+<li>Keep protocol notes in walkthrough documentation only.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Command names and result payloads are stable enough to map to v0.2 opcodes later.</li>
+<li>No v0.1 target requires POSIX sockets.</li>
+<li>No shared binary protocol files are required for local play.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Header review checklist.</li>
+<li>Build target dependency review.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-5-cmake-target-template">
+<h2 id="5-cmake-target-template">5. CMake Target Template</h2>
+<p>Use this as a design guide for the user-created root <code>CMakeLists.txt</code>. File names are illustrative and should be adapted to the actual implementation.</p>
+<pre><code class="language-cmake">
+cmake_minimum_required(VERSION 3.16)
+project(DungeonsAndDevs C)
+
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
+add_compile_options(-Wall -Wextra -Werror -pedantic)
+
+enable_testing()
+
+add_library(dtd_domain
+    domain/card.c
+    domain/deck.c
+    domain/player.c
+    domain/game_rules.c
+)
+target_include_directories(dtd_domain PUBLIC domain)
+
+add_library(dtd_application
+    application/game_service.c
+    application/bot_ai.c
+)
+target_include_directories(dtd_application PUBLIC application)
+target_link_libraries(dtd_application PUBLIC dtd_domain)
+
+find_package(PostgreSQL REQUIRED)
+add_library(dtd_infrastructure_db
+    infrastructure/db/postgresql_content_repository.c
+)
+target_include_directories(dtd_infrastructure_db PRIVATE ${PostgreSQL_INCLUDE_DIRS})
+target_link_libraries(dtd_infrastructure_db PRIVATE dtd_application dtd_domain ${PostgreSQL_LIBRARIES})
+
+find_package(Curses REQUIRED)
+add_executable(dtd_client_ncurses
+    client/ncurses_ui.c
+    client/main.c
+)
+target_include_directories(dtd_client_ncurses PRIVATE ${CURSES_INCLUDE_DIR})
+target_link_libraries(dtd_client_ncurses PRIVATE dtd_application dtd_domain dtd_infrastructure_db ${CURSES_LIBRARIES})
+
+add_executable(dtd_tests_domain
+    tests/domain/test_deck.c
+    tests/domain/test_combat.c
+)
+target_link_libraries(dtd_tests_domain PRIVATE dtd_domain)
+add_test(NAME domain COMMAND dtd_tests_domain)
+
+add_executable(dtd_tests_application
+    tests/application/test_commands.c
+    tests/fakes/fake_content_repository.c
+)
+target_link_libraries(dtd_tests_application PRIVATE dtd_application dtd_domain)
+add_test(NAME application COMMAND dtd_tests_application)
+</code></pre>
+<p>Important boundary check:</p>
+<ul>
+<li>Do not link <code>dtd_tests_domain</code> to PostgreSQL or NCurses.</li>
+<li>Do not include <code>libpq-fe.h</code> outside infrastructure DB files.</li>
+<li>Do not include <code>ncurses.h</code> outside client UI files.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-6-makefile-wrapper-template">
+<h2 id="6-makefile-wrapper-template">6. Makefile Wrapper Template</h2>
+<p>Use <code>make</code> as the day-to-day interface, while CMake owns target generation.</p>
+<pre><code class="language-makefile">
+.PHONY: configure build test test-db run clean
+
+BUILD_DIR := build
+
+configure:
+	cmake -S . -B $(BUILD_DIR)
+
+build: configure
+	cmake --build $(BUILD_DIR)
+
+test: build
+	ctest --test-dir $(BUILD_DIR) --output-on-failure
+
+test-db: build
+	ctest --test-dir $(BUILD_DIR) --output-on-failure -L db
+
+run: build
+	./$(BUILD_DIR)/dtd_client_ncurses
+
+clean:
+	cmake -E rm -rf $(BUILD_DIR)
+</code></pre>
+<p>Dependency installation should stay outside the default build path. If a setup target is added, make it explicit and document that it may require system package manager privileges.</p>
+<hr>
+</section>
+<section data-section id="section-7-test-matrix">
+<h2 id="7-test-matrix">7. Test Matrix</h2>
+<table><thead><tr>
+<th>Test Area</th>
+<th>Target</th>
+<th>Dependencies</th>
+<th>Backlog Coverage</th>
+</tr></thead><tbody>
+<tr>
+<td>Build boundary smoke</td>
+<td>all targets</td>
+<td>CMake</td>
+<td>A1</td>
+</tr>
+<tr>
+<td>Deck shuffle determinism</td>
+<td><code>dtd_tests_domain</code></td>
+<td>C standard library</td>
+<td>R2, R3, A6</td>
+</tr>
+<tr>
+<td>Power and combat</td>
+<td><code>dtd_tests_domain</code></td>
+<td>C standard library</td>
+<td>R4</td>
+</tr>
+<tr>
+<td>Curse effects</td>
+<td><code>dtd_tests_domain</code></td>
+<td>C standard library</td>
+<td>R5</td>
+</tr>
+<tr>
+<td>Match commands</td>
+<td><code>dtd_tests_application</code></td>
+<td>fake repositories</td>
+<td>A4, A7</td>
+</tr>
+<tr>
+<td>Bot decisions</td>
+<td><code>dtd_tests_application</code></td>
+<td>fake repositories, fixed seed</td>
+<td>R6, A6</td>
+</tr>
+<tr>
+<td>Repository mapping</td>
+<td>DB adapter test</td>
+<td>local PostgreSQL, libpq</td>
+<td>R1, Epic 2, A3</td>
+</tr>
+<tr>
+<td>UI layout smoke</td>
+<td>client/layout test</td>
+<td>optional NCurses or pure layout calculator</td>
+<td>R7, A5</td>
+</tr>
+<tr>
+<td>Memory lifecycle</td>
+<td>domain/application tests</td>
+<td>optional leak checker</td>
+<td>A8</td>
+</tr>
+</tbody></table>
+<p>Normal <code>make test</code> should run fast unit tests. Database adapter tests may be labeled separately so they can be run when PostgreSQL is configured.</p>
+<hr>
+</section>
+<section data-section id="section-8-memory-ownership-checklist">
+<h2 id="8-memory-ownership-checklist">8. Memory Ownership Checklist</h2>
+<p>Use this checklist during header review:</p>
+<pre><code class="language-text">
+Does every create/init function have a matching destroy/deinit?
+Does every adapter result array have one cleanup function?
+Are borrowed pointers documented as invalid after mutation?
+Are returned snapshots copied or clearly owned by the caller?
+Can a failed initialization clean up all partial allocations?
+Can tests create and destroy a full match without reachable allocations?
+</code></pre>
+<p>Recommended naming:</p>
+<pre><code class="language-text">
+match_create / match_destroy
+deck_init / deck_deinit
+content_result_free
+snapshot_destroy
+command_result_deinit
+</code></pre>
+<p>Avoid returning pointers into resizable arrays unless the lifetime is deliberately short and documented.</p>
+<hr>
+</section>
+<section data-section id="section-9-ncurses-manual-playtest-checklist">
+<h2 id="9-ncurses-manual-playtest-checklist">9. NCurses Manual Playtest Checklist</h2>
+<p>Run this after SP5 and GD5 have enough support to show a local match:</p>
+<pre><code class="language-text">
+Terminal size:
+Seed:
+Can resize without crash:
+Stats panel shows Level, Power, Influence:
+Battle panel shows encounter Power/rewards/modifiers:
+Hand panel keeps stable selection indexes:
+Log panel shows combat, curse, equipment, bot, and match-end events:
+Invalid key returns a readable error:
+Exit path restores terminal state:
+</code></pre>
+<p>The client should call <code>endwin()</code> on normal exit and on handled startup/render failures so the terminal is not left in raw mode.</p>
+<hr>
+</section>
+<section data-section id="section-10-v0-2-networking-notes">
+<h2 id="10-v0-2-networking-notes">10. v0.2 Networking Notes</h2>
+<p>Do not implement sockets in v0.1. Preserve the path by keeping commands and results serializable:</p>
+<pre><code class="language-text">
+START_LOCAL_MATCH
+KICK_BACKLOG
+EQUIP_CARD
+PLAY_CARD
+REQUEST_HELP
+RESOLVE_COMBAT
+END_TURN
+RESOLVE_BOT_TURN
+</code></pre>
+<p>When v0.2 starts, these commands can map to explicit opcodes with a fixed header:</p>
+<pre><code class="language-text">
++------------------+------------------+--------------------+--------------------+
+| Magic Bytes (2B) | Opcode (2B)      | Payload Length(4B) | Payload            |
++------------------+------------------+--------------------+--------------------+
+</code></pre>
+<p>For now, keep that as documentation only. The v0.1 build should not depend on socket headers, shared packet structs, or pthread worker pools.</p>
+</section>
+    </article>
+  </main>
+</div>
+<script>
+(function () {
+  const search = document.querySelector('[data-search]');
+  const toggle = document.querySelector('[data-toggle-sections]');
+  const sections = Array.from(document.querySelectorAll('[data-section]'));
+  const checks = Array.from(document.querySelectorAll('li'))
+    .filter(li => /\bGiven\b|\bVerification\b|checklist|Acceptance criteria/i.test(li.textContent));
+  checks.forEach((li, index) => {
+    li.dataset.checkItem = String(index);
+    li.addEventListener('click', () => li.classList.toggle('done'));
+    li.style.cursor = 'pointer';
+    li.title = 'Click to mark this planning item during review';
+  });
+  const style = document.createElement('style');
+  style.textContent = 'li.done{opacity:.62;text-decoration:line-through;}';
+  document.head.appendChild(style);
+  if (search) {
+    search.addEventListener('input', () => {
+      const q = search.value.trim().toLowerCase();
+      sections.forEach(section => {
+        section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+      });
+    });
+  }
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const collapsed = document.body.dataset.collapsed === 'true';
+      document.body.dataset.collapsed = String(!collapsed);
+      sections.forEach(section => {
+        const first = section.querySelector('h2, h3');
+        if (!first) return;
+        Array.from(section.children).forEach(child => {
+          if (child !== first) child.hidden = !collapsed;
+        });
+      });
+      toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+    });
+  }
+})();
+</script>
+</body>
+</html>

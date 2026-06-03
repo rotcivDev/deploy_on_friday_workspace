@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lead Architecture Backlog Refinement Guide: v0.1 Prototype</title>
+  <style>
+:root {
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --ink: #17202a;
+  --muted: #637083;
+  --line: #d8dee9;
+  --accent: #0f766e;
+  --accent-2: #b45309;
+  --code-bg: #101828;
+  --code-ink: #e5edf8;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--bg);
+}
+.page-shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+  padding: 24px 18px;
+  border-right: 1px solid var(--line);
+  background: #eef2f7;
+}
+main { padding: 32px min(5vw, 64px) 72px; }
+article {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: clamp(24px, 4vw, 48px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+h1, h2, h3, h4 { line-height: 1.2; margin: 1.4em 0 0.55em; letter-spacing: 0; }
+h1 { margin-top: 0; font-size: clamp(2rem, 4vw, 3rem); }
+h2 { border-top: 1px solid var(--line); padding-top: 1.1em; font-size: 1.55rem; }
+h3 { font-size: 1.2rem; color: #143a36; }
+h4 { font-size: 1.05rem; color: #3a2d12; }
+p, ul, ol, table, pre { margin: 0.85em 0; }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.25em 0; }
+a { color: var(--accent); text-decoration-thickness: 0.08em; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  background: #edf2f7;
+  border: 1px solid #d9e2ec;
+  border-radius: 4px;
+  padding: 0.05em 0.3em;
+}
+pre {
+  overflow-x: auto;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #1f2937;
+}
+pre code { background: transparent; border: 0; color: inherit; padding: 0; }
+table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--line); padding: 8px 10px; vertical-align: top; }
+th { background: #ecfdf5; text-align: left; }
+blockquote { border-left: 4px solid var(--accent-2); margin: 1em 0; padding: 0.25em 1em; background: #fff7ed; color: #4a2f12; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
+.toc-title { font-weight: 700; margin-bottom: 12px; }
+.toc a { display: block; padding: 6px 0; color: #334155; text-decoration: none; font-size: 0.92rem; }
+.toc a:hover { color: var(--accent); }
+.toolbar { display: grid; gap: 10px; margin-bottom: 18px; }
+.toolbar input, .toolbar button {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px 10px;
+  font: inherit;
+  background: white;
+}
+.toolbar button { cursor: pointer; color: white; background: var(--accent); border-color: var(--accent); }
+.meta { color: var(--muted); font-size: 0.95rem; margin-top: -0.5rem; }
+.section-hidden { display: none; }
+mark { background: #fef3c7; padding: 0 0.15em; }
+.back-home { display: inline-block; margin-bottom: 18px; color: var(--accent); }
+@media (max-width: 860px) {
+  .page-shell { display: block; }
+  aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  main { padding: 20px 14px 48px; }
+  article { padding: 22px; }
+}
+</style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a class="back-home" href="../index.html">Walkthrough Index</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter sections">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <div class="toc-title">Contents</div>
+    <nav class="toc"><a style="padding-left:0px" href="#lead-architecture-backlog-refinement-guide-v0-1-prototype">Lead Architecture Backlog Refinement Guide: v0.1 Prototype</a>
+<a style="padding-left:10px" href="#1-reviewed-inputs">1. Reviewed Inputs</a>
+<a style="padding-left:10px" href="#2-architecture-review-summary">2. Architecture Review Summary</a>
+<a style="padding-left:10px" href="#3-target-v0-1-dependency-shape">3. Target v0.1 Dependency Shape</a>
+<a style="padding-left:10px" href="#4-team-finding-synthesis">4. Team Finding Synthesis</a>
+<a style="padding-left:20px" href="#finding-1-the-build-boundary-must-come-first">Finding 1: The Build Boundary Must Come First</a>
+<a style="padding-left:20px" href="#finding-2-content-loading-is-an-application-port-not-a-domain-concern">Finding 2: Content Loading Is An Application Port, Not A Domain Concern</a>
+<a style="padding-left:20px" href="#finding-3-gameplay-balance-needs-fixture-support">Finding 3: Gameplay Balance Needs Fixture Support</a>
+<a style="padding-left:20px" href="#finding-4-determinism-is-a-cross-cutting-contract">Finding 4: Determinism Is A Cross-Cutting Contract</a>
+<a style="padding-left:20px" href="#finding-5-events-are-runtime-results-before-they-are-database-rows">Finding 5: Events Are Runtime Results Before They Are Database Rows</a>
+<a style="padding-left:10px" href="#5-architecture-increment-plan">5. Architecture Increment Plan</a>
+<a style="padding-left:20px" href="#ar0-architecture-decision-baseline">AR0. Architecture Decision Baseline</a>
+<a style="padding-left:20px" href="#ar1-layered-build-and-test-boundary">AR1. Layered Build And Test Boundary</a>
+<a style="padding-left:20px" href="#ar2-content-contract-and-startup-gate">AR2. Content Contract And Startup Gate</a>
+<a style="padding-left:20px" href="#ar3-domain-model-decks-and-deterministic-rng">AR3. Domain Model, Decks, And Deterministic RNG</a>
+<a style="padding-left:20px" href="#ar4-rule-results-combat-curses-and-events">AR4. Rule Results, Combat, Curses, And Events</a>
+<a style="padding-left:20px" href="#ar5-application-command-boundary-and-bot-orchestration">AR5. Application Command Boundary And Bot Orchestration</a>
+<a style="padding-left:20px" href="#ar6-snapshot-based-ncurses-boundary">AR6. Snapshot-Based NCurses Boundary</a>
+<a style="padding-left:20px" href="#ar7-playable-v0-1-vertical-slice">AR7. Playable v0.1 Vertical Slice</a>
+<a style="padding-left:20px" href="#ar8-deferred-v0-2-readiness-review">AR8. Deferred v0.2 Readiness Review</a>
+<a style="padding-left:10px" href="#6-unified-increment-order">6. Unified Increment Order</a>
+<a style="padding-left:10px" href="#7-interface-sketches">7. Interface Sketches</a>
+<a style="padding-left:20px" href="#content-load-flow">Content Load Flow</a>
+<a style="padding-left:20px" href="#command-result-shape">Command Result Shape</a>
+<a style="padding-left:20px" href="#snapshot-shape">Snapshot Shape</a>
+<a style="padding-left:20px" href="#domain-rule-boundary">Domain Rule Boundary</a>
+<a style="padding-left:10px" href="#8-architecture-checklist">8. Architecture Checklist</a></nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Generated as a self-contained HTML walkthrough. Click acceptance/checklist items to mark review progress.</p>
+<section data-section id="section-lead-architecture-backlog-refinement-guide-v0-1-prototype">
+<h1 id="lead-architecture-backlog-refinement-guide-v0-1-prototype">Lead Architecture Backlog Refinement Guide: v0.1 Prototype</h1>
+<p>This document evaluates <a href="kickoff_backlog.html">kickoff_backlog.html</a> together with the database, gameplay, and systems refinement guides. It consolidates the team plans into one architecture-led increment sequence for the v0.1 Root Prototype.</p>
+<p>This is a mentorship and support artifact. It does not require agents to edit production source directories.</p>
+<hr>
+</section>
+<section data-section id="section-1-reviewed-inputs">
+<h2 id="1-reviewed-inputs">1. Reviewed Inputs</h2>
+<p>This architecture pass reviewed:</p>
+<ul>
+<li><a href="kickoff_backlog.html">kickoff_backlog.html</a>: playable v0.1 stories R1-R7 and architecture stories A1-A8.</li>
+<li><a href="../database/db_refinement_guide.html">db_refinement_guide.html</a>: content loading, deck membership, application repository port, and deferred JSONB event persistence.</li>
+<li><a href="../design/gameplay_refinement_guide.html">gameplay_refinement_guide.html</a>: encounter curve, treasure pacing, curse expiry, bot behavior, and playtest gates.</li>
+<li><a href="../testing/systems_refinement_guide.html">systems_refinement_guide.html</a>: layered CMake targets, deterministic RNG, command tests, memory ownership, and NCurses smoke path.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-2-architecture-review-summary">
+<h2 id="2-architecture-review-summary">2. Architecture Review Summary</h2>
+<div class="callout"><strong>Second Review: Source-of-Truth Alignment.</strong> Architecture must treat strategic domain understanding as the source of truth. Clean Architecture remains the right operational boundary discipline, but it is not the starting point. The team should first name the gameplay/business capability and bounded context, then use layers, ports, adapters, and build targets only to protect that domain model. Tactical DDD patterns are optional and should be introduced only when current domain complexity justifies them.</div>
+<p>The backlog is now directionally coherent: all team roles are aiming at a local, deterministic, three-player prototype where PostgreSQL provides seeded content, the game loop runs in memory, and the terminal client renders application snapshots.</p>
+<p>The main architecture risk is sequence drift. If implementation starts from the UI or database adapter too early, the project can accidentally bypass the clean command boundary and push rule decisions into the wrong layer.</p>
+<p>Architecture recommendation:</p>
+<ul>
+<li>Start by enforcing build targets and dependency rules.</li>
+<li>Define domain/application data contracts before writing adapters or UI behavior.</li>
+<li>Load and validate content once at match startup.</li>
+<li>Keep match state and random state in memory for v0.1.</li>
+<li>Keep event persistence, sockets, pthreads, protocol structs, accounts, rankings, and achievements deferred.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-3-target-v0-1-dependency-shape">
+<h2 id="3-target-v0-1-dependency-shape">3. Target v0.1 Dependency Shape</h2>
+<pre><code class="language-mermaid">
+flowchart LR
+    UI[client/ncurses\nrenders snapshots\nsends commands]
+    APP[application\nmatch service\ncommands/results\nports]
+    DOM[domain\ncards decks players\nrules RNG-owned inputs]
+    PORT[application ports\ncontent_repository]
+    DB[infrastructure/db\nPostgreSQL adapter]
+    TESTS[tests\nfakes and simulations]
+
+    UI --&gt; APP
+    APP --&gt; DOM
+    APP --&gt; PORT
+    DB --&gt; PORT
+    DB --&gt; APP
+    TESTS --&gt; APP
+    TESTS --&gt; DOM
+</code></pre>
+<p>Boundary notes:</p>
+<ul>
+<li><code>domain/</code> must not include PostgreSQL, NCurses, sockets, pthreads, filesystem, or application service headers.</li>
+<li><code>application/</code> owns orchestration, commands, ports, snapshots, bot turn flow, and startup validation.</li>
+<li><code>infrastructure/db/</code> owns <code>libpq</code>, SQL, row mapping, and database connection lifecycle.</li>
+<li><code>client/</code> owns NCurses rendering and input translation only.</li>
+<li><code>shared/</code> stays deferred for v0.1 unless a type is genuinely needed by multiple runtime binaries. For the local prototype, application command structs are enough.</li>
+</ul>
+<hr>
+</section>
+<section data-section id="section-4-team-finding-synthesis">
+<h2 id="4-team-finding-synthesis">4. Team Finding Synthesis</h2>
+<section data-section id="section-finding-1-the-build-boundary-must-come-first">
+<h3 id="finding-1-the-build-boundary-must-come-first">Finding 1: The Build Boundary Must Come First</h3>
+<p>Systems identified that a single all-in-one executable would hide architecture violations. A1 must be the first implementation gate.</p>
+<p>Decision:</p>
+<ul>
+<li>Create layered targets before real gameplay code expands.</li>
+<li>Let target dependencies prove that domain/application do not need <code>libpq</code> or NCurses.</li>
+<li>Keep DB adapter tests separate from normal domain/application tests.</li>
+</ul>
+<section data-section id="section-finding-2-content-loading-is-an-application-port-not-a-domain-concern">
+<h3 id="finding-2-content-loading-is-an-application-port-not-a-domain-concern">Finding 2: Content Loading Is An Application Port, Not A Domain Concern</h3>
+<p>Database refinement correctly moved repository guidance from a domain repository to an application content port.</p>
+<p>Decision:</p>
+<ul>
+<li>The application starts a match by calling a content repository port.</li>
+<li>Infrastructure returns plain content definitions.</li>
+<li>Domain receives values, not database handles or SQL IDs as rule drivers.</li>
+<li>Missing content returns a startup failure rather than constructing an empty match.</li>
+</ul>
+<section data-section id="section-finding-3-gameplay-balance-needs-fixture-support">
+<h3 id="finding-3-gameplay-balance-needs-fixture-support">Finding 3: Gameplay Balance Needs Fixture Support</h3>
+<p>Game design identified that the current card set has weak early progression coverage. Architecture should support scripted fixtures without hardcoding game logic into the UI or DB adapter.</p>
+<p>Decision:</p>
+<ul>
+<li>Content validation should know required card/deck presence.</li>
+<li>Deterministic deck tests should accept fixed seed and, when needed, fixture draw order.</li>
+<li>The domain should support card properties and rule keys without embedding database queries.</li>
+</ul>
+<section data-section id="section-finding-4-determinism-is-a-cross-cutting-contract">
+<h3 id="finding-4-determinism-is-a-cross-cutting-contract">Finding 4: Determinism Is A Cross-Cutting Contract</h3>
+<p>Systems and gameplay both depend on reproducible shuffles and bot behavior. This cannot be hidden in utility globals.</p>
+<p>Decision:</p>
+<ul>
+<li>Store seed and RNG state in match/application state.</li>
+<li>Pass RNG state explicitly into deck shuffle and bot decisions.</li>
+<li>Do not call <code>rand()</code> from domain rules.</li>
+<li>Record seed in events/logs for replay.</li>
+</ul>
+<section data-section id="section-finding-5-events-are-runtime-results-before-they-are-database-rows">
+<h3 id="finding-5-events-are-runtime-results-before-they-are-database-rows">Finding 5: Events Are Runtime Results Before They Are Database Rows</h3>
+<p>The database guide defers JSONB event persistence, while systems and kickoff backlog require structured event results for UI logs.</p>
+<p>Decision:</p>
+<ul>
+<li>v0.1 event structs live in domain/application result flow.</li>
+<li>UI formats events into text but does not infer rules from state.</li>
+<li><code>game_events</code> persistence remains optional and deferred until after the local loop works.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-5-architecture-increment-plan">
+<h2 id="5-architecture-increment-plan">5. Architecture Increment Plan</h2>
+<section data-section id="section-ar0-architecture-decision-baseline">
+<h3 id="ar0-architecture-decision-baseline">AR0. Architecture Decision Baseline</h3>
+<p>Outcome: make the implementation order and dependency boundaries explicit before production code starts.</p>
+<p>Consumes:</p>
+<ul>
+<li>Kickoff A1-A8.</li>
+<li>Systems SP0.</li>
+<li>Database DB2.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Confirm layer responsibilities.</li>
+<li>Confirm deferred scope.</li>
+<li>Confirm target dependency rules.</li>
+<li>Confirm that v0.1 is local and server-authoritative in shape, even without a server process.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>The team can point to one dependency diagram for v0.1.</li>
+<li>Every story maps to domain, application, infrastructure, or client ownership.</li>
+<li>Deferred server/network/account concerns are not required for R1-R7.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Architecture checklist review.</li>
+<li>Build target plan review.</li>
+</ul>
+<section data-section id="section-ar1-layered-build-and-test-boundary">
+<h3 id="ar1-layered-build-and-test-boundary">AR1. Layered Build And Test Boundary</h3>
+<p>Outcome: make forbidden dependencies fail early.</p>
+<p>Consumes:</p>
+<ul>
+<li>Systems SP0.</li>
+<li>Kickoff A1.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Establish domain, application, infrastructure DB, client, and test targets.</li>
+<li>Keep <code>libpq</code> in infrastructure DB only.</li>
+<li>Keep NCurses in client only.</li>
+<li>Keep pure domain/application tests runnable without PostgreSQL or NCurses.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Domain builds against the C standard library only.</li>
+<li>Application builds against domain and application ports only.</li>
+<li>Infrastructure DB is the only PostgreSQL-linked target.</li>
+<li>Client is the only NCurses-linked target.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li><code>make build</code></li>
+<li><code>make test</code></li>
+<li>Include/dependency smoke review.</li>
+</ul>
+<section data-section id="section-ar2-content-contract-and-startup-gate">
+<h3 id="ar2-content-contract-and-startup-gate">AR2. Content Contract And Startup Gate</h3>
+<p>Outcome: make R1 safe by preventing empty or partial content from creating a match.</p>
+<p>Consumes:</p>
+<ul>
+<li>Database DB0, DB2, DB3.</li>
+<li>Gameplay GD0.</li>
+<li>Kickoff R1, A3.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Define application content repository contract.</li>
+<li>Define required v0.1 content groups: card types, classes, encounter cards, treasure cards, deck membership.</li>
+<li>Return typed startup failures for missing content.</li>
+<li>Keep <code>PGconn</code>, <code>PGresult</code>, SQL, and connection lifecycle private to infrastructure.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Application receives plain content definitions.</li>
+<li>Missing required content produces readable startup failure.</li>
+<li>Domain receives card/class values only.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Fake repository startup tests.</li>
+<li>Optional local PostgreSQL adapter mapping tests.</li>
+</ul>
+<section data-section id="section-ar3-domain-model-decks-and-deterministic-rng">
+<h3 id="ar3-domain-model-decks-and-deterministic-rng">AR3. Domain Model, Decks, And Deterministic RNG</h3>
+<p>Outcome: make R2, R3, and A6 testable without UI or DB runtime dependencies.</p>
+<p>Consumes:</p>
+<ul>
+<li>Systems SP1, SP2.</li>
+<li>Gameplay GD1.</li>
+<li>Database DB1.</li>
+<li>Kickoff R2, R3, A2, A6.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Model cards, decks, discard piles, players, equipment, and match state as pure domain/application values.</li>
+<li>Define seedable RNG state.</li>
+<li>Build deterministic Encounter and Treasure decks from loaded content.</li>
+<li>Keep shuffle and discard behavior reproducible.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Same seed creates the same draw order.</li>
+<li>Decks can reshuffle discard piles deterministically.</li>
+<li>Domain tests do not require PostgreSQL or NCurses.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Fixed-seed deck tests.</li>
+<li>Domain lifecycle tests.</li>
+</ul>
+<section data-section id="section-ar4-rule-results-combat-curses-and-events">
+<h3 id="ar4-rule-results-combat-curses-and-events">AR4. Rule Results, Combat, Curses, And Events</h3>
+<p>Outcome: make R4, R5, and A7 produce structured results the application and UI can trust.</p>
+<p>Consumes:</p>
+<ul>
+<li>Systems SP2, SP3.</li>
+<li>Gameplay GD2, GD3.</li>
+<li>Kickoff R4, R5, A7, A8.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Define combat resolver input/output shape.</li>
+<li>Define curse state transitions and expiry.</li>
+<li>Emit structured events for draw, curse, combat, reward, equipment, bot action, and match end.</li>
+<li>Define ownership for result arrays and snapshots.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Win/loss/Level 10 outcomes are deterministic.</li>
+<li>Invalid commands do not mutate state.</li>
+<li>Event order is testable.</li>
+<li>Public interfaces have ownership comments.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Domain rule tests.</li>
+<li>Application command tests.</li>
+<li>Optional leak-check run.</li>
+</ul>
+<section data-section id="section-ar5-application-command-boundary-and-bot-orchestration">
+<h3 id="ar5-application-command-boundary-and-bot-orchestration">AR5. Application Command Boundary And Bot Orchestration</h3>
+<p>Outcome: ensure human and bot actions use the same authoritative path.</p>
+<p>Consumes:</p>
+<ul>
+<li>Systems SP3.</li>
+<li>Gameplay GD4.</li>
+<li>Kickoff R6, A4.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Define command names for start match, kick backlog, equip, play, request help, resolve combat, resolve bot turn, and end turn.</li>
+<li>Route bot decisions through application commands.</li>
+<li>Keep bot logic deterministic and seed-driven.</li>
+<li>Return snapshots and events from every command.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Human and bot actions share validation.</li>
+<li>Bot choices replay with the same seed.</li>
+<li>Invalid phase errors leave state unchanged.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Application command tests.</li>
+<li>Fixed-seed full-match simulation.</li>
+</ul>
+<section data-section id="section-ar6-snapshot-based-ncurses-boundary">
+<h3 id="ar6-snapshot-based-ncurses-boundary">AR6. Snapshot-Based NCurses Boundary</h3>
+<p>Outcome: keep the UI replaceable and unable to own game rules.</p>
+<p>Consumes:</p>
+<ul>
+<li>Systems SP5.</li>
+<li>Gameplay GD5.</li>
+<li>Kickoff R7, A5.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Define snapshot fields: active player, phase, player summaries, visible encounter, hand view, equipment view, actions, and recent events.</li>
+<li>UI renders snapshots and sends commands.</li>
+<li>UI does not recalculate Power, rewards, legality, or combat outcomes.</li>
+<li>Provide static snapshot smoke path and manual resize checklist.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>UI can render a static snapshot.</li>
+<li>UI command selection uses stable IDs or indexes supplied by application.</li>
+<li>Terminal redraw does not mutate domain state.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Static layout smoke test if feasible.</li>
+<li>Manual terminal playtest checklist.</li>
+</ul>
+<section data-section id="section-ar7-playable-v0-1-vertical-slice">
+<h3 id="ar7-playable-v0-1-vertical-slice">AR7. Playable v0.1 Vertical Slice</h3>
+<p>Outcome: integrate R1-R7 into one local match loop.</p>
+<p>Consumes:</p>
+<ul>
+<li>AR1-AR6.</li>
+<li>Gameplay GD5.</li>
+<li>Systems test matrix.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Start match from validated content.</li>
+<li>Build deterministic decks.</li>
+<li>Run human and bot turns through commands.</li>
+<li>Resolve combat, curses, equipment, help, and sabotage.</li>
+<li>Render logs and snapshots.</li>
+<li>End immediately at Level 10.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>One human and two bots can complete a local match.</li>
+<li>A fixed seed replays the same major event sequence.</li>
+<li>The UI never directly mutates match state.</li>
+<li>No v0.1 code requires sockets, pthread worker pools, shared protocol structs, accounts, rankings, achievements, or match history.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Fixed-seed full-match simulation.</li>
+<li>Manual NCurses playtest.</li>
+<li>Architecture boundary review.</li>
+</ul>
+<section data-section id="section-ar8-deferred-v0-2-readiness-review">
+<h3 id="ar8-deferred-v0-2-readiness-review">AR8. Deferred v0.2 Readiness Review</h3>
+<p>Outcome: preserve future multiplayer architecture without pulling it into v0.1.</p>
+<p>Consumes:</p>
+<ul>
+<li>Systems SP6.</li>
+<li>Database DB4.</li>
+<li>Kickoff deferred items.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>Review command/result shape as future protocol payloads.</li>
+<li>Keep JSONB event persistence optional.</li>
+<li>Keep socket/pthread/server work as v0.2 backlog.</li>
+</ul>
+<p>Acceptance criteria:</p>
+<ul>
+<li>Commands can map to future opcodes.</li>
+<li>Event structs can map to future JSONB payloads.</li>
+<li>v0.1 remains local and deterministic.</li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li>Architecture review only.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-6-unified-increment-order">
+<h2 id="6-unified-increment-order">6. Unified Increment Order</h2>
+<p>Use this order to keep the backlog executable:</p>
+<table><thead><tr>
+<th>Order</th>
+<th>Lead Increment</th>
+<th>Supporting Team Increments</th>
+<th>Main Risk Retired</th>
+</tr></thead><tbody>
+<tr>
+<td>1</td>
+<td>AR0 Architecture Decision Baseline</td>
+<td>SP0, DB2</td>
+<td>Ambiguous ownership</td>
+</tr>
+<tr>
+<td>2</td>
+<td>AR1 Layered Build And Test Boundary</td>
+<td>SP0</td>
+<td>Hidden dependency violations</td>
+</tr>
+<tr>
+<td>3</td>
+<td>AR2 Content Contract And Startup Gate</td>
+<td>DB0, DB2, DB3, GD0</td>
+<td>Empty/invalid content</td>
+</tr>
+<tr>
+<td>4</td>
+<td>AR3 Domain Model, Decks, And RNG</td>
+<td>SP1, SP2, DB1, GD1</td>
+<td>Non-replayable gameplay</td>
+</tr>
+<tr>
+<td>5</td>
+<td>AR4 Rule Results, Combat, Curses, Events</td>
+<td>SP2, SP3, GD2, GD3</td>
+<td>Untestable state mutation</td>
+</tr>
+<tr>
+<td>6</td>
+<td>AR5 Command Boundary And Bots</td>
+<td>SP3, GD4</td>
+<td>UI/bot bypassing authority</td>
+</tr>
+<tr>
+<td>7</td>
+<td>AR6 Snapshot-Based NCurses Boundary</td>
+<td>SP5, GD5</td>
+<td>UI owns game rules</td>
+</tr>
+<tr>
+<td>8</td>
+<td>AR7 Playable v0.1 Vertical Slice</td>
+<td>All R1-R7</td>
+<td>Local prototype incompleteness</td>
+</tr>
+<tr>
+<td>9</td>
+<td>AR8 Deferred v0.2 Readiness Review</td>
+<td>SP6, DB4</td>
+<td>Premature networking/persistence</td>
+</tr>
+</tbody></table>
+<hr>
+</section>
+<section data-section id="section-7-interface-sketches">
+<h2 id="7-interface-sketches">7. Interface Sketches</h2>
+<p>These sketches are guidance only. The user should adapt names to the final C conventions.</p>
+<section data-section id="section-content-load-flow">
+<h3 id="content-load-flow">Content Load Flow</h3>
+<pre><code class="language-text">
+application_start_local_match(seed, content_repository)
+    -&gt; content_repository.validate_required_v0_1_content()
+    -&gt; content_repository.load_classes()
+    -&gt; content_repository.load_deck_cards(&quot;Core Monster Deck&quot;)
+    -&gt; content_repository.load_deck_cards(&quot;Treasure Deck&quot;)
+    -&gt; domain/application creates match values
+    -&gt; application returns command result with snapshot and MATCH_STARTED event
+</code></pre>
+<section data-section id="section-command-result-shape">
+<h3 id="command-result-shape">Command Result Shape</h3>
+<pre><code class="language-text">
+command_result
+    status
+    error_code
+    snapshot
+    events[]
+    ownership: caller deinitializes result
+</code></pre>
+<section data-section id="section-snapshot-shape">
+<h3 id="snapshot-shape">Snapshot Shape</h3>
+<pre><code class="language-text">
+snapshot
+    active_player
+    phase
+    player_summaries[]
+    visible_encounter
+    hand_view[]
+    equipment_view[]
+    available_actions[]
+    recent_events[]
+</code></pre>
+<section data-section id="section-domain-rule-boundary">
+<h3 id="domain-rule-boundary">Domain Rule Boundary</h3>
+<pre><code class="language-text">
+combat_result = resolve_combat(combat_input)
+curse_result = resolve_curse(curse_input)
+power = calculate_power(player_view, temporary_modifiers)
+</code></pre>
+<p>The domain should not know whether the input came from PostgreSQL, a fake repository, a scripted fixture, or a future network message.</p>
+<hr>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section data-section id="section-8-architecture-checklist">
+<h2 id="8-architecture-checklist">8. Architecture Checklist</h2>
+<p>Use this checklist at the end of each increment:</p>
+<pre><code class="language-text">
+Does domain compile without libpq, ncurses, sockets, pthreads, or application services?
+Does application avoid SQL, terminal rendering, and socket calls?
+Do infrastructure adapters keep external library types private?
+Does client render snapshots and send commands only?
+Can tests run domain/application behavior without PostgreSQL?
+Does every mutable command return explicit status, events, and snapshot data?
+Is RNG state explicit and replayable?
+Are ownership rules documented for allocated results and borrowed views?
+Are v0.2 concerns still deferred unless explicitly chosen as a spike?
+</code></pre>
+<p>If any answer is no, stop and refine the boundary before adding more gameplay behavior.</p>
+</section>
+    </article>
+  </main>
+</div>
+<script>
+(function () {
+  const search = document.querySelector('[data-search]');
+  const toggle = document.querySelector('[data-toggle-sections]');
+  const sections = Array.from(document.querySelectorAll('[data-section]'));
+  const checks = Array.from(document.querySelectorAll('li'))
+    .filter(li => /\bGiven\b|\bVerification\b|checklist|Acceptance criteria/i.test(li.textContent));
+  checks.forEach((li, index) => {
+    li.dataset.checkItem = String(index);
+    li.addEventListener('click', () => li.classList.toggle('done'));
+    li.style.cursor = 'pointer';
+    li.title = 'Click to mark this planning item during review';
+  });
+  const style = document.createElement('style');
+  style.textContent = 'li.done{opacity:.62;text-decoration:line-through;}';
+  document.head.appendChild(style);
+  if (search) {
+    search.addEventListener('input', () => {
+      const q = search.value.trim().toLowerCase();
+      sections.forEach(section => {
+        section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+      });
+    });
+  }
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const collapsed = document.body.dataset.collapsed === 'true';
+      document.body.dataset.collapsed = String(!collapsed);
+      sections.forEach(section => {
+        const first = section.querySelector('h2, h3');
+        if (!first) return;
+        Array.from(section.children).forEach(child => {
+          if (child !== first) child.hidden = !collapsed;
+        });
+      });
+      toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+    });
+  }
+})();
+</script>
+</body>
+</html>
