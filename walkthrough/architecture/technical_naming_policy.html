@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Technical Naming Policy</title>
+  <style>
+    :root{--bg:#f7f8fb;--panel:#fff;--ink:#17202a;--muted:#637083;--line:#d8dee9;--accent:#0f766e;--soft:#ecfdf5;--warn:#fff7ed}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;color:var(--ink);background:var(--bg)}
+    main{max-width:1040px;margin:0 auto;padding:32px 18px 72px}
+    article{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:clamp(24px,4vw,44px);box-shadow:0 8px 24px rgba(15,23,42,.05)}
+    h1,h2{line-height:1.2;letter-spacing:0}h1{margin-top:0;font-size:clamp(2rem,4vw,3rem)}h2{border-top:1px solid var(--line);padding-top:1.1rem;margin-top:2rem}
+    a{color:var(--accent)}.meta{color:var(--muted)}.callout{border-left:4px solid var(--accent);background:var(--soft);padding:12px 14px;margin:16px 0}.warning{border-left-color:#b45309;background:var(--warn)}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;background:#edf2f7;border:1px solid #d9e2ec;border-radius:4px;padding:.05em .3em}
+    table{width:100%;border-collapse:collapse;display:block;overflow-x:auto}th,td{border:1px solid var(--line);padding:8px 10px;vertical-align:top}th{background:var(--soft);text-align:left}
+    ul{padding-left:1.4rem}li{margin:.25em 0}
+  </style>
+</head>
+<body>
+<main><article>
+  <p><a href="../index.html">Walkthrough Index</a></p>
+  <h1>Technical Naming Policy</h1>
+  <p class="meta">Architecture and systems guidance for decoupling product branding from implementation identifiers.</p>
+
+  <section>
+    <h2>Decision</h2>
+    <div class="callout"><strong>Product names must not become code prefixes.</strong> The public title is a marketing and product artifact. C symbols, CMake targets, database names, protocol constants, package namespaces, and service identifiers must use stable technical naming instead.</div>
+    <p><strong>Deploy on Friday</strong> is the current public product title. Implementation examples must not use title-derived prefixes. Documentation examples now use <code>game_</code> as the stable generic technical prefix because it describes the software system without binding it to the current public title or to one mechanic.</p>
+  </section>
+
+  <section>
+    <h2>Why This Matters</h2>
+    <ul>
+      <li>Public titles are product decisions and must not force code, database, build, or protocol renames.</li>
+      <li>Renaming C symbols, targets, database names, and protocol fields late is expensive and risky.</li>
+      <li>Brand-coupled identifiers leak marketing volatility into stable architecture.</li>
+      <li>Generic technical names are less expressive than domain names, but they are safer than product-title initials when the title is not final.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Approved Naming Layers</h2>
+    <table>
+      <thead><tr><th>Layer</th><th>Use</th><th>Avoid</th></tr></thead>
+      <tbody>
+        <tr><td>Public product title</td><td>Deploy on Friday.</td><td>Using the title as the implementation namespace.</td></tr>
+        <tr><td>C symbol prefix</td><td><code>game_</code> for examples and future implementation unless a stronger stable technical codename is approved.</td><td>Title initials, joke prefixes, or extension-specific prefixes in core code.</td></tr>
+        <tr><td>CMake targets</td><td><code>game_domain</code>, <code>game_application</code>, <code>game_client_ncurses</code>.</td><td>Targets named from public title initials or store branding.</td></tr>
+        <tr><td>Database examples</td><td><code>game_db</code>, <code>game_user</code>, <code>game_password</code> for local examples.</td><td>Brand-derived DB names that would require migration if the title changes.</td></tr>
+        <tr><td>Protocol constants</td><td>Domain behavior names such as <code>INCIDENT_SEVERITY_CHANGED</code>.</td><td>Product-title or extension-title prefixes in stable core packets.</td></tr>
+        <tr><td>Extension content</td><td>Extension IDs such as <code>punch-card-era</code> or <code>ai-new-era</code>.</td><td>Hardcoding extension IDs into core rule functions.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Human Implementation Rule</h2>
+    <ul>
+      <li>When creating new C files, headers, CMake targets, SQL examples, Make targets, protocol names, or test binaries, prefer <code>game_</code> for project-owned examples.</li>
+      <li>Do not introduce abbreviations derived from the current product title unless the team explicitly approves a stable technical codename.</li>
+      <li>Keep player-facing strings free to use the public product title; those are presentation content, not stable architecture.</li>
+      <li>If the public name changes, product copy should change without requiring domain/API/schema renames.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Review Checklist</h2>
+    <ul>
+      <li>Does this identifier still make sense if the public title changes?</li>
+      <li>Is this name stable enough to survive store-page, logo, and naming-risk changes?</li>
+      <li>Would changing this name require database migrations, protocol changes, or public API churn?</li>
+      <li>Does the name preserve the domain-first source-of-truth principle?</li>
+    </ul>
+  </section>
+</article></main>
+</body>
+</html>

@@ -5,6 +5,7 @@
 </style></head>
 <body><div class="page-shell"><aside><a href="index.html">Walkthrough Index</a><div class="toolbar"><input data-search type="search" placeholder="Filter sections"><button data-toggle-sections type="button">Collapse Sections</button></div><nav class="toc"><a style="padding-left:0px" href="#support-material-and-walkthrough-hub">Support Material and Walkthrough Hub</a>
 <a style="padding-left:10px" href="#folder-structure">📂 Folder Structure</a>
+<a style="padding-left:10px" href="#product-walkthrough-product">Product (walkthrough/product/)</a>
 <a style="padding-left:10px" href="#1-database-walkthrough-database">💾 1. Database (walkthrough/database/)</a>
 <a style="padding-left:10px" href="#2-design-walkthrough-design">🎮 2. Design (walkthrough/design/)</a>
 <a style="padding-left:10px" href="#3-devops-walkthrough-devops">⚙️ 3. DevOps (walkthrough/devops/)</a>
@@ -24,6 +25,7 @@
 <h2 id="folder-structure">📂 Folder Structure</h2>
 <pre><code>
 walkthrough/
+├── product/           # Product vision, modular deck strategy, and extension outlines
 ├── database/          # Database DDLs, schema structure, seeds, and migrations templates
 ├── design/            # Gameplay balance, content specs, card design, and playtest guides
 ├── devops/            # Local environment, CI gates, release readiness, and runtime topology
@@ -33,6 +35,20 @@ walkthrough/
 ├── testing/           # Make / CMake guides, CTest suites, unit testing templates
 └── xp/                # XP story slicing, TDD task lists, release-cycle checklists
 </code></pre>
+<hr>
+</section>
+<section data-section id="section-product-walkthrough-product">
+<h2 id="product-walkthrough-product">Product (<code>walkthrough/product/</code>)</h2>
+<p>Reserved for product vision, modular deck strategy, extension outlines, and release patch planning:</p>
+<ul>
+<li><strong><a href="product/modular_deck_strategy.html">modular_deck_strategy.html</a></strong>: Product Owner, game engineer, and architecture lead alignment for the main deck plus extension-pack vision.</li>
+<li><strong><a href="product/market_research_response.html">market_research_response.html</a></strong>: Cross-mentor response to MARKET_RESEARCH.txt, including positioning, commercial strategy, signature mechanics, and clarification questions.</li>
+<li><strong><a href="product/extension_punch_card_era.html">extension_punch_card_era.html</a></strong>: Patch outline for The Punch Card Era extension.</li>
+<li><strong><a href="product/extension_dot_com_bubble.html">extension_dot_com_bubble.html</a></strong>: Patch outline for The .com Bubble extension.</li>
+<li><strong><a href="product/extension_im_a_developer.html">extension_im_a_developer.html</a></strong>: Patch outline for the I'm a Developer extension.</li>
+<li><strong><a href="product/extension_saas_bubble.html">extension_saas_bubble.html</a></strong>: Patch outline for The SaaS Bubble extension.</li>
+<li><strong><a href="product/extension_ai_new_era.html">extension_ai_new_era.html</a></strong>: Patch outline for The AI New Era extension.</li>
+</ul>
 <hr>
 </section>
 <section data-section id="section-1-database-walkthrough-database">
@@ -86,6 +102,7 @@ walkthrough/
 <li><strong><a href="architecture/software_engineering_principles.html">software_engineering_principles.html</a></strong>: Source-of-truth engineering principle: domain understanding before tactical structure.</li>
 <li><strong><a href="architecture/lead_architecture_refinement_guide.html">lead_architecture_refinement_guide.html</a></strong>: Lead architecture synthesis of team refinement plans, dependency boundaries, and unified increment order.</li>
 <li><strong><a href="architecture/t01_cycle_boundary_review.html">t01_cycle_boundary_review.html</a></strong>: Lead Architect completion evidence for XP task T01, confirming v0.1 cycle boundary, deferred scope, and traceability gates.</li>
+<li><strong><a href="architecture/technical_naming_policy.html">technical_naming_policy.html</a></strong>: Architecture and systems policy decoupling public product names from C symbols, build targets, database names, protocol constants, and service identifiers.</li>
 </ul>
 <hr>
 </section>

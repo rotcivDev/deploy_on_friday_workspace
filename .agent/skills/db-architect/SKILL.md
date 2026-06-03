@@ -6,7 +6,7 @@ version: 1.0.0
 
 # PostgreSQL Architect Skill
 
-You are the PostgreSQL Architect and Database Mentor for **Dungeons and Devs**.
+You are the PostgreSQL Architect and Database Mentor for **Deploy on Friday**.
 
 > [!IMPORTANT]
 > **CRITICAL BOUNDARY: MENTORSHIP & SCHEMAS/SUPPORT ONLY**

@@ -1,6 +1,6 @@
 # Agent and Mentorship Hub (AGENTS.md)
 
-Welcome to the **Dungeons and Devs** Agent Hub. This file acts as a central registry and organizer for all agent configurations, workspace skills, and agent-generated support files (documentation, guides, specs, templates).
+Welcome to the **Deploy on Friday** Agent Hub. This file acts as a central registry and organizer for all agent configurations, workspace skills, and agent-generated support files (documentation, guides, specs, templates).
 
 ---
 
@@ -9,7 +9,7 @@ To keep the learning experience hands-on and ensure code quality, the following 
 
 > [!IMPORTANT]
 > **1. Tech Project Source Tree Is Read-Only**: Agents **cannot** write or modify files in the main production codebase (`domain/`, `application/`, `infrastructure/`, `server/`, `client/`, or `shared/`) directly.
-> **2. Project-Level Docs Are Writable**: Agents may freely create and update repository-level documentation and support artifacts outside the protected source tree, including root `README.md` files, `docs/`, `walkthrough/`, plans, guides, templates, and diagram files such as `.html`, `.drawio`, `.puml`, and `.mermaid`.
+> **2. Project-Level Docs Are Writable**: Agents may freely create and update repository-level documentation and support artifacts outside the protected source tree, including root README files, `docs/`, `walkthrough/`, plans, guides, templates, and diagram files such as `.html`, `.drawio`, `.puml`, and `.mermaid`.
 > **3. Designers & Architects**: Can create design specifications, documentation files, templates, creative descriptions, and diagrams.
 > **4. Engineers (Systems, DB & DevOps)**: Can produce support materials, API guides, configuration templates, SQL templates, CI/CD templates, environment guides, deployment plans, test plans, standalone coding examples, and implementation walkthroughs, but must never modify the primary codebase files.
 
@@ -115,12 +115,22 @@ The following skills are placed in the project root [`.agent/skills/`](file:///h
 When agents generate documents, specs, examples, or templates, they must be registered in the directory below for easy tracking:
 
 ### 🎨 Creative & Design Docs (Architects & Designers)
-*   **[dungeons_and_devs/README.md](file:///home/msratso/workspaces/c_dev/dungeons_and_devs/README.md)**: Original project overview, game mechanics, and lore.
-*   **[dungeons_and_devs_prompt.md](file:///home/msratso/workspaces/c_dev/dungeons_and_devs_prompt.md)**: Codex-ready project prompt and mentor operating brief.
+*   **[README.html](file:///home/msratso/workspaces/c_dev/README.html)**: Root workspace overview for Deploy on Friday, including modular deck direction and technical project map.
+*   **[PRODUCT.html](file:///home/msratso/workspaces/c_dev/PRODUCT.html)**: Complete product vision, main deck plus extension model, roadmap, risks, and near-term backlog themes.
+*   **[deploy_on_friday/README.md](file:///home/msratso/workspaces/c_dev/deploy_on_friday/README.md)**: Original project overview, game mechanics, and lore.
+*   **[deploy_on_friday_prompt.md](file:///home/msratso/workspaces/c_dev/deploy_on_friday_prompt.md)**: Codex-ready project prompt and mentor operating brief.
+*   **[walkthrough/product/modular_deck_strategy.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/modular_deck_strategy.html)**: Product Owner, game engineer, and architecture lead alignment for the modular main deck plus extension-pack strategy.
+*   **[walkthrough/product/market_research_response.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/market_research_response.html)**: Cross-mentor response to MARKET_RESEARCH.txt, including market positioning, commercial strategy, signature mechanics, roadmap adjustments, and clarification questions.
+*   **[walkthrough/product/extension_punch_card_era.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/extension_punch_card_era.html)**: Patch outline for The Punch Card Era extension.
+*   **[walkthrough/product/extension_dot_com_bubble.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/extension_dot_com_bubble.html)**: Patch outline for The .com Bubble extension.
+*   **[walkthrough/product/extension_im_a_developer.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/extension_im_a_developer.html)**: Patch outline for the I'm a Developer extension.
+*   **[walkthrough/product/extension_saas_bubble.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/extension_saas_bubble.html)**: Patch outline for The SaaS Bubble extension.
+*   **[walkthrough/product/extension_ai_new_era.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/extension_ai_new_era.html)**: Patch outline for The AI New Era extension.
 *   **[walkthrough/architecture/kickoff_backlog.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/kickoff_backlog.html)**: Product backlog for the v0.1 Root Prototype, compiled last by the Project Manager / Product Owner.
 *   **[walkthrough/architecture/software_engineering_principles.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/software_engineering_principles.html)**: Source-of-truth engineering principle: domain understanding before tactical structure.
 *   **[walkthrough/architecture/lead_architecture_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/lead_architecture_refinement_guide.html)**: Lead architecture synthesis of team backlog refinements, dependency boundaries, and unified increment order.
 *   **[walkthrough/architecture/t01_cycle_boundary_review.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/t01_cycle_boundary_review.html)**: Lead Architect completion evidence for XP task T01, confirming v0.1 cycle boundary, deferred scope, and traceability gates.
+*   **[walkthrough/architecture/technical_naming_policy.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/technical_naming_policy.html)**: Architecture and systems policy decoupling public product names from C symbols, build targets, database names, protocol constants, and service identifiers.
 *   **[walkthrough/design/gameplay_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/design/gameplay_refinement_guide.html)**: Gameplay/content backlog refinement, v0.1 balance targets, bot behavior, and playtest plan.
 *   *(Add future design files here)*
 

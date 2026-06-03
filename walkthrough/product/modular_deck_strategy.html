@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deploy on Friday Modular Deck Strategy</title>
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;color:#17202a;background:#f7f8fb}
+    main{max-width:1040px;margin:0 auto;padding:32px 18px 64px}
+    article{background:#fff;border:1px solid #d8dee9;border-radius:8px;padding:32px}
+    h1,h2,h3{line-height:1.2} h1{margin-top:0} h2{border-top:1px solid #d8dee9;padding-top:1.2rem;margin-top:2rem}
+    code{background:#edf2f7;border:1px solid #d9e2ec;border-radius:4px;padding:.05em .3em}
+    table{width:100%;border-collapse:collapse;display:block;overflow-x:auto} th,td{border:1px solid #d8dee9;padding:8px 10px;vertical-align:top} th{background:#ecfdf5;text-align:left}
+    .meta{color:#637083}.callout{border-left:4px solid #0f766e;background:#ecfdf5;padding:12px 14px;margin:16px 0}
+    a{color:#0f766e}
+  </style>
+</head>
+<body>
+<main><article>
+  <p><a href="../index.html">Walkthrough Index</a></p>
+  <h1>Deploy on Friday Modular Deck Strategy</h1>
+  <p class="meta">Product Owner, game engineer, and architecture lead alignment for the extension-based product vision.</p>
+
+  <section>
+    <h2>Decision</h2>
+    <p>Deploy on Friday should ship with a broad main deck for general software-engineering satire, then grow through optional extensions. Players unlock extensions, select which content packs participate in a match, and can mix compatible card classes from different themes.</p>
+    <div class="callout"><strong>Product rule:</strong> extensions expand the card catalog and deck recipes; they must not fork the core game loop.</div>
+  </section>
+
+  <section>
+    <h2>Mentor Discussion</h2>
+    <table>
+      <thead><tr><th>Role</th><th>Position</th><th>Implementation Constraint</th></tr></thead>
+      <tbody>
+        <tr><td>Product Owner</td><td>The extension model is a product pillar, not post-launch flavor.</td><td>Roadmap must include extension metadata, unlocks, deck recipes, and mixed-theme validation.</td></tr>
+        <tr><td>Game Engineer</td><td>Keep the first extension releases content-heavy and mechanic-light.</td><td>New mechanics should enter as keywords and deterministic card effects before any extension-specific rule engine exists.</td></tr>
+        <tr><td>Architecture Lead</td><td>Model extensions as domain content catalogs selected by match configuration.</td><td>Domain and application layers receive plain content definitions; infrastructure loads them but does not own the language.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Core Concepts</h2>
+    <ul>
+      <li><strong>Main Deck:</strong> required evergreen cards for the basic software-engineering experience.</li>
+      <li><strong>Extension:</strong> a named content pack with metadata, cards, classes, deck recipes, achievements, and compatibility tags.</li>
+      <li><strong>Deck Recipe:</strong> rules that construct match draw piles from selected content packs.</li>
+      <li><strong>Card Class:</strong> reusable gameplay grouping such as Monster, Equipment, Curse, Event, PvP, AI-Chaos, Legacy, Infrastructure, Business, Career, or Community.</li>
+      <li><strong>Compatibility Tag:</strong> a validation and balancing marker such as <code>core</code>, <code>retro</code>, <code>startup</code>, <code>saas</code>, <code>ai</code>, or <code>high-chaos</code>.</li>
+      <li><strong>Unlock:</strong> player/account permission to select an extension for a match.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Architecture Shape</h2>
+    <p>The implementation should preserve the existing dependency direction:</p>
+    <ul>
+      <li><strong>Domain:</strong> validates card definitions, card classes, deck recipes, selected extensions, compatibility tags, deterministic deck construction, and match rules.</li>
+      <li><strong>Application:</strong> coordinates match setup, selected extensions, unlock checks, content validation, and command results.</li>
+      <li><strong>Infrastructure:</strong> loads extension metadata, cards, deck membership, unlock state, and achievements from PostgreSQL.</li>
+      <li><strong>Server:</strong> validates client match setup requests and owns the authoritative selected deck recipe.</li>
+      <li><strong>Client:</strong> shows available extensions and selected recipe summaries; it does not validate ownership or balance.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Development Consistency Rules</h2>
+    <ul>
+      <li>Every extension must pass the same content validation path as the main deck.</li>
+      <li>Every mixed deck must be reproducible from selected extension IDs, recipe IDs, and RNG seed.</li>
+      <li>Extension cards should use existing card classes before introducing new ones.</li>
+      <li>New mechanics must include deterministic tests and a fallback rule when mixed with unrelated extensions.</li>
+      <li>The main deck must remain playable alone after every extension patch.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>First Implementation Slice</h2>
+    <ol>
+      <li>Add extension metadata to support docs and seed templates.</li>
+      <li>Represent the main deck as a content pack named <code>main-software-engineering</code>.</li>
+      <li>Add a deck recipe concept to validation plans.</li>
+      <li>Build one tiny sample extension fixture with 6 to 10 cards.</li>
+      <li>Prove one deterministic match can load main deck only and another can load main deck plus the sample extension.</li>
+    </ol>
+  </section>
+</article></main>
+</body>
+</html>

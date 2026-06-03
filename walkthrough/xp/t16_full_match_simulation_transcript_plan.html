@@ -79,7 +79,7 @@
           <tbody>
             <tr><td>DevOps Principal Engineer</td><td>Integrate simulation targets into Makefile and output matches to <code>walkthrough/simulation_transcript.txt</code>.</td><td>The simulation output directory must reside inside the workspace.</td></tr>
             <tr><td>Systems Programmer</td><td>Implement headless simulation execution in standard C. Check limits to prevent infinite loops.</td><td>Add a maximum turn counter limit (e.g. 500 turns) to prevent infinite loops if bots get stuck.</td></tr>
-            <tr><td>Lead Architect</td><td>Run simulation entirely in Application space using <code>dad_game_service_t</code>.</td><td>No NCurses operations or display handles during execution.</td></tr>
+            <tr><td>Lead Architect</td><td>Run simulation entirely in Application space using <code>game_game_service_t</code>.</td><td>No NCurses operations or display handles during execution.</td></tr>
           </tbody>
         </table>
       </section>
@@ -115,8 +115,8 @@
       <section data-section id="green">
         <h2>Green Slice</h2>
         <ol>
-          <li>Add a simulation entry point target in CMake: <code>dad_simulator</code>.</li>
-          <li>Implement the loop in <code>client/simulation_main.c</code> that queries <code>dad_bot_evaluate()</code> and executes commands using <code>dad_service_execute()</code> until <code>PHASE_MATCH_OVER</code> is reached.</li>
+          <li>Add a simulation entry point target in CMake: <code>game_simulator</code>.</li>
+          <li>Implement the loop in <code>client/simulation_main.c</code> that queries <code>game_bot_evaluate()</code> and executes commands using <code>game_service_execute()</code> until <code>PHASE_MATCH_OVER</code> is reached.</li>
           <li>Write the generated result events out to the transcript text file.</li>
           <li>Verify check commands pass successfully.</li>
         </ol>
@@ -153,22 +153,22 @@ int main(int argc, char **argv) {
     fprintf(out, "MATCH SIMULATION SEED: %lu\n", seed);
     printf("Simulating game match with seed %lu...\n", seed);
 
-    dad_game_service_t svc;
-    dad_service_init(&svc);
+    game_game_service_t svc;
+    game_service_init(&svc);
 
     // Mock content database
-    dad_class_def_t test_classes[6] = {
+    game_class_def_t test_classes[6] = {
         {1, "Backend Dev", 1}, {2, "Frontend Dev", 0}, {3, "DevOps", 0},
         {4, "QA", 0}, {5, "Security", 0}, {6, "AI", 0}
     };
-    dad_card_def_t test_cards[5] = {
+    game_card_def_t test_cards[5] = {
         {"Legacy Spooky Monster", CARD_MONSTER, 4, 0, 10},
         {"Scope Creep", CARD_CURSE, 0, 0, 5},
         {"Broken CI", CARD_CURSE, 0, 0, 5},
         {"ThinkPad", CARD_EQUIPMENT, 0, 2, 10},
         {"Linux Skill", CARD_TREASURE, 0, 1, 10}
     };
-    dad_content_definitions_t content = {
+    game_content_definitions_t content = {
         .classes = test_classes,
         .class_count = 6,
         .cards = test_cards,
@@ -176,17 +176,17 @@ int main(int argc, char **argv) {
     };
 
     // Start Match
-    dad_command_t start_cmd = {CMD_START_MATCH, 0, 0};
-    dad_command_result_t res = dad_service_execute(&svc, &start_cmd, &content);
+    game_command_t start_cmd = {CMD_START_MATCH, 0, 0};
+    game_command_result_t res = game_service_execute(&svc, &start_cmd, &content);
 
     int limit = 0;
     while (svc.match_active && svc.match.phase != PHASE_MATCH_OVER && limit &lt; 500) {
         int active_idx = svc.match.current_player_index;
         
         // Evaluate bot decision
-        dad_command_t cmd = dad_bot_evaluate(&svc.match, active_idx, BOT_LEGACY_MAINTAINER);
+        game_command_t cmd = game_bot_evaluate(&svc.match, active_idx, BOT_LEGACY_MAINTAINER);
         
-        res = dad_service_execute(&svc, &cmd, &content);
+        res = game_service_execute(&svc, &cmd, &content);
         if (res.status == CMD_OK) {
             for (int i = 0; i &lt; res.event_count; i++) {
                 fprintf(out, "[TURN %d][PLAYER %d] %s\n", limit, res.events[i].player_index, res.events[i].message);

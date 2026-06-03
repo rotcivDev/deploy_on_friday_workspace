@@ -115,7 +115,7 @@
       <section data-section id="green">
         <h2>Green Slice</h2>
         <ol>
-          <li>Configure `dad_client_ncurses` build target in <code>CMakeLists.txt</code>.</li>
+          <li>Configure `game_client_ncurses` build target in <code>CMakeLists.txt</code>.</li>
           <li>Implement NCurses lifecycle management in <code>client/ncurses_client.c</code>.</li>
           <li>Render snap information using standard NCurses printing (<code>mvprintw</code>, <code>box</code>, <code>wrefresh</code>).</li>
           <li>Implement the input loop translating characters (e.g. 'k' -> <code>CMD_KICK_BACKLOG</code>) to service commands.</li>
@@ -139,10 +139,10 @@
 
 #include "snapshot.h"
 
-void dad_ui_init(void);
-void dad_ui_shutdown(void);
-void dad_ui_render(const dad_match_snapshot_t *snap);
-int dad_ui_get_input(void);
+void game_ui_init(void);
+void game_ui_shutdown(void);
+void game_ui_render(const game_match_snapshot_t *snap);
+int game_ui_get_input(void);
 
 #endif</code></pre>
 
@@ -152,7 +152,7 @@ int dad_ui_get_input(void);
 #include &lt;ncurses.h&gt;
 #include &lt;string.h&gt;
 
-void dad_ui_init(void) {
+void game_ui_init(void) {
     initscr();
     cbreak();
     noecho();
@@ -166,11 +166,11 @@ void dad_ui_init(void) {
     init_pair(3, COLOR_GREEN, COLOR_BLACK);
 }
 
-void dad_ui_shutdown(void) {
+void game_ui_shutdown(void) {
     endwin();
 }
 
-void dad_ui_render(const dad_match_snapshot_t *snap) {
+void game_ui_render(const game_match_snapshot_t *snap) {
     if (!snap) return;
     clear();
 
@@ -210,7 +210,7 @@ void dad_ui_render(const dad_match_snapshot_t *snap) {
     refresh();
 }
 
-int dad_ui_get_input(void) {
+int game_ui_get_input(void) {
     return getch();
 }</code></pre>
       </section>

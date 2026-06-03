@@ -110,8 +110,8 @@
       <section data-section id="red">
         <h2>Red Slice</h2>
         <ol>
-          <li>Write a CTest unit test that initializes an empty <code>dad_content_definitions_t</code> struct.</li>
-          <li>Call <code>dad_validate_content(&amp;empty_content)</code> and assert it returns <code>false</code>.</li>
+          <li>Write a CTest unit test that initializes an empty <code>game_content_definitions_t</code> struct.</li>
+          <li>Call <code>game_validate_content(&amp;empty_content)</code> and assert it returns <code>false</code>.</li>
           <li>Verify this test fails to compile or run until the validation interface is added.</li>
         </ol>
       </section>
@@ -119,8 +119,8 @@
       <section data-section id="green">
         <h2>Green Slice</h2>
         <ol>
-          <li>Define <code>dad_card_def_t</code> and <code>dad_class_def_t</code> structs in <code>application/content.h</code>.</li>
-          <li>Implement <code>dad_validate_content()</code> in <code>application/content.c</code> checking the rules described under Domain Invariants.</li>
+          <li>Define <code>game_card_def_t</code> and <code>game_class_def_t</code> structs in <code>application/content.h</code>.</li>
+          <li>Implement <code>game_validate_content()</code> in <code>application/content.c</code> checking the rules described under Domain Invariants.</li>
           <li>Implement a fake repository in the unit tests that returns a subset of valid data to make the validation test pass.</li>
         </ol>
       </section>
@@ -151,30 +151,30 @@ typedef enum {
     CARD_AI,
     CARD_TREASURE,
     CARD_TYPE_COUNT
-} dad_card_type_t;
+} game_card_type_t;
 
 typedef struct {
     char name[64];
-    dad_card_type_t type;
+    game_card_type_t type;
     int power;
     int power_bonus;
     int quantity;
-} dad_card_def_t;
+} game_card_def_t;
 
 typedef struct {
     int class_id;
     char name[64];
     int base_power_bonus;
-} dad_class_def_t;
+} game_class_def_t;
 
 typedef struct {
-    dad_card_def_t *cards;
+    game_card_def_t *cards;
     int card_count;
-    dad_class_def_t *classes;
+    game_class_def_t *classes;
     int class_count;
-} dad_content_definitions_t;
+} game_content_definitions_t;
 
-bool dad_validate_content(const dad_content_definitions_t *content);
+bool game_validate_content(const game_content_definitions_t *content);
 
 #endif</code></pre>
 
@@ -184,7 +184,7 @@ bool dad_validate_content(const dad_content_definitions_t *content);
 #include &lt;stdio.h&gt;
 #include &lt;string.h&gt;
 
-bool dad_validate_content(const dad_content_definitions_t *content) {
+bool game_validate_content(const game_content_definitions_t *content) {
     if (!content) {
         fprintf(stderr, "Validation failed: content is NULL\n");
         return false;
@@ -204,7 +204,7 @@ bool dad_validate_content(const dad_content_definitions_t *content) {
     bool has_ai = false;
 
     for (int i = 0; i &lt; content->card_count; i++) {
-        const dad_card_def_t *c = &content->cards[i];
+        const game_card_def_t *c = &content->cards[i];
         if (strlen(c->name) == 0) {
             fprintf(stderr, "Validation failed: card at index %d has no name\n", i);
             return false;
@@ -235,11 +235,11 @@ bool dad_validate_content(const dad_content_definitions_t *content) {
 
 int main(void) {
     // Red: empty validation fails
-    dad_content_definitions_t empty = {0};
-    assert(!dad_validate_content(&empty));
+    game_content_definitions_t empty = {0};
+    assert(!game_validate_content(&empty));
 
     // Green: valid validation passes
-    dad_class_def_t test_classes[6] = {
+    game_class_def_t test_classes[6] = {
         {1, "Backend Developer", 0},
         {2, "Frontend Developer", 0},
         {3, "DevOps Engineer", 0},
@@ -248,21 +248,21 @@ int main(void) {
         {6, "AI Engineer", 0}
     };
 
-    dad_card_def_t test_cards[4] = {
+    game_card_def_t test_cards[4] = {
         {"Legacy Code Monster", CARD_MONSTER, 5, 0, 2},
         {"ThinkPad T480", CARD_EQUIPMENT, 0, 2, 2},
         {"Broken CI", CARD_CURSE, 0, 0, 1},
         {"Prompt Intern", CARD_AI, 2, 0, 1}
     };
 
-    dad_content_definitions_t valid = {
+    game_content_definitions_t valid = {
         .classes = test_classes,
         .class_count = 6,
         .cards = test_cards,
         .card_count = 4
     };
 
-    assert(dad_validate_content(&valid));
+    assert(game_validate_content(&valid));
 
     return 0;
 }</code></pre>
@@ -279,7 +279,7 @@ int main(void) {
       <section data-section id="done">
         <h2>Definition Of Done</h2>
         <ul>
-          <li><code>dad_validate_content()</code> fails cleanly with descriptive logs if any class or critical card type is missing.</li>
+          <li><code>game_validate_content()</code> fails cleanly with descriptive logs if any class or critical card type is missing.</li>
           <li>Unit tests verify both failing and passing content structures.</li>
           <li>CMake builds and tests run successfully.</li>
         </ul>

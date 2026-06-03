@@ -111,8 +111,8 @@
       <section data-section id="green">
         <h2>Green Slice</h2>
         <ol>
-          <li>Define <code>dad_rng_t</code> state struct in <code>domain/rng.h</code>.</li>
-          <li>Implement <code>dad_rng_init()</code>, <code>dad_rng_next()</code>, and <code>dad_rng_range()</code> (to get numbers in a bounded range like [0, N-1] for card index selections).</li>
+          <li>Define <code>game_rng_t</code> state struct in <code>domain/rng.h</code>.</li>
+          <li>Implement <code>game_rng_init()</code>, <code>game_rng_next()</code>, and <code>game_rng_range()</code> (to get numbers in a bounded range like [0, N-1] for card index selections).</li>
           <li>Verify unit test passes successfully.</li>
         </ol>
       </section>
@@ -135,11 +135,11 @@
 
 typedef struct {
     uint64_t state;
-} dad_rng_t;
+} game_rng_t;
 
-void dad_rng_init(dad_rng_t *rng, uint64_t seed);
-uint32_t dad_rng_next(dad_rng_t *rng);
-uint32_t dad_rng_range(dad_rng_t *rng, uint32_t min, uint32_t max);
+void game_rng_init(game_rng_t *rng, uint64_t seed);
+uint32_t game_rng_next(game_rng_t *rng);
+uint32_t game_rng_range(game_rng_t *rng, uint32_t min, uint32_t max);
 
 #endif</code></pre>
 
@@ -151,22 +151,22 @@ uint32_t dad_rng_range(dad_rng_t *rng, uint32_t min, uint32_t max);
 static const uint64_t MULTIPLIER = 6364136223846793005ULL;
 static const uint64_t INCREMENT = 1442695040888963407ULL;
 
-void dad_rng_init(dad_rng_t *rng, uint64_t seed) {
+void game_rng_init(game_rng_t *rng, uint64_t seed) {
     if (rng) {
         rng->state = seed;
     }
 }
 
-uint32_t dad_rng_next(dad_rng_t *rng) {
+uint32_t game_rng_next(game_rng_t *rng) {
     if (!rng) return 0;
     rng->state = (MULTIPLIER * rng->state + INCREMENT);
     return (uint32_t)(rng->state >> 32);
 }
 
-uint32_t dad_rng_range(dad_rng_t *rng, uint32_t min, uint32_t max) {
+uint32_t game_rng_range(game_rng_t *rng, uint32_t min, uint32_t max) {
     if (!rng || min >= max) return min;
     uint32_t range = (max - min + 1);
-    return min + (dad_rng_next(rng) % range);
+    return min + (game_rng_next(rng) % range);
 }</code></pre>
 
         <h3>Example RNG CTest</h3>
@@ -175,22 +175,22 @@ uint32_t dad_rng_range(dad_rng_t *rng, uint32_t min, uint32_t max) {
 #include &lt;assert.h&gt;
 
 int main(void) {
-    dad_rng_t rng1;
-    dad_rng_t rng2;
+    game_rng_t rng1;
+    game_rng_t rng2;
 
-    dad_rng_init(&rng1, 42);
-    dad_rng_init(&rng2, 42);
+    game_rng_init(&rng1, 42);
+    game_rng_init(&rng2, 42);
 
     // Verify same seed produces identical sequence
     for (int i = 0; i < 20; i++) {
-        assert(dad_rng_next(&rng1) == dad_rng_next(&rng2));
+        assert(game_rng_next(&rng1) == game_rng_next(&rng2));
     }
 
     // Verify different seeds produce different outputs
-    dad_rng_init(&rng2, 99);
+    game_rng_init(&rng2, 99);
     bool different = false;
     for (int i = 0; i < 5; i++) {
-        if (dad_rng_next(&rng1) != dad_rng_next(&rng2)) {
+        if (game_rng_next(&rng1) != game_rng_next(&rng2)) {
             different = true;
             break;
         }
@@ -199,7 +199,7 @@ int main(void) {
 
     // Verify range constraints
     for (int i = 0; i < 100; i++) {
-        uint32_t val = dad_rng_range(&rng1, 10, 20);
+        uint32_t val = game_rng_range(&rng1, 10, 20);
         assert(val >= 10 && val <= 20);
     }
 
@@ -210,7 +210,7 @@ int main(void) {
       <section data-section id="checks">
         <h2>Review Checks</h2>
         <ul>
-          <li>Verify <code>dad_rng_t</code> is registered as a CTest in <code>CMakeLists.txt</code>.</li>
+          <li>Verify <code>game_rng_t</code> is registered as a CTest in <code>CMakeLists.txt</code>.</li>
           <li>Verify there is no usage of <code>rand()</code> or <code>srand()</code> headers in the implementation.</li>
         </ul>
       </section>

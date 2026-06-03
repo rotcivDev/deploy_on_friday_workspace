@@ -67,7 +67,7 @@
       <section data-section id="intent">
         <h2>Intent</h2>
         <div class="callout">
-          <strong>Goal:</strong> Implement the <code>dad_game_service_t</code> API wrapper. Route all match changes through explicit application commands, validating phase conditions before modifying the underlying game state.
+          <strong>Goal:</strong> Implement the <code>game_game_service_t</code> API wrapper. Route all match changes through explicit application commands, validating phase conditions before modifying the underlying game state.
         </div>
         <p>In Clean Architecture, client applications and bot scripts must not call domain structures directly to change levels or draw cards. All moves must pass through an Application Service command route. The service evaluates if the action is legal for the current phase, execute the move, and return a result.</p>
       </section>
@@ -117,8 +117,8 @@
       <section data-section id="green">
         <h2>Green Slice</h2>
         <ol>
-          <li>Define <code>dad_command_type_t</code> enum and <code>dad_game_service_t</code> struct in <code>application/game_service.h</code>.</li>
-          <li>Implement <code>dad_service_init()</code> and <code>dad_service_execute()</code> in <code>application/game_service.c</code>.</li>
+          <li>Define <code>game_command_type_t</code> enum and <code>game_game_service_t</code> struct in <code>application/game_service.h</code>.</li>
+          <li>Implement <code>game_service_init()</code> and <code>game_service_execute()</code> in <code>application/game_service.c</code>.</li>
           <li>Verify CTests pass successfully.</li>
         </ol>
       </section>
@@ -146,21 +146,21 @@ typedef enum {
     CMD_RESOLVE_ENCOUNTER,
     CMD_EQUIP_CARD,
     CMD_END_TURN
-} dad_command_type_t;
+} game_command_type_t;
 
 typedef struct {
-    dad_command_type_t type;
+    game_command_type_t type;
     int player_index;
     int hand_index;
-} dad_command_t;
+} game_command_t;
 
 typedef struct {
-    dad_match_t match;
+    game_match_t match;
     bool match_active;
-} dad_game_service_t;
+} game_game_service_t;
 
-void dad_service_init(dad_game_service_t *svc);
-dad_command_result_t dad_service_execute(dad_game_service_t *svc, const dad_command_t *cmd, const dad_content_definitions_t *content);
+void game_service_init(game_game_service_t *svc);
+game_command_result_t game_service_execute(game_game_service_t *svc, const game_command_t *cmd, const game_content_definitions_t *content);
 
 #endif</code></pre>
 
@@ -171,15 +171,15 @@ dad_command_result_t dad_service_execute(dad_game_service_t *svc, const dad_comm
 #include "curse.h"
 #include &lt;stdio.h&gt;
 
-void dad_service_init(dad_game_service_t *svc) {
+void game_service_init(game_game_service_t *svc) {
     if (svc) {
         svc->match_active = false;
     }
 }
 
-dad_command_result_t dad_service_execute(dad_game_service_t *svc, const dad_command_t *cmd, const dad_content_definitions_t *content) {
-    dad_command_result_t result;
-    dad_result_init(&result, CMD_OK);
+game_command_result_t game_service_execute(game_game_service_t *svc, const game_command_t *cmd, const game_content_definitions_t *content) {
+    game_command_result_t result;
+    game_result_init(&result, CMD_OK);
 
     if (!svc || !cmd) {
         result.status = CMD_ERROR;
@@ -188,9 +188,9 @@ dad_command_result_t dad_service_execute(dad_game_service_t *svc, const dad_comm
 
     if (cmd->type == CMD_START_MATCH) {
         int classes[3] = {1, 2, 3}; // Stub starting classes
-        if (dad_match_create(&svc->match, content, 12345, 3, classes)) {
+        if (game_match_create(&svc->match, content, 12345, 3, classes)) {
             svc->match_active = true;
-            dad_result_add_event(&result, EV_MATCH_STARTED, "Match started successfully", 0);
+            game_result_add_event(&result, EV_MATCH_STARTED, "Match started successfully", 0);
             result.status = CMD_OK;
         } else {
             result.status = CMD_ERROR;
@@ -203,7 +203,7 @@ dad_command_result_t dad_service_execute(dad_game_service_t *svc, const dad_comm
         return result;
     }
 
-    dad_match_t *match = &svc->match;
+    game_match_t *match = &svc->match;
 
     switch (cmd->type) {
         case CMD_KICK_BACKLOG:
@@ -212,11 +212,11 @@ dad_command_result_t dad_service_execute(dad_game_service_t *svc, const dad_comm
                 break;
             }
             // Draw encounter card
-            match->active_encounter = dad_deck_draw(&match->encounter_deck, &match->rng);
+            match->active_encounter = game_deck_draw(&match->encounter_deck, &match->rng);
             if (match->active_encounter) {
                 char buffer[128];
                 snprintf(buffer, sizeof(buffer), "Drew encounter card: %s", match->active_encounter->name);
-                dad_result_add_event(&result, EV_CARD_DRAWN, buffer, match->current_player_index);
+                game_result_add_event(&result, EV_CARD_DRAWN, buffer, match->current_player_index);
                 match->phase = PHASE_RESOLVE_ENCOUNTER;
                 result.status = CMD_OK;
             } else {
@@ -231,19 +231,19 @@ dad_command_result_t dad_service_execute(dad_game_service_t *svc, const dad_comm
             }
             
             if (match->active_encounter->type == CARD_MONSTER) {
-                dad_combat_outcome_t outcome = dad_resolve_combat(match, match->current_player_index, match->active_encounter);
+                game_combat_outcome_t outcome = game_resolve_combat(match, match->current_player_index, match->active_encounter);
                 if (outcome.win) {
-                    dad_result_add_event(&result, EV_COMBAT_WON, "Player won combat", match->current_player_index);
+                    game_result_add_event(&result, EV_COMBAT_WON, "Player won combat", match->current_player_index);
                 } else {
-                    dad_result_add_event(&result, EV_COMBAT_LOST, "Player lost combat (bad stuff applied)", match->current_player_index);
+                    game_result_add_event(&result, EV_COMBAT_LOST, "Player lost combat (bad stuff applied)", match->current_player_index);
                 }
             } else if (match->active_encounter->type == CARD_CURSE) {
-                dad_apply_curse(match, match->current_player_index, match->active_encounter);
-                dad_result_add_event(&result, EV_CURSE_APPLIED, "Curse effect applied", match->current_player_index);
+                game_apply_curse(match, match->current_player_index, match->active_encounter);
+                game_result_add_event(&result, EV_CURSE_APPLIED, "Curse effect applied", match->current_player_index);
             }
 
             // Put active encounter to discard pile
-            dad_deck_discard(&match->encounter_deck, match->active_encounter);
+            game_deck_discard(&match->encounter_deck, match->active_encounter);
             match->active_encounter = NULL;
             match->phase = PHASE_LOBBY_PLAY;
             result.status = CMD_OK;
@@ -254,8 +254,8 @@ dad_command_result_t dad_service_execute(dad_game_service_t *svc, const dad_comm
                 result.status = CMD_INVALID_PHASE;
                 break;
             }
-            if (dad_player_equip_from_hand(&match->players[match->current_player_index], cmd->hand_index)) {
-                dad_result_add_event(&result, EV_CARD_EQUIPPED, "Equipped item card", match->current_player_index);
+            if (game_player_equip_from_hand(&match->players[match->current_player_index], cmd->hand_index)) {
+                game_result_add_event(&result, EV_CARD_EQUIPPED, "Equipped item card", match->current_player_index);
                 result.status = CMD_OK;
             } else {
                 result.status = CMD_INVALID_ACTION;
@@ -269,7 +269,7 @@ dad_command_result_t dad_service_execute(dad_game_service_t *svc, const dad_comm
             }
             match->current_player_index = (match->current_player_index + 1) % match->player_count;
             match->phase = PHASE_START_TURN;
-            dad_result_add_event(&result, EV_TURN_ENDED, "Turn advanced to next developer", match->current_player_index);
+            game_result_add_event(&result, EV_TURN_ENDED, "Turn advanced to next developer", match->current_player_index);
             result.status = CMD_OK;
             break;
 
@@ -287,42 +287,42 @@ dad_command_result_t dad_service_execute(dad_game_service_t *svc, const dad_comm
 #include &lt;assert.h&gt;
 
 int main(void) {
-    dad_class_def_t test_classes[6] = {
+    game_class_def_t test_classes[6] = {
         {1, "QA", 0}, {2, "QA", 0}, {3, "QA", 0}, {4, "QA", 0}, {5, "QA", 0}, {6, "QA", 0}
     };
-    dad_card_def_t test_cards[4] = {
+    game_card_def_t test_cards[4] = {
         {"Monster A", CARD_MONSTER, 3, 0, 5},
         {"Equip A", CARD_EQUIPMENT, 0, 2, 5},
         {"Curse A", CARD_CURSE, 0, 0, 5},
         {"AI A", CARD_AI, 2, 0, 5}
     };
-    dad_content_definitions_t content = {
+    game_content_definitions_t content = {
         .classes = test_classes,
         .class_count = 6,
         .cards = test_cards,
         .card_count = 4
     };
 
-    dad_game_service_t svc;
-    dad_service_init(&svc);
+    game_game_service_t svc;
+    game_service_init(&svc);
 
     // Verify resolve before start fails
-    dad_command_t cmd_resolve = {CMD_RESOLVE_ENCOUNTER, 0, 0};
-    dad_command_result_t res = dad_service_execute(&svc, &cmd_resolve, &content);
+    game_command_t cmd_resolve = {CMD_RESOLVE_ENCOUNTER, 0, 0};
+    game_command_result_t res = game_service_execute(&svc, &cmd_resolve, &content);
     assert(res.status == CMD_INVALID_ACTION);
 
     // Start match
-    dad_command_t cmd_start = {CMD_START_MATCH, 0, 0};
-    res = dad_service_execute(&svc, &cmd_start, &content);
+    game_command_t cmd_start = {CMD_START_MATCH, 0, 0};
+    res = game_service_execute(&svc, &cmd_start, &content);
     assert(res.status == CMD_OK);
 
     // Draw encounter
-    dad_command_t cmd_draw = {CMD_KICK_BACKLOG, 0, 0};
-    res = dad_service_execute(&svc, &cmd_draw, &content);
+    game_command_t cmd_draw = {CMD_KICK_BACKLOG, 0, 0};
+    res = game_service_execute(&svc, &cmd_draw, &content);
     assert(res.status == CMD_OK);
 
     // Verify resolve now works
-    res = dad_service_execute(&svc, &cmd_resolve, &content);
+    res = game_service_execute(&svc, &cmd_resolve, &content);
     assert(res.status == CMD_OK);
 
     return 0;

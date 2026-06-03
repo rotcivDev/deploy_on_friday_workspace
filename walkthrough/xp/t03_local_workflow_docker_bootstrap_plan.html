@@ -142,9 +142,9 @@ services:
   db:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: dad_db
-      POSTGRES_USER: dad_user
-      POSTGRES_PASSWORD: dad_password
+      POSTGRES_DB: game_db
+      POSTGRES_USER: game_user
+      POSTGRES_PASSWORD: game_password
     ports:
       - "5432:5432"
     volumes:
@@ -157,9 +157,9 @@ services:
     environment:
       - PGHOST=db
       - PGPORT=5432
-      - PGDATABASE=dad_db
-      - PGUSER=dad_user
-      - PGPASSWORD=dad_password
+      - PGDATABASE=game_db
+      - PGUSER=game_user
+      - PGPASSWORD=game_password
     depends_on:
       - db
     volumes:
@@ -189,7 +189,7 @@ WORKDIR /workspace</code></pre>
         <pre><code class="language-makefile">.PHONY: configure build test clean db-up db-down db-seed db-validate test-db simulate run
 
 BUILD_DIR := build
-DB_URL := postgresql://dad_user:dad_password@localhost:5432/dad_db
+DB_URL := postgresql://game_user:game_password@localhost:5432/game_db
 
 configure:
 	cmake -S . -B $(BUILD_DIR)
@@ -208,9 +208,9 @@ db-down:
 
 db-seed: db-up
 	@echo "Seeding database..."
-	PGPASSWORD=dad_password psql -h localhost -U dad_user -d dad_db -f walkthrough/database/01_schema.sql
-	PGPASSWORD=dad_password psql -h localhost -U dad_user -d dad_db -f walkthrough/database/02_seed_core_data.sql
-	PGPASSWORD=dad_password psql -h localhost -U dad_user -d dad_db -f walkthrough/database/03_seed_cards.sql
+	PGPASSWORD=game_password psql -h localhost -U game_user -d game_db -f walkthrough/database/01_schema.sql
+	PGPASSWORD=game_password psql -h localhost -U game_user -d game_db -f walkthrough/database/02_seed_core_data.sql
+	PGPASSWORD=game_password psql -h localhost -U game_user -d game_db -f walkthrough/database/03_seed_cards.sql
 
 db-validate: db-up
 	@echo "Validating seeded content integrity..."
@@ -221,10 +221,10 @@ test-db: build db-up
 	ctest --test-dir $(BUILD_DIR) -R "db|integration" --output-on-failure
 
 simulate: build
-	./$(BUILD_DIR)/dad_client_ncurses --simulate
+	./$(BUILD_DIR)/game_client_ncurses --simulate
 
 run: build
-	./$(BUILD_DIR)/dad_client_ncurses
+	./$(BUILD_DIR)/game_client_ncurses
 
 clean:
 	cmake -E rm -rf $(BUILD_DIR)</code></pre>

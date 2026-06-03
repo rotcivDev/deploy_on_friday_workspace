@@ -97,38 +97,38 @@
 
       <section data-section id="target-shape">
         <h2>Target Shape</h2>
-        <pre><code>dad_domain
+        <pre><code>game_domain
     pure C17 domain placeholders only
     links: C standard library only
 
-dad_application
+game_application
     application command/service placeholders
-    links: dad_domain
+    links: game_domain
 
-dad_infrastructure_db
+game_infrastructure_db
     PostgreSQL adapter placeholder only
-    links: dad_application, dad_domain, libpq
+    links: game_application, game_domain, libpq
 
-dad_client_ncurses
+game_client_ncurses
     terminal client placeholder only
-    links: dad_application, dad_domain, dad_infrastructure_db, ncurses
+    links: game_application, game_domain, game_infrastructure_db, ncurses
 
-dad_tests_domain
+game_tests_domain
     minimal CTest smoke test
-    links: dad_domain
+    links: game_domain
 
-dad_tests_application
+game_tests_application
     optional application smoke test
-    links: dad_application, dad_domain</code></pre>
+    links: game_application, game_domain</code></pre>
         <p>Keep <code>server/</code> and <code>shared/</code> empty or absent for T02 unless the repo already has them. They are v0.2 concerns and should not be used to justify protocol work in this slice.</p>
       </section>
 
       <section data-section id="red">
         <h2>Red Slice</h2>
         <ol>
-          <li>Create or identify a minimal domain smoke test expectation: <code>dad_domain_smoke()</code> returns a known value such as <code>17</code>.</li>
+          <li>Create or identify a minimal domain smoke test expectation: <code>game_domain_smoke()</code> returns a known value such as <code>17</code>.</li>
           <li>Define the desired CTest name before implementation: <code>domain_smoke</code>.</li>
-          <li>Write down the boundary expectation: the domain test must link only <code>dad_domain</code>.</li>
+          <li>Write down the boundary expectation: the domain test must link only <code>game_domain</code>.</li>
           <li>Run <code>make test</code> before the implementation exists. It should fail because the build skeleton or test does not exist yet.</li>
         </ol>
         <p>The red state is meaningful if the failure says there is no build target, no test executable, or no test registered. Do not skip this just because the code is trivial.</p>
@@ -164,11 +164,11 @@ dad_tests_application
 ├── CMakeLists.txt
 ├── Makefile
 ├── domain/
-│   ├── dad_domain_smoke.h
-│   └── dad_domain_smoke.c
+│   ├── game_domain_smoke.h
+│   └── game_domain_smoke.c
 ├── application/
-│   ├── dad_application_smoke.h
-│   └── dad_application_smoke.c
+│   ├── game_application_smoke.h
+│   └── game_application_smoke.c
 ├── infrastructure/
 │   └── db/
 │       ├── postgresql_content_repository_smoke.h
@@ -184,52 +184,52 @@ dad_tests_application
         └── test_application_smoke.c</code></pre>
 
         <h3>Example Domain Placeholder</h3>
-        <p>Human-created file: <code>domain/dad_domain_smoke.h</code></p>
+        <p>Human-created file: <code>domain/game_domain_smoke.h</code></p>
         <pre><code class="language-c">#ifndef DTD_DOMAIN_SMOKE_H
 #define DTD_DOMAIN_SMOKE_H
 
-int dad_domain_smoke(void);
+int game_domain_smoke(void);
 
 #endif</code></pre>
-        <p>Human-created file: <code>domain/dad_domain_smoke.c</code></p>
-        <pre><code class="language-c">#include "dad_domain_smoke.h"
+        <p>Human-created file: <code>domain/game_domain_smoke.c</code></p>
+        <pre><code class="language-c">#include "game_domain_smoke.h"
 
-int dad_domain_smoke(void)
+int game_domain_smoke(void)
 {
     return 17;
 }</code></pre>
 
         <h3>Example Domain Test</h3>
         <p>Human-created file: <code>tests/domain/test_domain_smoke.c</code></p>
-        <pre><code class="language-c">#include "dad_domain_smoke.h"
+        <pre><code class="language-c">#include "game_domain_smoke.h"
 
 int main(void)
 {
-    return dad_domain_smoke() == 17 ? 0 : 1;
+    return game_domain_smoke() == 17 ? 0 : 1;
 }</code></pre>
 
         <h3>Example Application Placeholder</h3>
-        <p>Human-created file: <code>application/dad_application_smoke.h</code></p>
+        <p>Human-created file: <code>application/game_application_smoke.h</code></p>
         <pre><code class="language-c">#ifndef DTD_APPLICATION_SMOKE_H
 #define DTD_APPLICATION_SMOKE_H
 
-int dad_application_smoke(void);
+int game_application_smoke(void);
 
 #endif</code></pre>
-        <p>Human-created file: <code>application/dad_application_smoke.c</code></p>
-        <pre><code class="language-c">#include "dad_application_smoke.h"
-#include "dad_domain_smoke.h"
+        <p>Human-created file: <code>application/game_application_smoke.c</code></p>
+        <pre><code class="language-c">#include "game_application_smoke.h"
+#include "game_domain_smoke.h"
 
-int dad_application_smoke(void)
+int game_application_smoke(void)
 {
-    return dad_domain_smoke();
+    return game_domain_smoke();
 }</code></pre>
 
         <h3>Example Infrastructure Placeholder</h3>
         <p>Human-created file: <code>infrastructure/db/postgresql_content_repository_smoke.c</code></p>
         <pre><code class="language-c">#include &lt;libpq-fe.h&gt;
 
-int dad_postgresql_repository_smoke(void)
+int game_postgresql_repository_smoke(void)
 {
     return sizeof(PGconn *) &gt; 0 ? 0 : 1;
 }</code></pre>
@@ -257,59 +257,59 @@ add_compile_options(-Wall -Wextra -Werror -pedantic)
 
 enable_testing()
 
-add_library(dad_domain
-    domain/dad_domain_smoke.c
+add_library(game_domain
+    domain/game_domain_smoke.c
 )
-target_include_directories(dad_domain PUBLIC domain)
+target_include_directories(game_domain PUBLIC domain)
 
-add_library(dad_application
-    application/dad_application_smoke.c
+add_library(game_application
+    application/game_application_smoke.c
 )
-target_include_directories(dad_application PUBLIC application)
-target_link_libraries(dad_application PUBLIC dad_domain)
+target_include_directories(game_application PUBLIC application)
+target_link_libraries(game_application PUBLIC game_domain)
 
 find_package(PostgreSQL REQUIRED)
-add_library(dad_infrastructure_db
+add_library(game_infrastructure_db
     infrastructure/db/postgresql_content_repository_smoke.c
 )
-target_include_directories(dad_infrastructure_db PRIVATE ${PostgreSQL_INCLUDE_DIRS})
-target_link_libraries(dad_infrastructure_db PRIVATE
-    dad_application
-    dad_domain
+target_include_directories(game_infrastructure_db PRIVATE ${PostgreSQL_INCLUDE_DIRS})
+target_link_libraries(game_infrastructure_db PRIVATE
+    game_application
+    game_domain
     ${PostgreSQL_LIBRARIES}
 )
 
 find_package(Curses REQUIRED)
-add_executable(dad_client_ncurses
+add_executable(game_client_ncurses
     client/main.c
 )
-target_include_directories(dad_client_ncurses PRIVATE ${CURSES_INCLUDE_DIR})
-target_link_libraries(dad_client_ncurses PRIVATE
-    dad_application
-    dad_domain
-    dad_infrastructure_db
+target_include_directories(game_client_ncurses PRIVATE ${CURSES_INCLUDE_DIR})
+target_link_libraries(game_client_ncurses PRIVATE
+    game_application
+    game_domain
+    game_infrastructure_db
     ${CURSES_LIBRARIES}
 )
 
-add_executable(dad_tests_domain
+add_executable(game_tests_domain
     tests/domain/test_domain_smoke.c
 )
-target_link_libraries(dad_tests_domain PRIVATE dad_domain)
-add_test(NAME domain_smoke COMMAND dad_tests_domain)
+target_link_libraries(game_tests_domain PRIVATE game_domain)
+add_test(NAME domain_smoke COMMAND game_tests_domain)
 
-add_executable(dad_tests_application
+add_executable(game_tests_application
     tests/application/test_application_smoke.c
 )
-target_link_libraries(dad_tests_application PRIVATE dad_application dad_domain)
-add_test(NAME application_smoke COMMAND dad_tests_application)</code></pre>
+target_link_libraries(game_tests_application PRIVATE game_application game_domain)
+add_test(NAME application_smoke COMMAND game_tests_application)</code></pre>
 
         <h3>Example Application Test</h3>
         <p>Human-created file: <code>tests/application/test_application_smoke.c</code></p>
-        <pre><code class="language-c">#include "dad_application_smoke.h"
+        <pre><code class="language-c">#include "game_application_smoke.h"
 
 int main(void)
 {
-    return dad_application_smoke() == 17 ? 0 : 1;
+    return game_application_smoke() == 17 ? 0 : 1;
 }</code></pre>
 
         <h3>Example Makefile</h3>
@@ -345,13 +345,13 @@ ctest --test-dir build --output-on-failure</code></pre>
         <h3>Manual Dependency Review</h3>
         <ul>
           <li>Search domain and application for forbidden includes: <code>libpq-fe.h</code>, <code>ncurses.h</code>, <code>pthread.h</code>, <code>sys/socket.h</code>, and <code>netinet/in.h</code>.</li>
-          <li>Confirm <code>dad_tests_domain</code> links only <code>dad_domain</code>.</li>
-          <li>Confirm <code>dad_tests_application</code> links only <code>dad_application</code> and <code>dad_domain</code>.</li>
-          <li>Confirm <code>dad_infrastructure_db</code> is the only target with PostgreSQL libraries.</li>
-          <li>Confirm <code>dad_client_ncurses</code> is the only target with Curses libraries.</li>
+          <li>Confirm <code>game_tests_domain</code> links only <code>game_domain</code>.</li>
+          <li>Confirm <code>game_tests_application</code> links only <code>game_application</code> and <code>game_domain</code>.</li>
+          <li>Confirm <code>game_infrastructure_db</code> is the only target with PostgreSQL libraries.</li>
+          <li>Confirm <code>game_client_ncurses</code> is the only target with Curses libraries.</li>
         </ul>
         <h3>Forbidden Shortcut</h3>
-        <p>Do not create a single <code>dungeon_client</code> or <code>dad_everything</code> target that directly compiles domain, application, infrastructure, and client files together. That hides the dependency violations T02 is meant to expose.</p>
+        <p>Do not create a single <code>dungeon_client</code> or <code>game_everything</code> target that directly compiles domain, application, infrastructure, and client files together. That hides the dependency violations T02 is meant to expose.</p>
       </section>
 
       <section data-section id="done">

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deploy on Friday Workspace</title>
+  <style>
+    :root{--bg:#f7f8fb;--panel:#fff;--ink:#17202a;--muted:#637083;--line:#d8dee9;--accent:#0f766e;--code:#101828;--codeink:#e5edf8}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;color:var(--ink);background:var(--bg)}
+    main{max-width:1040px;margin:0 auto;padding:32px 18px 72px}
+    article{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:clamp(24px,4vw,44px);box-shadow:0 8px 24px rgba(15,23,42,.05)}
+    h1,h2{line-height:1.2;letter-spacing:0} h1{margin-top:0;font-size:clamp(2rem,4vw,3rem)} h2{border-top:1px solid var(--line);padding-top:1.1rem;margin-top:2rem}
+    a{color:var(--accent)} .lead{font-size:1.12rem;color:#263241}.meta{color:var(--muted)}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;background:#edf2f7;border:1px solid #d9e2ec;border-radius:4px;padding:.05em .3em}
+    pre{overflow-x:auto;background:var(--code);color:var(--codeink);padding:16px;border-radius:8px;border:1px solid #1f2937}
+    pre code{background:transparent;border:0;color:inherit;padding:0}
+    ul{padding-left:1.4rem} li{margin:.25em 0}
+  </style>
+</head>
+<body>
+<main>
+<article>
+  <h1>Deploy on Friday Workspace</h1>
+  <p class="lead">Deploy on Friday is a terminal-native multiplayer incident-management satire where developers weaponize bugs, tools, influence, tech debt, and production chaos to become Principal Engineer.</p>
+  <p>This repository is organized as a mentorship-first C17 project. The production source tree is intentionally protected from agent edits so the human developer keeps hands-on ownership of the implementation.</p>
+
+  <section>
+    <h2>Product Direction</h2>
+    <p>The product is built around a modular deck model and a deliberately developer-native identity:</p>
+    <ul>
+      <li>The main deck carries the evergreen software-engineering theme.</li>
+      <li>Emblematic eras and subcultures ship as extensions.</li>
+      <li>Players unlock extensions and choose which decks participate in a match.</li>
+      <li>Extensions can be mixed, allowing card classes and themes from different eras to interact in the same game.</li>
+    </ul>
+    <p>Planned extension examples include:</p>
+    <ul>
+      <li>The Punch Card Era</li>
+      <li>The .com Bubble</li>
+      <li>I'm a Developer</li>
+      <li>The SaaS Bubble</li>
+      <li>The AI New Era</li>
+    </ul>
+    <p>See <a href="PRODUCT.html">PRODUCT.html</a> for the full product vision and roadmap.</p>
+  </section>
+
+  <section>
+    <h2>Market Position</h2>
+    <p>The strongest audience is not the mass-market card-game audience. It is developers who want a funny, low-friction game to play with developer friends. The product should lean into terminal-native identity, short bot-supported matches, replayable logs, and shareable screenshots.</p>
+    <ul>
+      <li>Public positioning: incident-response multiplayer satire with terminal-native identity. Workplace satire is the tone; software-history eras are expansion flavor.</li>
+      <li>Avoid public comparison to existing tabletop brands or clone-like wording.</li>
+      <li>First playable promise: free demo with the default deck, one-command local match with bots, 3 completed online matches per account per day, abandoned-match cooldown protection, and a readable terminal UI.</li>
+      <li>v0.1 signature mechanic: Incident Severity, a shared production-chaos pressure meter that players can reduce, ignore, exploit, or escalate.</li>
+      <li>Commercial shape: free demo first; no paid build until official online multiplayer exists; then low-cost base game, extension ownership plus in-game unlock progression, optional supporter cosmetics, and no pay-to-win cards.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Technical Project</h2>
+    <p>The technical project targets a deterministic, server-authoritative terminal game:</p>
+    <ul>
+      <li>Language: C17</li>
+      <li>Build: CMake with Make workflow wrappers</li>
+      <li>UI: NCurses terminal client</li>
+      <li>Runtime: POSIX sockets and pthreads</li>
+      <li>Persistence: PostgreSQL</li>
+      <li>Tests: CTest</li>
+      <li>Architecture: domain-first Clean Architecture</li>
+    </ul>
+    <p>The implementation should treat cards, decks, card classes, extensions, unlock rules, match configuration, and content validation as domain concepts first. PostgreSQL tables, repositories, CMake targets, protocol packets, and terminal screens are tactical tools that serve those concepts.</p>
+    <p>Technical identifiers must not depend on the public product title. Use stable generic names such as <code>game_</code> in C symbols, build targets, database examples, and protocol examples so the public title can change without forcing a codebase rename.</p>
+  </section>
+
+  <section>
+    <h2>Repository Map</h2>
+    <pre><code>domain/             Protected production source: pure game rules
+application/        Protected production source: use cases and ports
+infrastructure/     Protected production source: PostgreSQL and adapters
+server/             Protected production source: server entry points
+client/             Protected production source: terminal UI
+shared/             Protected production source: protocol/shared types
+deploy_on_friday/  Technical project overview
+walkthrough/        Human-facing guides, plans, examples, and specs
+PRODUCT.html        Product vision, roadmap, and extension strategy
+AGENTS.md           Agent boundaries, mentor registry, and support-file index</code></pre>
+  </section>
+
+  <section>
+    <h2>Current Planning References</h2>
+    <ul>
+      <li><a href="deploy_on_friday/README.md">Technical project README</a></li>
+      <li><a href="PRODUCT.html">Product vision</a></li>
+      <li><a href="walkthrough/architecture/technical_naming_policy.html">Technical naming policy</a></li>
+      <li><a href="walkthrough/product/modular_deck_strategy.html">Modular deck strategy</a></li>
+      <li><a href="walkthrough/product/market_research_response.html">Market research response</a></li>
+      <li><a href="walkthrough/index.html">Walkthrough hub</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Agent Boundary</h2>
+    <p>Agents may update documentation, plans, templates, walkthroughs, and support examples. Agents must not directly modify production source directories: <code>domain/</code>, <code>application/</code>, <code>infrastructure/</code>, <code>server/</code>, <code>client/</code>, or <code>shared/</code>.</p>
+  </section>
+</article>
+</main>
+</body>
+</html>

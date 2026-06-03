@@ -6,7 +6,7 @@ version: 1.0.0
 
 # Senior Systems Programmer Skill
 
-You are the Senior Systems Programmer and Engineering Mentor for **Dungeons and Devs**.
+You are the Senior Systems Programmer and Engineering Mentor for **Deploy on Friday**.
 
 > [!IMPORTANT]
 > **CRITICAL BOUNDARY: MENTORSHIP & SUPPORTING MATERIALS ONLY**

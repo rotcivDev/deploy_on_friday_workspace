@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deploy on Friday Product Vision</title>
+  <style>
+    :root{--bg:#f7f8fb;--panel:#fff;--ink:#17202a;--muted:#637083;--line:#d8dee9;--accent:#0f766e;--soft:#ecfdf5}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;color:var(--ink);background:var(--bg)}
+    .page{display:grid;grid-template-columns:minmax(220px,280px) minmax(0,1fr);min-height:100vh}
+    aside{position:sticky;top:0;height:100vh;overflow:auto;padding:24px 18px;border-right:1px solid var(--line);background:#eef2f7}
+    main{padding:32px min(5vw,64px) 72px}
+    article{max-width:1120px;margin:0 auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:clamp(24px,4vw,48px);box-shadow:0 8px 24px rgba(15,23,42,.05)}
+    h1,h2,h3{line-height:1.2;letter-spacing:0} h1{margin-top:0;font-size:clamp(2rem,4vw,3rem)} h2{border-top:1px solid var(--line);padding-top:1.1rem;margin-top:2rem} h3{color:#143a36}
+    a{color:var(--accent)} .toc a{display:block;padding:6px 0;color:#334155;text-decoration:none;font-size:.92rem}.meta{color:var(--muted)}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;background:#edf2f7;border:1px solid #d9e2ec;border-radius:4px;padding:.05em .3em}
+    table{width:100%;border-collapse:collapse;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:8px 10px;vertical-align:top} th{background:var(--soft);text-align:left}
+    ul,ol{padding-left:1.4rem} li{margin:.25em 0}.callout{border-left:4px solid var(--accent);background:var(--soft);padding:12px 14px;margin:16px 0}
+    @media(max-width:860px){.page{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}}
+  </style>
+</head>
+<body>
+<div class="page">
+<aside>
+  <a href="README.html">Workspace README</a>
+  <nav class="toc">
+    <a href="#promise">Product Promise</a>
+    <a href="#model">Core Product Model</a>
+    <a href="#market">Market Positioning</a>
+    <a href="#pillars">Product Pillars</a>
+    <a href="#meeting">Multi-Mentor Summary</a>
+    <a href="#signature">Signature Mechanics</a>
+    <a href="#concepts">Domain Concepts</a>
+    <a href="#commercial">Commercial Strategy</a>
+    <a href="#roadmap">Basic Roadmap</a>
+    <a href="#risks">Product Risks</a>
+    <a href="#backlog">Near-Term Backlog</a>
+    <a href="#questions">Clarifications</a>
+  </nav>
+</aside>
+<main>
+<article>
+  <h1>Deploy on Friday Product Vision</h1>
+  <p class="meta">Terminal-native incident-management satire, main deck, extension packs, mixed themes, and the first product roadmap.</p>
+
+  <section id="promise">
+    <h2>Product Promise</h2>
+    <p>Deploy on Friday is a terminal-native multiplayer incident-management satire where software engineers survive the history, culture, hype cycles, failures, and rituals of the software industry. The core game should be easy to learn, deterministic enough to test, and expandable through thematic content packs.</p>
+    <p>The player fantasy is simple: assemble an engineering identity, survive absurd technical and organizational disasters, negotiate with other players, sabotage at the right time, and become the first Principal Engineer.</p>
+  </section>
+
+  <section id="market">
+    <h2>Market Positioning</h2>
+    <p>Market research points to a focused niche with strong community potential and medium commercial upside. The product should not try to look like a generic tabletop card-game clone. Its ownable position is developer identity plus terminal-native multiplayer chaos.</p>
+    <table>
+      <thead><tr><th>Decision</th><th>Product Impact</th></tr></thead>
+      <tbody>
+        <tr><td>Target buyer</td><td>Developers who want a funny game to play with developer friends, coworkers, streams, meetups, and online communities.</td></tr>
+        <tr><td>Primary hook</td><td>Terminal-native multiplayer satire with replay logs, bots, sabotage, career progression, and modular software-era decks.</td></tr>
+        <tr><td>Brand emphasis</td><td>Lead with incident response plus terminal culture. Use workplace satire as the tone and software-history eras as expansion flavor.</td></tr>
+        <tr><td>First public promise</td><td>Free demo with the default deck, local bot play, 3 completed online matches per account per day, abandoned-match cooldown protection, readable terminal UI, replay logs, and one-command local match.</td></tr>
+        <tr><td>Positioning rule</td><td>Do not market the game by comparing it to specific existing tabletop brands. Describe the original fantasy directly.</td></tr>
+        <tr><td>Friction rule</td><td>Installation, invite flow, account setup, and match start must be simpler than the jokes are clever.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="model">
+    <h2>Core Product Model</h2>
+    <p>The game has one evergreen main deck and many optional extensions.</p>
+    <p>The main deck represents general software engineering: bugs, technical debt, production incidents, tools, career progression, code review, architecture, testing, deployment, security, and team dynamics.</p>
+    <p>Extensions represent emblematic eras or subcultures. They add cards, card classes, achievements, optional mechanics, and themed deck recipes without replacing the core rules. The commercial model is paid ownership plus in-game unlock progression: buying or otherwise owning a pack grants access to that theme, while gameplay progression unlocks recipes, achievements, cosmetic profile items, or advanced variants inside the owned content.</p>
+    <p>Players should be able to:</p>
+    <ul>
+      <li>Play with only the main deck.</li>
+      <li>Unlock one extension and add it to the match.</li>
+      <li>Combine multiple extensions in the same match.</li>
+      <li>Mix compatible card classes from different extensions.</li>
+      <li>Use official deck recipes or custom deck selection rules.</li>
+    </ul>
+  </section>
+
+  <section id="pillars">
+    <h2>Product Pillars</h2>
+    <table>
+      <thead><tr><th>Pillar</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>Satire With Recognizable Truth</td><td>Every card should feel like a real software-industry memory exaggerated into a game object.</td></tr>
+        <tr><td>Modular Content</td><td>New eras should arrive as extensions rather than rewrites. Content is data-driven where possible, and new mechanics must be small enough to validate.</td></tr>
+        <tr><td>Deterministic Core</td><td>Match rules, deck construction, shuffling, bot behavior, and command results must be reproducible for tests and playtest review.</td></tr>
+        <tr><td>Server Authority</td><td>Clients express player intent. The server validates deck ownership, unlocked extensions, match configuration, card effects, combat, rewards, and achievements.</td></tr>
+        <tr><td>Mixable Themes</td><td>Extension content should be fun alone and surprising when combined. The system must support compatibility tags, conflict checks, and balance bands.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="meeting">
+    <h2>Multi-Mentor Product Meeting Summary</h2>
+    <div class="callout"><strong>Product Owner decision:</strong> the main deck remains broad software-engineering satire. The extension system becomes the long-term content and progression axis. Unlocking extensions and choosing deck mixes are first-class product capabilities, not late polish.</div>
+    <p><strong>Game engineer guidance:</strong> keep the core loop stable. Extensions should initially add cards, deck recipes, achievements, and limited keyword mechanics. Avoid extension-specific rule engines until at least two extensions prove the same mechanic shape is needed.</p>
+    <p><strong>Architecture lead guidance:</strong> model extensions as content catalogs and match configuration inputs. The domain should know about card definitions, deck membership, compatibility tags, card classes, unlock status, and match deck recipes. Infrastructure loads these facts, but PostgreSQL must not define the domain language.</p>
+    <p><strong>Technical naming guidance:</strong> the public product title must not become the implementation namespace. Use stable generic identifiers such as <code>game_</code> for C symbols, CMake targets, database examples, protocol examples, and test binaries.</p>
+  </section>
+
+  <section id="signature">
+    <h2>Signature Mechanics</h2>
+    <p>The product needs mechanics that grow from software culture rather than feeling like renamed generic card-game behavior.</p>
+    <table>
+      <thead><tr><th>Mechanic</th><th>Why It Matters</th><th>Implementation Guardrail</th></tr></thead>
+      <tbody>
+        <tr><td>Incident Severity Meter</td><td><strong>v0.1 signature mechanic.</strong> Turns production chaos into a shared pressure system that players can fix, exploit, or escalate.</td><td>Keep severity deterministic and visible in every command result.</td></tr>
+        <tr><td>Influence Economy</td><td>Makes reputation, talks, AI discourse, and community drama central instead of cosmetic.</td><td>Influence must enable help, cancellation, AI boosts, and reputation attacks without replacing Power.</td></tr>
+        <tr><td>Shared Tech Debt</td><td>Creates table-wide risk where players decide whether to clean up debt or let it explode during another turn.</td><td>Represent debt as explicit match state, not hidden UI flavor.</td></tr>
+        <tr><td>Deployment Windows</td><td>Makes Friday deployments, demo day, freezes, and outages tactically meaningful.</td><td>Use simple match-context flags before adding complex calendar systems.</td></tr>
+        <tr><td>Career Identity Builds</td><td>Classes should feel strategically different, not just category bonuses.</td><td>Each class needs one signature decision pattern proven by tests and playtest transcripts.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="concepts">
+    <h2>Domain Concepts</h2>
+    <table>
+      <thead><tr><th>Concept</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Main Deck</td><td>The default content set required for every match unless the product later supports special challenge modes.</td></tr>
+        <tr><td>Extension</td><td>A named content pack with metadata, unlock requirements, cards, deck recipes, compatibility tags, optional achievements, and optional mechanic flags.</td></tr>
+        <tr><td>Deck Recipe</td><td>A match-ready selection rule that combines card pools from the main deck and selected extensions into Encounter, Treasure, PvP, Event, or other draw piles.</td></tr>
+        <tr><td>Card Class</td><td>A gameplay grouping such as Monster, Equipment, Curse, Event, PvP, AI-Chaos, Legacy, Infrastructure, Business, Career, or Community. Card classes can appear across multiple extensions.</td></tr>
+        <tr><td>Compatibility Tag</td><td>A lightweight marker that helps validate mixed decks, such as <code>core</code>, <code>retro</code>, <code>startup</code>, <code>saas</code>, <code>ai</code>, <code>infrastructure</code>, <code>career</code>, <code>high-chaos</code>, or <code>advanced</code>.</td></tr>
+        <tr><td>Unlock</td><td>A player/account capability that allows an extension to be selected for a match.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="commercial">
+    <h2>Commercial Strategy</h2>
+    <p>The recommended business model is low-cost premium plus optional content, not aggressive free-to-play.</p>
+    <ul>
+      <li><strong>Public demo:</strong> default deck, local play with bots, 3 completed online matches per account per day, one-command startup, abandoned-match cooldown protection, and replay logs.</li>
+      <li><strong>Demo quota policy:</strong> only completed online matches consume the daily quota; repeated abandoned or disconnected matches trigger a temporary cooldown instead of spending quota.</li>
+      <li><strong>Paid gate:</strong> do not charge for early access until official online multiplayer exists. The social loop is the strongest retention hook and must be real before asking for money.</li>
+      <li><strong>Early access:</strong> full main deck, official online multiplayer, rankings, deterministic match transcripts, and low trial-friendly price.</li>
+      <li><strong>v1.0:</strong> polished main game with official servers and stable deck recipes.</li>
+      <li><strong>Extensions:</strong> small paid content packs with cards, achievements, deck recipes, terminal themes, and at most one lightweight mechanic. Ownership grants theme access; in-game progression unlocks recipes, cosmetics, achievements, and advanced variants without selling stronger cards directly.</li>
+      <li><strong>Supporter pack:</strong> cosmetic badges, title screen variants, profile titles, soundtrack or terminal ambience, and no gameplay advantage.</li>
+      <li><strong>Avoid:</strong> loot boxes, pay-to-win card packs, and battle passes before the audience is large enough to justify constant content production.</li>
+    </ul>
+  </section>
+
+  <section id="roadmap">
+    <h2>Basic Roadmap</h2>
+    <h3>v0.1 Root Prototype</h3>
+    <p><strong>Goal:</strong> prove the deterministic local turn loop with seeded main-deck content and Incident Severity as the first signature mechanic.</p>
+    <p><strong>Scope:</strong> main deck only, Encounter and Treasure deck construction from seed data, deterministic RNG, local simulation, terminal smoke path, content validation before match startup, and a visible Incident Severity meter that players can reduce, ignore, exploit, or escalate.</p>
+    <p><strong>Out of scope:</strong> unlocks, extension mixing, persistent accounts, and real multiplayer.</p>
+
+    <h3>v0.2 Modular Content Foundation</h3>
+    <p><strong>Goal:</strong> introduce extension-aware content metadata without changing the player loop, while preserving the main deck as a standalone demo candidate.</p>
+    <ul>
+      <li>Extension metadata model.</li>
+      <li>Card-to-extension mapping.</li>
+      <li>Card class and compatibility tags.</li>
+      <li>Deck recipe validation.</li>
+      <li>Main deck as the default recipe.</li>
+      <li>Test fixtures for one small sample extension.</li>
+    </ul>
+
+    <h3>v0.3 Unlocks And Custom Deck Selection</h3>
+    <p><strong>Goal:</strong> let players select unlocked extensions for a match and prepare the first public demo/playtest funnel.</p>
+    <ul>
+      <li>Player extension unlock state.</li>
+      <li>Match configuration that lists selected extensions.</li>
+      <li>Server-side validation of selected content.</li>
+      <li>Basic terminal flow for selecting available extensions.</li>
+      <li>Persistence for unlocks and match deck configuration.</li>
+      <li>Copy-paste invite command, bot fallback, and 3 completed online matches per account per day for low-friction public demo testing.</li>
+    </ul>
+
+    <h3>v0.4 Mixed Theme Alpha</h3>
+    <p><strong>Goal:</strong> support multiple selected extensions in one match.</p>
+    <ul>
+      <li>Mixed deck recipe construction.</li>
+      <li>Compatibility checks.</li>
+      <li>Balance bands for mixed Encounter and Treasure pools.</li>
+      <li>First public-style playtest with at least two extensions enabled.</li>
+    </ul>
+
+    <h3>v1.0 Core Game</h3>
+    <p><strong>Goal:</strong> ship the complete main-deck experience with the extension framework ready.</p>
+    <ul>
+      <li>Stable server-authoritative multiplayer loop.</li>
+      <li>Main deck balance pass.</li>
+      <li>Extension-compatible content catalog.</li>
+      <li>Achievements.</li>
+      <li>Rankings and match history.</li>
+      <li>Deck recipe validation gates.</li>
+    </ul>
+
+    <h3>v1.x Extension Releases</h3>
+    <p><strong>Goal:</strong> ship themed extensions incrementally without destabilizing the core game.</p>
+    <p><strong>Initial sequence:</strong> The Punch Card Era, The .com Bubble, I'm a Developer, The SaaS Bubble, and The AI New Era.</p>
+    <p>Each extension should ship with a theme promise, card list, deck recipe impact, achievements, balance notes, compatibility tags, validation tests, and a release gate proving the main deck still works alone.</p>
+  </section>
+
+  <section id="risks">
+    <h2>Product Risks</h2>
+    <ul>
+      <li><strong>Scope creep:</strong> extensions can easily become new games. Keep first versions content-heavy and mechanic-light.</li>
+      <li><strong>Balance complexity:</strong> mixed decks can create extreme combinations. Use power bands, rarity, compatibility tags, and playtest transcripts.</li>
+      <li><strong>Implementation coupling:</strong> avoid hardcoding extension behavior in the UI, database layer, or server packet names. Extension data should flow into stable domain/application APIs.</li>
+      <li><strong>Player confusion:</strong> deck construction must be explainable. Start with official recipes before offering fully custom deck builders.</li>
+      <li><strong>IP and positioning risk:</strong> public docs, store pages, card layout, and terminology must avoid brand comparisons or clone-like expression.</li>
+      <li><strong>Terminal friction:</strong> the unique UI is a strength only if install, setup, match start, and command readability are excellent.</li>
+    </ul>
+  </section>
+
+  <section id="backlog">
+    <h2>Near-Term Backlog Themes</h2>
+    <ol>
+      <li>Define extension metadata and deck recipe language.</li>
+      <li>Update seed templates to distinguish main-deck content from extension content.</li>
+      <li>Add content validation for selected deck recipes.</li>
+      <li>Add a terminal-visible match setup summary.</li>
+      <li>Build one tiny sample extension fixture before designing all expansion mechanics.</li>
+      <li>Remove public-facing references to specific inspiration brands and preserve those only, if needed, in private design notes.</li>
+      <li>Design the public demo path: default deck, play now with bots, one-command local match, 3 completed online matches per account per day, readable replay log, and short 20-35 minute match target.</li>
+    </ol>
+  </section>
+
+  <section id="questions">
+    <h2>Clarifications To Force Now</h2>
+    <ol>
+      <li><strong>Decided:</strong> the first public artifact is a free demo with the default deck, local play with bots, and 3 completed online matches per account per day.</li>
+      <li><strong>Decided:</strong> daily-limited multiplayer means a quota of 3 completed online matches per player/account per day, not a scheduled time window or rotating room.</li>
+      <li><strong>Decided:</strong> only completed online matches consume daily quota; repeated abandons or disconnects trigger a temporary cooldown.</li>
+      <li><strong>Decided:</strong> do not charge for early access until official online multiplayer exists. Local/bot play and private server support can exist earlier, but they remain part of the free demo/playtest path.</li>
+      <li><strong>Decided:</strong> Incident Severity is the v0.1 signature mechanic. Influence, Shared Tech Debt, Deployment Windows, and deeper Career Identity builds are deferred until the incident loop is playable and testable.</li>
+      <li><strong>Decided:</strong> extensions use paid ownership plus in-game unlock progression. Paid ownership grants access to a theme; gameplay progression unlocks recipes, cosmetics, achievements, and advanced variants inside owned content. Do not sell strictly stronger cards.</li>
+      <li><strong>Decided:</strong> public brand emphasis leads with incident response plus terminal culture. Workplace satire is the tone; software-history eras are expansion flavor.</li>
+      <li><strong>Decided:</strong> Deploy on Friday is the public product title. Code and infrastructure examples must not use product-title-derived prefixes; current examples use <code>game_</code>.</li>
+    </ol>
+  </section>
+</article>
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Market Research Response</title>
+  <style>
+    :root{--bg:#f7f8fb;--panel:#fff;--ink:#17202a;--muted:#637083;--line:#d8dee9;--accent:#0f766e;--soft:#ecfdf5;--warn:#fff7ed}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;color:var(--ink);background:var(--bg)}
+    main{max-width:1120px;margin:0 auto;padding:32px 18px 72px}
+    article{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:clamp(24px,4vw,48px);box-shadow:0 8px 24px rgba(15,23,42,.05)}
+    h1,h2,h3{line-height:1.2;letter-spacing:0} h1{margin-top:0;font-size:clamp(2rem,4vw,3rem)} h2{border-top:1px solid var(--line);padding-top:1.1rem;margin-top:2rem} h3{color:#143a36}
+    a{color:var(--accent)} .meta{color:var(--muted)} .callout{border-left:4px solid var(--accent);background:var(--soft);padding:12px 14px;margin:16px 0}.warning{border-left-color:#b45309;background:var(--warn)}
+    table{width:100%;border-collapse:collapse;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:8px 10px;vertical-align:top} th{background:var(--soft);text-align:left}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;background:#edf2f7;border:1px solid #d9e2ec;border-radius:4px;padding:.05em .3em}
+    ul,ol{padding-left:1.4rem} li{margin:.25em 0}
+  </style>
+</head>
+<body>
+<main><article>
+  <p><a href="../index.html">Walkthrough Index</a></p>
+  <h1>Market Research Response</h1>
+  <p class="meta">Cross-mentor evaluation of <code>MARKET_RESEARCH.txt</code> and resulting product documentation changes.</p>
+
+  <section>
+    <h2>Executive Decision</h2>
+    <div class="callout"><strong>Continue the product, but reposition it.</strong> Deploy on Friday should not present itself as a derivative tabletop-card-game adaptation. The ownable product promise is: a terminal-native multiplayer incident-management satire where developers weaponize bugs, tools, influence, tech debt, and production chaos to become Principal Engineer.</div>
+    <p>The research says the project has a strong niche, high community potential, medium commercial upside, and real differentiation if it leans into developer identity, terminal-first presentation, modular extensions, and signature software-culture mechanics.</p>
+  </section>
+
+  <section>
+    <h2>All-Mentor Evaluation</h2>
+    <table>
+      <thead><tr><th>Skill</th><th>Read Of The Research</th><th>Documentation Impact</th></tr></thead>
+      <tbody>
+        <tr><td>Project Manager / Product Owner</td><td>Focus the business around a narrow, passionate developer audience. Prioritize demo friction, pricing clarity, and extension roadmap.</td><td>Added market positioning, commercial strategy, public-demo framing, and clarification questions to <code>PRODUCT.html</code>.</td></tr>
+        <tr><td>Game Designer</td><td>The theme is strong, but the game needs signature mechanics that are impossible to describe as a simple reskin.</td><td>Elevated Incident Severity, Influence economy, Shared Tech Debt, Deployment Windows, and Career Identity Builds.</td></tr>
+        <tr><td>Lead Architect</td><td>The extension and signature-mechanic system must stay domain-first. The database and UI must not become the source of product language.</td><td>Kept extensions, recipes, compatibility tags, unlocks, and match context as domain concepts.</td></tr>
+        <tr><td>Systems Programmer</td><td>Terminal-first is marketable only if setup and match start are extremely low friction.</td><td>Added one-command local match, bots, readable terminal UI, replay logs, and invite-flow requirements.</td></tr>
+        <tr><td>PostgreSQL Architect</td><td>Modular decks require explicit content-pack, deck-recipe, unlock, and match transcript data later.</td><td>Added persistence implications while keeping v0.1 focused on seeded main-deck validation.</td></tr>
+        <tr><td>DevOps Principal Engineer</td><td>The first public release needs reproducible local startup and a clean public test path before infrastructure ambition.</td><td>Added demo/playtest funnel, public test server as a later readiness item, and release gates around deterministic transcripts.</td></tr>
+        <tr><td>XP Principal Engineer</td><td>The research translates into small test-first slices: first prove Incident Severity and one low-friction playable loop.</td><td>Updated roadmap/backlog to make Incident Severity the v0.1 signature mechanic.</td></tr>
+        <tr><td>Git Specialist</td><td>Market research is a product-doc change. Keep production source untouched and commit separately from implementation work.</td><td>Kept changes in root docs, walkthrough docs, and nested technical README only.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Positioning Changes</h2>
+    <ul>
+      <li>Use: "terminal-native multiplayer incident-management satire."</li>
+      <li>Use: "developers weaponize bugs, tools, influence, tech debt, and production chaos."</li>
+      <li>Lead public brand emphasis with incident response plus terminal culture.</li>
+      <li>Use workplace satire as the tone and software-history eras as expansion flavor.</li>
+      <li>Avoid public wording that compares the product to named existing tabletop brands.</li>
+      <li>Make the terminal UI an identity feature, not just a low-budget interface.</li>
+      <li>Make match transcripts and replay logs part of the shareable community loop.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Product Strategy Updates</h2>
+    <table>
+      <thead><tr><th>Theme</th><th>Decision</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td>Audience</td><td>Target developers first.</td><td>The jokes, terminal UI, and friend-invite loop make the most sense for developer communities.</td></tr>
+        <tr><td>Demo</td><td>Prioritize a free demo with default deck, play now with bots, 3 completed online matches per account per day, and abandoned-match cooldown protection.</td><td>Terminal multiplayer friction can kill the experience before the social loop starts.</td></tr>
+        <tr><td>Match length</td><td>Aim for short, readable sessions.</td><td>The product should feel like a developer party game with tactical chaos, not a heavy collectible card game.</td></tr>
+        <tr><td>Pricing</td><td>Low-cost premium base game plus extension ownership, in-game unlock progression, and optional supporter cosmetics.</td><td>Low price improves friend conversion; extensions fit the modular deck model.</td></tr>
+        <tr><td>Monetization boundary</td><td>No loot boxes, no pay-to-win card packs, and no direct sale of strictly stronger cards.</td><td>Trust is central for a developer audience and for multiplayer fairness.</td></tr>
+        <tr><td>Legal posture</td><td>Build original terminology, UI, taxonomy, pacing, and public copy.</td><td>The safest product is visibly its own expression, not a renamed clone.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Recommended Roadmap Adjustment</h2>
+    <ol>
+      <li><strong>v0.1:</strong> default deck, deterministic local loop, bots, terminal smoke path, replay log, 3-match daily online quota plan, abandoned-match cooldown policy, and Incident Severity as the signature mechanic.</li>
+      <li><strong>v0.2:</strong> modular content foundation with main deck represented as the first content pack.</li>
+      <li><strong>v0.3:</strong> unlocks and match setup flow, with copy-paste invite support or clear private-server setup.</li>
+      <li><strong>v0.4:</strong> mixed-theme alpha using two extensions and fixed-seed balance transcripts.</li>
+      <li><strong>Paid early access gate:</strong> no paid build until official online multiplayer exists.</li>
+      <li><strong>v1.0:</strong> polished main deck, official deck recipes, public demo, stable multiplayer, and extension-ready catalog.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Documentation Changes Made</h2>
+    <ul>
+      <li><code>README.html</code>: updated the lead positioning and added market position guidance.</li>
+      <li><code>PRODUCT.html</code>: added market positioning, commercial strategy, signature mechanics, friction requirements, IP-positioning risk, and clarification questions.</li>
+      <li><code>deploy_on_friday/README.md</code>: removed public reference to a named inspiration brand and replaced it with original product positioning.</li>
+      <li><code>walkthrough/product/market_research_response.html</code>: captured this evaluation as a durable support artifact.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Clarification Questions</h2>
+    <div class="callout warning"><strong>These need owner decisions before the next roadmap rewrite.</strong></div>
+    <ol>
+      <li><strong>Decided:</strong> first public artifact is a free demo with the default deck, local play with bots, and 3 completed online matches per account per day.</li>
+      <li><strong>Decided:</strong> daily-limited multiplayer means a quota of 3 completed online matches per player/account per day, not a scheduled time window or rotating room.</li>
+      <li><strong>Decided:</strong> only completed online matches consume daily quota; repeated abandons or disconnects trigger a temporary cooldown.</li>
+      <li><strong>Decided:</strong> do not charge for early access until official online multiplayer exists. Local/bot play and private server support can exist earlier, but they stay in the free demo/playtest path.</li>
+      <li><strong>Decided:</strong> Incident Severity defines v0.1. Influence economy, Shared Tech Debt, Deployment Windows, and deeper Career Identity builds are deferred until Incident Severity is playable and testable.</li>
+      <li><strong>Decided:</strong> extensions use paid ownership plus in-game unlock progression. Paid ownership grants access to a theme; gameplay progression unlocks recipes, cosmetics, achievements, and advanced variants inside owned content. Do not sell strictly stronger cards.</li>
+      <li><strong>Decided:</strong> public brand emphasis leads with incident response plus terminal culture. Workplace satire is the tone; software-history eras are expansion flavor.</li>
+      <li><strong>Decided:</strong> Deploy on Friday is the public product title. Code and infrastructure examples must not use product-title-derived prefixes; current examples use <code>game_</code>.</li>
+    </ol>
+  </section>
+</article></main>
+</body>
+</html>

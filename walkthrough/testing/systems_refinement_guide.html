@@ -194,23 +194,23 @@ mark { background: #fef3c7; padding: 0 0.15em; }
 <p>The earlier systems guide used a single <code>dungeon_client</code> executable that directly included domain, application, infrastructure, and client sources together. That compiles, but it does not prove the architecture. A1 needs separate libraries so dependency mistakes fail during build review and test setup.</p>
 <p>Recommended target shape:</p>
 <pre><code class="language-text">
-dad_domain
+game_domain
     C standard library only
 
-dad_application
-    links dad_domain
+game_application
+    links game_domain
 
-dad_infrastructure_db
-    links dad_application + dad_domain + libpq
+game_infrastructure_db
+    links game_application + game_domain + libpq
 
-dad_client_ncurses
-    links dad_application + dad_domain + dad_infrastructure_db + ncurses
+game_client_ncurses
+    links game_application + game_domain + game_infrastructure_db + ncurses
 
-dad_tests_domain
-    links dad_domain
+game_tests_domain
+    links game_domain
 
-dad_tests_application
-    links dad_application + dad_domain + fake repositories
+game_tests_application
+    links game_application + game_domain + fake repositories
 </code></pre>
 <p>Design rule:</p>
 <ul>
@@ -367,7 +367,7 @@ error_code
 </ul>
 <p>Verification:</p>
 <ul>
-<li><code>dad_tests_domain</code></li>
+<li><code>game_tests_domain</code></li>
 <li>Optional leak-check run where available.</li>
 </ul>
 <section data-section id="section-sp3-application-command-boundary-tests">
@@ -388,7 +388,7 @@ error_code
 </ul>
 <p>Verification:</p>
 <ul>
-<li><code>dad_tests_application</code></li>
+<li><code>game_tests_application</code></li>
 <li>Full-match simulation test with one fixed seed.</li>
 </ul>
 <section data-section id="section-sp4-repository-adapter-mapping-tests">
@@ -478,53 +478,53 @@ add_compile_options(-Wall -Wextra -Werror -pedantic)
 
 enable_testing()
 
-add_library(dad_domain
+add_library(game_domain
     domain/card.c
     domain/deck.c
     domain/player.c
     domain/game_rules.c
 )
-target_include_directories(dad_domain PUBLIC domain)
+target_include_directories(game_domain PUBLIC domain)
 
-add_library(dad_application
+add_library(game_application
     application/game_service.c
     application/bot_ai.c
 )
-target_include_directories(dad_application PUBLIC application)
-target_link_libraries(dad_application PUBLIC dad_domain)
+target_include_directories(game_application PUBLIC application)
+target_link_libraries(game_application PUBLIC game_domain)
 
 find_package(PostgreSQL REQUIRED)
-add_library(dad_infrastructure_db
+add_library(game_infrastructure_db
     infrastructure/db/postgresql_content_repository.c
 )
-target_include_directories(dad_infrastructure_db PRIVATE ${PostgreSQL_INCLUDE_DIRS})
-target_link_libraries(dad_infrastructure_db PRIVATE dad_application dad_domain ${PostgreSQL_LIBRARIES})
+target_include_directories(game_infrastructure_db PRIVATE ${PostgreSQL_INCLUDE_DIRS})
+target_link_libraries(game_infrastructure_db PRIVATE game_application game_domain ${PostgreSQL_LIBRARIES})
 
 find_package(Curses REQUIRED)
-add_executable(dad_client_ncurses
+add_executable(game_client_ncurses
     client/ncurses_ui.c
     client/main.c
 )
-target_include_directories(dad_client_ncurses PRIVATE ${CURSES_INCLUDE_DIR})
-target_link_libraries(dad_client_ncurses PRIVATE dad_application dad_domain dad_infrastructure_db ${CURSES_LIBRARIES})
+target_include_directories(game_client_ncurses PRIVATE ${CURSES_INCLUDE_DIR})
+target_link_libraries(game_client_ncurses PRIVATE game_application game_domain game_infrastructure_db ${CURSES_LIBRARIES})
 
-add_executable(dad_tests_domain
+add_executable(game_tests_domain
     tests/domain/test_deck.c
     tests/domain/test_combat.c
 )
-target_link_libraries(dad_tests_domain PRIVATE dad_domain)
-add_test(NAME domain COMMAND dad_tests_domain)
+target_link_libraries(game_tests_domain PRIVATE game_domain)
+add_test(NAME domain COMMAND game_tests_domain)
 
-add_executable(dad_tests_application
+add_executable(game_tests_application
     tests/application/test_commands.c
     tests/fakes/fake_content_repository.c
 )
-target_link_libraries(dad_tests_application PRIVATE dad_application dad_domain)
-add_test(NAME application COMMAND dad_tests_application)
+target_link_libraries(game_tests_application PRIVATE game_application game_domain)
+add_test(NAME application COMMAND game_tests_application)
 </code></pre>
 <p>Important boundary check:</p>
 <ul>
-<li>Do not link <code>dad_tests_domain</code> to PostgreSQL or NCurses.</li>
+<li>Do not link <code>game_tests_domain</code> to PostgreSQL or NCurses.</li>
 <li>Do not include <code>libpq-fe.h</code> outside infrastructure DB files.</li>
 <li>Do not include <code>ncurses.h</code> outside client UI files.</li>
 </ul>
@@ -551,7 +551,7 @@ test-db: build
 	ctest --test-dir $(BUILD_DIR) --output-on-failure -L db
 
 run: build
-	./$(BUILD_DIR)/dad_client_ncurses
+	./$(BUILD_DIR)/game_client_ncurses
 
 clean:
 	cmake -E rm -rf $(BUILD_DIR)
@@ -575,31 +575,31 @@ clean:
 </tr>
 <tr>
 <td>Deck shuffle determinism</td>
-<td><code>dad_tests_domain</code></td>
+<td><code>game_tests_domain</code></td>
 <td>C standard library</td>
 <td>R2, R3, A6</td>
 </tr>
 <tr>
 <td>Power and combat</td>
-<td><code>dad_tests_domain</code></td>
+<td><code>game_tests_domain</code></td>
 <td>C standard library</td>
 <td>R4</td>
 </tr>
 <tr>
 <td>Curse effects</td>
-<td><code>dad_tests_domain</code></td>
+<td><code>game_tests_domain</code></td>
 <td>C standard library</td>
 <td>R5</td>
 </tr>
 <tr>
 <td>Match commands</td>
-<td><code>dad_tests_application</code></td>
+<td><code>game_tests_application</code></td>
 <td>fake repositories</td>
 <td>A4, A7</td>
 </tr>
 <tr>
 <td>Bot decisions</td>
-<td><code>dad_tests_application</code></td>
+<td><code>game_tests_application</code></td>
 <td>fake repositories, fixed seed</td>
 <td>R6, A6</td>
 </tr>
