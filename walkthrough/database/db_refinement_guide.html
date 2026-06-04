@@ -505,15 +505,15 @@ USING GIN(payload);
 <h2 id="8-local-validation-checklist">8. Local Validation Checklist</h2>
 <p>Use this checklist to validate DB0 and DB1 locally:</p>
 <pre><code class="language-bash">
-createdb dungeons_devs
-psql -v ON_ERROR_STOP=1 -d dungeons_devs -f walkthrough/database/01_schema.sql
-psql -v ON_ERROR_STOP=1 -d dungeons_devs -f walkthrough/database/02_seed_core_data.sql
-psql -v ON_ERROR_STOP=1 -d dungeons_devs -f walkthrough/database/03_seed_cards.sql
-psql -v ON_ERROR_STOP=1 -d dungeons_devs -f walkthrough/database/04_seed_achievements.sql
+createdb game_db
+psql -v ON_ERROR_STOP=1 -d game_db -f walkthrough/database/01_schema.sql
+psql -v ON_ERROR_STOP=1 -d game_db -f walkthrough/database/02_seed_core_data.sql
+psql -v ON_ERROR_STOP=1 -d game_db -f walkthrough/database/03_seed_cards.sql
+psql -v ON_ERROR_STOP=1 -d game_db -f walkthrough/database/04_seed_achievements.sql
 </code></pre>
 <p>After DB1 exists, apply the deck membership seed:</p>
 <pre><code class="language-bash">
-psql -v ON_ERROR_STOP=1 -d dungeons_devs -f walkthrough/database/05_seed_deck_cards.sql
+psql -v ON_ERROR_STOP=1 -d game_db -f walkthrough/database/05_seed_deck_cards.sql
 </code></pre>
 <p>Then run the validation queries from section 3. The expected result is a complete content catalog and non-empty Encounter and Treasure deck membership before the application builds any in-memory deck.</p>
 </section>

@@ -90,6 +90,7 @@
         <tr><td>Modular Content</td><td>New eras should arrive as extensions rather than rewrites. Content is data-driven where possible, and new mechanics must be small enough to validate.</td></tr>
         <tr><td>Deterministic Core</td><td>Match rules, deck construction, shuffling, bot behavior, and command results must be reproducible for tests and playtest review.</td></tr>
         <tr><td>Server Authority</td><td>Clients express player intent. The server validates deck ownership, unlocked extensions, match configuration, card effects, combat, rewards, and achievements.</td></tr>
+        <tr><td>Observable From The Start</td><td>Every command must produce structured evidence for actor/session, match, turn, command, correlation id, replay seed, result, typed error, quota/cooldown decision, and event order. Observability is required for product control, not postponed to monitoring dashboards.</td></tr>
         <tr><td>Mixable Themes</td><td>Extension content should be fun alone and surprising when combined. The system must support compatibility tags, conflict checks, and balance bands.</td></tr>
       </tbody>
     </table>
@@ -101,6 +102,7 @@
     <p><strong>Game engineer guidance:</strong> keep the core loop stable. Extensions should initially add cards, deck recipes, achievements, and limited keyword mechanics. Avoid extension-specific rule engines until at least two extensions prove the same mechanic shape is needed.</p>
     <p><strong>Architecture lead guidance:</strong> model extensions as content catalogs and match configuration inputs. The domain should know about card definitions, deck membership, compatibility tags, card classes, unlock status, and match deck recipes. Infrastructure loads these facts, but PostgreSQL must not define the domain language.</p>
     <p><strong>Technical naming guidance:</strong> the public product title must not become the implementation namespace. Use stable generic identifiers such as <code>game_</code> for C symbols, CMake targets, database examples, protocol examples, and test binaries.</p>
+    <p><strong>Engineering policy guidance:</strong> TDD and observability are non-negotiable. Product control requires replayable command evidence, actor/session traceability, quota and cooldown auditability, typed errors, and privacy-aware operational records from the first local prototype.</p>
   </section>
 
   <section id="signature">
@@ -153,6 +155,7 @@
     <h3>v0.1 Root Prototype</h3>
     <p><strong>Goal:</strong> prove the deterministic local turn loop with seeded main-deck content and Incident Severity as the first signature mechanic.</p>
     <p><strong>Scope:</strong> main deck only, Encounter and Treasure deck construction from seed data, deterministic RNG, local simulation, terminal smoke path, content validation before match startup, and a visible Incident Severity meter that players can reduce, ignore, exploit, or escalate.</p>
+    <p><strong>Engineering gate:</strong> every v0.1 story must start with a failing check and finish with observable command evidence: deterministic local actor/session, match, turn, command, correlation id, replay seed, ordered events, result, and typed error when applicable.</p>
     <p><strong>Out of scope:</strong> unlocks, extension mixing, persistent accounts, and real multiplayer.</p>
 
     <h3>v0.2 Modular Content Foundation</h3>

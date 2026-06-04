@@ -60,6 +60,10 @@
           <p>Every technical decision must first explain which domain capability, business/gameplay rule, player outcome, or team communication problem it serves. Code structure, Clean Architecture layers, Docker, CMake, repositories, entities, value objects, SQL schemas, and protocol shapes are tools. They are justified only when they make the domain clearer, safer, more testable, or easier to evolve.</p>
         </div>
         <p>For this project, "business" means the actual product domain: the game experience, player progression, card/content rules, match lifecycle, release constraints, and the language shared by designers, engineers, database, DevOps, and product mentors.</p>
+        <div class="callout warning">
+          <strong>TDD and observability are non-negotiable.</strong>
+          <p>No production behavior is accepted without a prior failing check and observable evidence that explains what happened, which actor/session initiated it, which command path executed, which state changed, and how the behavior can be replayed or audited. See <a href="tdd_observability_policy.html">tdd_observability_policy.html</a>.</p>
+        </div>
       </section>
 
       <section data-section id="decision-order">
@@ -69,6 +73,7 @@
           <li><strong>Map the boundary.</strong> Decide which context owns the language and behavior: gameplay rules, match orchestration, content loading, persistence, terminal rendering, runtime environment, or release readiness.</li>
           <li><strong>Choose the simplest tactical shape.</strong> Apply entities, value objects, repositories, services, adapters, Docker, CI gates, or SQL structure only when they support the mapped boundary.</li>
           <li><strong>Protect feedback loops.</strong> Make the decision testable through CTest, SQL validation, fixed-seed simulation, manual terminal playtest, or release checklist evidence.</li>
+          <li><strong>Make behavior observable.</strong> Emit structured command results, domain/application events, replay seeds, typed errors, actor/session context, and artifacts that explain the behavior without guessing from UI state.</li>
           <li><strong>Revisit when the domain changes.</strong> Refactor structure when learning invalidates the previous model.</li>
         </ol>
       </section>
@@ -81,7 +86,7 @@
             <tr><td>DDD</td><td>Strategic DDD is mandatory: ubiquitous language, bounded contexts, and domain mapping. Tactical DDD patterns are optional and must be earned by complexity.</td></tr>
             <tr><td>Clean Architecture</td><td>Clean Architecture is tactical/operational. It protects dependency direction, but it must reflect domain boundaries instead of inventing them.</td></tr>
             <tr><td>Domain Layer</td><td>Domain code owns deterministic game rules and invariants, not PostgreSQL IDs, UI behavior, Docker concerns, or infrastructure details.</td></tr>
-            <tr><td>Application Layer</td><td>Application services coordinate domain use cases and ports. They exist to preserve business flow and command authority, not to become a generic service bucket.</td></tr>
+            <tr><td>Application Layer</td><td>Application services coordinate domain use cases and ports. They exist to preserve business flow, command authority, structured results, actor/session context, and observable event envelopes, not to become a generic service bucket.</td></tr>
             <tr><td>Database</td><td>PostgreSQL stores content and future persistence in ways that match domain language. Schema design follows the content model and match lifecycle.</td></tr>
             <tr><td>DevOps</td><td>Docker/Compose isolates dependencies because reproducible feedback serves product learning. It is not a production architecture decision for v0.1.</td></tr>
             <tr><td>Frontend/Client</td><td>The NCurses client renders snapshots and sends intentions. It does not own rules because player-facing truth comes from the domain/application model.</td></tr>
@@ -99,6 +104,7 @@
           <li>Is this tactical pattern required by current complexity, or is it ceremony copied from a template?</li>
           <li>Does this preserve deterministic rules, server-authoritative command flow, and testable feedback?</li>
           <li>Can it be verified with a concrete gate: unit test, SQL validation, fixed-seed transcript, Docker/Compose check, or manual playtest?</li>
+          <li>Does the behavior produce enough structured evidence to identify actor/session, command, correlation id, seed, state transition, result, and error mode?</li>
         </ul>
       </section>
 

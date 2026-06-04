@@ -71,6 +71,7 @@
     </ul>
     <p>The implementation should treat cards, decks, card classes, extensions, unlock rules, match configuration, and content validation as domain concepts first. PostgreSQL tables, repositories, CMake targets, protocol packets, and terminal screens are tactical tools that serve those concepts.</p>
     <p>Technical identifiers must not depend on the public product title. Use stable generic names such as <code>game_</code> in C symbols, build targets, database examples, and protocol examples so the public title can change without forcing a codebase rename.</p>
+    <p>TDD and observability are non-negotiable. Every accepted behavior needs a prior failing check and structured evidence that explains actor/session, command path, correlation id, replay seed, state transition, result, and failure mode. See <a href="walkthrough/architecture/tdd_observability_policy.html">TDD and observability policy</a>.</p>
   </section>
 
   <section>
@@ -93,6 +94,7 @@ AGENTS.md           Agent boundaries, mentor registry, and support-file index</c
       <li><a href="deploy_on_friday/README.md">Technical project README</a></li>
       <li><a href="PRODUCT.html">Product vision</a></li>
       <li><a href="walkthrough/architecture/technical_naming_policy.html">Technical naming policy</a></li>
+      <li><a href="walkthrough/architecture/tdd_observability_policy.html">TDD and observability policy</a></li>
       <li><a href="walkthrough/product/modular_deck_strategy.html">Modular deck strategy</a></li>
       <li><a href="walkthrough/product/market_research_response.html">Market research response</a></li>
       <li><a href="walkthrough/index.html">Walkthrough hub</a></li>

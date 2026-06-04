@@ -100,6 +100,7 @@
         <ul>
           <li><a href="../architecture/kickoff_backlog.html">kickoff_backlog.html</a>: R0 through R9 proposed v0.1 cycle.</li>
           <li><a href="../architecture/software_engineering_principles.html">software_engineering_principles.html</a>: domain-first source-of-truth rule.</li>
+          <li><a href="../architecture/tdd_observability_policy.html">tdd_observability_policy.html</a>: non-negotiable TDD and observability policy for all implementation slices.</li>
           <li><a href="../architecture/lead_architecture_refinement_guide.html">lead_architecture_refinement_guide.html</a>: unified increment order AR0 through AR8.</li>
           <li><a href="../design/gameplay_refinement_guide.html">gameplay_refinement_guide.html</a>: content bands, combat targets, curse expiry, bot behavior, and playtest metrics.</li>
           <li><a href="../database/db_refinement_guide.html">db_refinement_guide.html</a>: seed validation, deck membership, content repository contract, and deferred event persistence.</li>
@@ -112,10 +113,13 @@
         <h2>Working Rules</h2>
         <ul>
           <li>Write the failing test, validation query, or playtest checklist before implementation.</li>
+          <li>Every task must define the observable evidence it will emit or preserve: command result, domain/application event, typed error, replay seed, transcript line, log field, or playtest note.</li>
+          <li>A task is not complete if the behavior works but the team cannot identify actor/session, command, correlation id, seed, state transition, result, and failure mode from artifacts.</li>
           <li>Keep pure domain/application tests independent of PostgreSQL, NCurses, sockets, pthreads, and filesystem fixtures.</li>
           <li>Load seeded content at match startup; do not query PostgreSQL during each turn.</li>
           <li>Use explicit seeds for shuffles, bot decisions, and simulation transcripts.</li>
           <li>Route human and bot actions through application commands; the UI renders snapshots and sends intentions only.</li>
+          <li>For v0.1 local play, use deterministic local actors and session identifiers so the future online control model is designed from the start.</li>
           <li>Defer networking, account persistence, rankings, runtime JSONB event persistence, production deployment, and complex class abilities.</li>
         </ul>
       </section>
@@ -371,10 +375,10 @@ make db-reset
 make db-seed
 make db-validate
 make test-db
-make simulate DTD_MATCH_SEED=&lt;known-seed&gt;
+make simulate GAME_MATCH_SEED=&lt;known-seed&gt;
 manual NCurses playtest checklist
 architecture boundary checklist</code></pre>
-        <p>A cycle is not complete if the fixed-seed simulation cannot replay, if content validation can start an empty match, if domain/application tests require PostgreSQL or NCurses, or if the UI owns combat, reward, curse, or bot decision rules.</p>
+        <p>A cycle is not complete if the fixed-seed simulation cannot replay, if content validation can start an empty match, if domain/application tests require PostgreSQL or NCurses, if the UI owns combat, reward, curse, or bot decision rules, or if commands lack structured observable evidence.</p>
       </section>
 
       <section data-section id="pairing">
@@ -385,12 +389,13 @@ architecture boundary checklist</code></pre>
           <li>Which dependency must not leak into this layer?</li>
           <li>What event should the UI log instead of inferring from private state?</li>
           <li>What seed, fixture, or transcript will let us replay the bug?</li>
+          <li>Which actor/session and correlation id will let us audit this command path later?</li>
         </ul>
       </section>
 
       <section data-section id="stop">
         <h2>Stop Condition</h2>
-        <p>Stop the cycle when the v0.1 release gate passes and one reviewed transcript plus one manual playtest note prove the local Level 1 to Level 10 match. Do not continue into sockets, event persistence, rankings, accounts, advanced AI, or expanded card catalogs until this stop condition is met.</p>
+        <p>Stop the cycle when the v0.1 release gate passes and one reviewed transcript plus one manual playtest note prove the local Level 1 to Level 10 match with structured observable evidence. Do not continue into sockets, runtime event persistence, rankings, accounts, advanced AI, or expanded card catalogs until this stop condition is met.</p>
       </section>
     </article>
   </main>

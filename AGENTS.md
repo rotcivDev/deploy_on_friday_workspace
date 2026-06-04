@@ -57,6 +57,14 @@ All technical approaches and decisions in this workspace must follow the princip
 
 Clean Architecture, tactical DDD patterns, Docker/Compose, CMake, database repositories, protocol layouts, and CI gates are implementation tools. Use them only when they clarify the domain, protect a domain boundary, improve deterministic feedback, or reduce delivery risk. Do not start from tactical patterns and force the game/product domain to fit them.
 
+### Non-Negotiable TDD And Observability
+
+All development policy in this workspace assumes test-driven development and observability from the first slice. No production behavior is accepted without a prior failing check and observable evidence that explains what happened, which actor/session initiated it, which command/result path executed, which state changed, and how the behavior can be replayed or audited.
+
+Observability means structured domain/application events, command results, correlation identifiers, actor or session identifiers, replay seeds, quota/cooldown decisions, typed errors, transcripts, logs, and release artifacts. It is not just future monitoring dashboards. Operational control must be privacy-aware: collect the facts required for debugging, support, abuse prevention, demo quota enforcement, abandoned-match cooldowns, replay reconstruction, and product control; do not collect unrelated personal data.
+
+The detailed policy is maintained in [walkthrough/architecture/tdd_observability_policy.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/tdd_observability_policy.html).
+
 Codex must not directly write production implementation files in:
 
 * `domain/`
@@ -131,6 +139,7 @@ When agents generate documents, specs, examples, or templates, they must be regi
 *   **[walkthrough/architecture/lead_architecture_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/lead_architecture_refinement_guide.html)**: Lead architecture synthesis of team backlog refinements, dependency boundaries, and unified increment order.
 *   **[walkthrough/architecture/t01_cycle_boundary_review.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/t01_cycle_boundary_review.html)**: Lead Architect completion evidence for XP task T01, confirming v0.1 cycle boundary, deferred scope, and traceability gates.
 *   **[walkthrough/architecture/technical_naming_policy.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/technical_naming_policy.html)**: Architecture and systems policy decoupling public product names from C symbols, build targets, database names, protocol constants, and service identifiers.
+*   **[walkthrough/architecture/tdd_observability_policy.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/tdd_observability_policy.html)**: Lead Architect and XP Principal Engineer policy making TDD and observability non-negotiable from the first implementation slice.
 *   **[walkthrough/design/gameplay_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/design/gameplay_refinement_guide.html)**: Gameplay/content backlog refinement, v0.1 balance targets, bot behavior, and playtest plan.
 *   *(Add future design files here)*
 

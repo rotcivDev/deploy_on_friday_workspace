@@ -301,12 +301,12 @@ review v0.1 release checklist
 <p>The first local prototype still has configuration: database DSN, seed, log level, artifact path, optional terminal behavior, and feature spikes. If these are hidden in source, the future v0.2 runtime will inherit avoidable operational debt.</p>
 <p>Recommended <code>.env.example</code> values:</p>
 <pre><code class="language-text">
-DTD_DB_DSN=postgresql://localhost/dungeons_devs
-DTD_MATCH_SEED=12345
-DTD_LOG_LEVEL=info
-DTD_ARTIFACT_DIR=artifacts
-DTD_ENABLE_DB_TESTS=0
-DTD_ENABLE_EVENT_PERSISTENCE=0
+GAME_DB_DSN=postgresql://localhost/game_db
+GAME_MATCH_SEED=12345
+GAME_LOG_LEVEL=info
+GAME_ARTIFACT_DIR=artifacts
+GAME_ENABLE_DB_TESTS=0
+GAME_ENABLE_EVENT_PERSISTENCE=0
 </code></pre>
 <p>Acceptance target:</p>
 <ul>
@@ -326,7 +326,7 @@ make db-reset
 make db-seed
 make db-validate
 make test-db
-make simulate DTD_MATCH_SEED=&lt;known seed&gt;
+make simulate GAME_MATCH_SEED=&lt;known seed&gt;
 manual NCurses playtest checklist
 architecture boundary checklist
 </code></pre>
@@ -503,7 +503,7 @@ architecture boundary checklist
 </ul>
 <section data-section id="section-dev6-observability-and-debugging-baseline">
 <h3 id="dev6-observability-and-debugging-baseline">DEV6. Observability And Debugging Baseline</h3>
-<p>Outcome: provide enough logs and artifacts for v0.1 debugging without adding an observability stack.</p>
+<p>Outcome: make v0.1 observable from the first development slice. The project does not need a production observability stack yet, but it must emit structured evidence that explains commands, actors, sessions, seeds, state transitions, errors, and replay paths.</p>
 <p>Consumes:</p>
 <ul>
 <li>Kickoff A7.</li>
@@ -512,20 +512,24 @@ architecture boundary checklist
 </ul>
 <p>Scope:</p>
 <ul>
-<li>Define local log fields: seed, turn, phase, actor, command, event type, card, result, level, power, error code.</li>
+<li>Define local log and event fields: correlation id, local session, actor, match, seed, turn, phase, command, command sequence, event type, card, result, level, power, typed error code, and quota or cooldown decision when applicable.</li>
 <li>Keep logs readable and line-oriented.</li>
 <li>Capture DB validation logs, CTest output, simulation transcripts, and manual playtest notes.</li>
+<li>Use deterministic local actors for v0.1 so future online account/session auditability is designed into command results before networking exists.</li>
 </ul>
 <p>Acceptance criteria:</p>
 <ul>
 <li>Every match transcript starts with the seed.</li>
+<li>Every command result can be tied to an actor, local session, match, turn, command type, correlation id, and ordered event list.</li>
 <li>Command failures include typed error codes.</li>
+<li>Demo quota and abandoned-match cooldown decisions have a documented event field even if v0.1 only records placeholder local values.</li>
 <li>Manual playtest notes use the gameplay template and include terminal resize behavior.</li>
 </ul>
 <p>Verification:</p>
 <ul>
 <li>Log sample review.</li>
 <li>Artifact directory review.</li>
+<li>Cross-check with <a href="../architecture/tdd_observability_policy.html">tdd_observability_policy.html</a>.</li>
 </ul>
 <section data-section id="section-dev7-v0-1-release-readiness-checklist">
 <h3 id="dev7-v0-1-release-readiness-checklist">DEV7. v0.1 Release Readiness Checklist</h3>
@@ -711,7 +715,7 @@ stage: db-tests
     condition: local/CI PostgreSQL service is available
 
 stage: simulation
-    make simulate DTD_MATCH_SEED=12345
+    make simulate GAME_MATCH_SEED=12345
     condition: AR7 simulation entry point exists
 
 stage: artifacts
@@ -726,17 +730,17 @@ stage: artifacts
 <h2 id="9-configuration-checklist">9. Configuration Checklist</h2>
 <p>When configuration templates are created, include these values and keep real secrets out of Git:</p>
 <pre><code class="language-text">
-DTD_DB_DSN
-DTD_MATCH_SEED
-DTD_LOG_LEVEL
-DTD_ARTIFACT_DIR
-DTD_ENABLE_DB_TESTS
-DTD_ENABLE_EVENT_PERSISTENCE
+GAME_DB_DSN
+GAME_MATCH_SEED
+GAME_LOG_LEVEL
+GAME_ARTIFACT_DIR
+GAME_ENABLE_DB_TESTS
+GAME_ENABLE_EVENT_PERSISTENCE
 </code></pre>
 <p>Review questions:</p>
 <pre><code class="language-text">
-Can a developer run unit tests without setting DTD_DB_DSN?
-Does a missing DTD_DB_DSN produce a readable DB test skip or failure?
+Can a developer run unit tests without setting GAME_DB_DSN?
+Does a missing GAME_DB_DSN produce a readable DB test skip or failure?
 Is the match seed logged at startup?
 Is the artifact directory configurable but defaulted locally?
 Is event persistence disabled by default for v0.1?
@@ -762,7 +766,7 @@ Database:
     make test-db
 
 Simulation:
-    make simulate DTD_MATCH_SEED=12345
+    make simulate GAME_MATCH_SEED=12345
     transcript saved with seed, winner, turn count, and final event
 
 Manual terminal playtest:

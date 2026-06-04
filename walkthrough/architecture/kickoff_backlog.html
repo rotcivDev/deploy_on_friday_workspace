@@ -96,6 +96,7 @@
 <p>This final backlog is compiled after the role refinements so it can act as the v0.1 planning entry point:</p>
 <ul>
 <li><a href="lead_architecture_refinement_guide.html">lead_architecture_refinement_guide.html</a>: architecture boundaries, unified increment order, and v0.2 deferral posture.</li>
+<li><a href="tdd_observability_policy.html">tdd_observability_policy.html</a>: non-negotiable TDD and observability policy for implementation slices, command results, actor/session evidence, and replayability.</li>
 <li><a href="../design/gameplay_refinement_guide.html">gameplay_refinement_guide.html</a>: encounter pacing, treasure balance, curse expiry, bot baseline, and playtest metrics.</li>
 <li><a href="../database/db_refinement_guide.html">db_refinement_guide.html</a>: seed validation, deck membership, content repository contract, and deferred JSONB event persistence.</li>
 <li><a href="../testing/systems_refinement_guide.html">systems_refinement_guide.html</a>: layered CMake targets, deterministic RNG, command tests, memory ownership, and NCurses smoke path.</li>
@@ -115,6 +116,7 @@
 <li><strong>Deck target</strong>: Use the current seeded card set as the initial content floor; add only the minimum card links/quantities needed to build repeatable Encounter and Treasure draw piles.</li>
 <li><strong>Interaction target</strong>: Bots may help or apply a simple sabotage modifier, but only through deterministic thresholds. Full PvP card play remains deferred unless seeded PvP cards are added.</li>
 <li><strong>Operational readiness</strong>: v0.1 must remain local-first, Make-driven, Docker/Compose-friendly, and reproducible. Docker/Compose is the recommended first-time path for dependency isolation; cloud deployment, Kubernetes, production secrets platforms, and required event persistence stay deferred.</li>
+<li><strong>Observability from the start</strong>: every implementation slice must start with a failing check and finish with structured evidence for actor/session, command, correlation id, seed, state transition, result, typed error, and replay path. This is required even before production monitoring or runtime event persistence exists.</li>
 </ul>
 <section data-section id="section-suggested-build-order">
 <h3 id="suggested-build-order">Suggested Build Order</h3>
