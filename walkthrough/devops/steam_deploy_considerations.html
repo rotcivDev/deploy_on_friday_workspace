@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Steam Deployment Considerations: Deploy on Friday</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; --code:#101828; --code-ink:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1180px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15, 23, 42, .05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { margin-top:1.6em; border-top:1px solid var(--line); padding-top:1em; }
+    h3 { margin-top:1.2em; color:#143a36; }
+    p,ul,ol,table,pre { margin:.85em 0; }
+    ul,ol { padding-left:1.4rem; }
+    li { margin:.25em 0; }
+    a { color:var(--accent); }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:var(--code); color:var(--code-ink); padding:16px; border-radius:8px; border:1px solid #1f2937; }
+    pre code { background:transparent; border:0; color:inherit; padding:0; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; }
+    th { background:#ecfdf5; text-align:left; }
+    .callout { border-left:4px solid var(--accent); background:#ecfdf5; padding:14px 16px; border-radius:6px; margin:18px 0; }
+    .warning { border-left-color:var(--warn); background:#fff7ed; }
+    .meta { color:var(--muted); font-size:.95rem; margin-top:-.5rem; }
+    .toolbar { display:grid; gap:10px; margin-bottom:18px; }
+    .toolbar input,.toolbar button { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px 10px; font:inherit; background:white; }
+    .toolbar button { cursor:pointer; color:white; background:var(--accent); border-color:var(--accent); }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    .section-hidden { display:none; }
+    li.done { opacity:.62; text-decoration:line-through; }
+    @media(max-width:860px){.page-shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 14px 48px}article{padding:22px}}
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Hub</a>
+    <div class="toolbar">
+      <input data-search type="search" placeholder="Filter sections">
+      <button data-toggle-sections type="button">Collapse Sections</button>
+    </div>
+    <nav class="toc">
+      <a href="#overview">1. Overview</a>
+      <a href="#platform-packaging">2. Terminal Packaging &amp; Wrappers</a>
+      <a href="#windows-compatibility">3. Windows Terminal Support</a>
+      <a href="#steamworks-sdk">4. Steamworks SDK &amp; C Bindings</a>
+      <a href="#dlc-extensions">5. DLC &amp; Modular Content Packs</a>
+      <a href="#launch-options">6. Satirical Launch Configurations</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Senior Game Designer &amp; DevOps compilation guide. Steam deployment architecture specs.</p>
+      <h1>Steam Deployment Considerations: Deploy on Friday</h1>
+
+      <section data-section id="overview">
+        <h2>1. Overview</h2>
+        <p>Deploying a terminal-native, C17 game like <em>Deploy on Friday</em> to Steam poses unique opportunities and challenges. While Steam easily distributes executable binaries, players expect graphical overlay support, customizable window behaviors, achievements, and cross-platform plug-and-play installation. This document details the technical wrappers, library shims, and architectural integration plans for a Steam launch.</p>
+      </section>
+
+      <section data-section id="platform-packaging">
+        <h2>2. Terminal Packaging &amp; Wrappers</h2>
+        <p>Running a raw C binary directly relies on the operating system's default system terminal (e.g., Apple Terminal, command.exe, or PowerShell). This compromises the visual aesthetic due to unconstrained aspect ratios, missing custom font glyphs, and the inability to hook the Steam Overlay.</p>
+        <div class="callout">
+          <strong>Recommended Solution:</strong> Package the C game inside a graphics-backed terminal renderer wrapper (such as **SDL2**, **Raylib**, or an **Electron-wrapped xterm.js** interface).
+        </div>
+        <p>This approach captures the stdin/stdout of the game and pipes it into a dedicated window, enabling:</p>
+        <ul>
+          <li>Locked aspect ratios and custom sizing parameters.</li>
+          <li>Retro post-processing shaders (CRT scanlines, chromatic aberration, or green-phosphor tints).</li>
+          <li>Steam Overlay integration (as Steam hooks into the OpenGL/DirectX/Vulkan context of the wrapper).</li>
+        </ul>
+      </section>
+
+      <section data-section id="windows-compatibility">
+        <h2>3. Windows Terminal Support</h2>
+        <p>While NCurses is native on Linux and macOS, Windows requires special handling. To compile a single C codebase across environments, use conditional builds linking either <code>ncurses</code> or <code>PDCurses</code>:</p>
+        <pre><code class="language-c">#ifdef _WIN32
+  #include &lt;curses.h&gt; // Links to PDCurses in Windows builds
+#else
+  #include &lt;ncurses.h&gt; // Links to standard NCurses in POSIX
+#endif</code></pre>
+        <p>This allows the same terminal client code to compile natively into a Windows console executable without forks.</p>
+      </section>
+
+      <section data-section id="steamworks-sdk">
+        <h2>4. Steamworks SDK &amp; C Bindings</h2>
+        <p>Steam features such as Achievements, Leaderboards, Rich Presence, and Cloud Saves require linking the C++ Steamworks SDK. Since our core codebase is C17, we establish flat C export bindings around the Steam API:</p>
+        
+        <h3>Example Steam C Wrapper Header</h3>
+        <pre><code class="language-c">#ifndef DTD_STEAM_WRAPPER_H
+#define DTD_STEAM_WRAPPER_H
+
+#include &lt;stdbool.h&gt;
+
+bool dtd_steam_init(void);
+void dtd_steam_run_callbacks(void);
+void dtd_steam_set_achievement(const char *name);
+void dtd_steam_set_rich_presence(const char *key, const char *value);
+void dtd_steam_shutdown(void);
+
+#endif</code></pre>
+
+        <h3>Example Wrapper Implementation (C++)</h3>
+        <pre><code class="language-cpp">#include "steam_api.h"
+extern "C" {
+    #include "steam_wrapper.h"
+
+    bool dtd_steam_init(void) {
+        return SteamAPI_Init();
+    }
+
+    void dtd_steam_run_callbacks(void) {
+        SteamAPI_RunCallbacks();
+    }
+
+    void dtd_steam_set_achievement(const char *name) {
+        if (SteamUserStats()) {
+            SteamUserStats()-&gt;SetAchievement(name);
+            SteamUserStats()-&gt;StoreStats();
+        }
+    }
+
+    void dtd_steam_set_rich_presence(const char *key, const char *value) {
+        if (SteamFriends()) {
+            SteamFriends()-&gt;SetRichPresence(key, value);
+        }
+    }
+
+    void dtd_steam_shutdown(void) {
+        SteamAPI_Shutdown();
+    }
+}</code></pre>
+      </section>
+
+      <section data-section id="dlc-extensions">
+        <h2>5. DLC &amp; Modular Content Packs</h2>
+        <p>Our extension strategy (e.g., <em>The Punch Card Era</em>, <em>The AI New Era</em>) can be distributed directly as Steam DLC.
+        At match startup, the game client queries the Steamworks API to verify product ownership before letting the player select extension decks:</p>
+        <pre><code class="language-c">bool has_ai_expansion = SteamAppHasSubscription(1234560); // Steam DLC AppID
+if (has_ai_expansion) {
+    // Enable AI New Era content recipes inside the startup validator
+}</code></pre>
+      </section>
+
+      <section data-section id="launch-options">
+        <h2>6. Satirical Launch Configurations</h2>
+        <p>In line with the game's satirical tech-industry theme, we can configure Steam's launch configurations with developer jokes:</p>
+        <ul>
+          <li><strong>Launch Deploy on Friday (Native Bash Mode)</strong>: Starts raw terminal console.</li>
+          <li><strong>Launch with Legacy VM wrapper (CRT green tint)</strong>: Starts emulator with scanlines.</li>
+          <li><strong>Launch in Panic Hotfix Mode</strong>: Launches with default font sizing and simplified logs.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</div>
+<script>
+  (function () {
+    const search = document.querySelector('[data-search]');
+    const toggle = document.querySelector('[data-toggle-sections]');
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+    document.querySelectorAll('li').forEach((li) => {
+      li.title = 'Click to mark reviewed';
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => li.classList.toggle('done'));
+    });
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        sections.forEach((section) => {
+          section.classList.toggle('section-hidden', q && !section.textContent.toLowerCase().includes(q));
+        });
+      });
+    }
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const collapsed = document.body.dataset.collapsed === 'true';
+        document.body.dataset.collapsed = String(!collapsed);
+        sections.forEach((section) => {
+          Array.from(section.children).forEach((child, index) => {
+            if (index > 0) child.hidden = !collapsed;
+          });
+        });
+        toggle.textContent = collapsed ? 'Collapse Sections' : 'Expand Sections';
+      });
+    }
+  })();
+</script>
+</body>
+</html>
