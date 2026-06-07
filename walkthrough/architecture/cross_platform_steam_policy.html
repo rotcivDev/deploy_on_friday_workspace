@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cross-Platform and Steam Distribution Policy</title>
+  <style>
+    :root { --bg:#f7f8fb; --panel:#fff; --ink:#17202a; --muted:#637083; --line:#d8dee9; --accent:#0f766e; --warn:#b45309; --soft:#ecfdf5; --code:#101828; --code-ink:#e5edf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; color:var(--ink); background:var(--bg); }
+    .page-shell { display:grid; grid-template-columns:minmax(220px,280px) minmax(0,1fr); min-height:100vh; }
+    aside { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:#eef2f7; }
+    main { padding:32px min(5vw,64px) 72px; }
+    article { max-width:1120px; margin:0 auto; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:clamp(24px,4vw,48px); box-shadow:0 8px 24px rgba(15,23,42,.05); }
+    h1,h2,h3 { line-height:1.2; letter-spacing:0; }
+    h1 { margin-top:0; font-size:clamp(2rem,4vw,3rem); }
+    h2 { margin-top:1.6em; border-top:1px solid var(--line); padding-top:1em; }
+    h3 { color:#143a36; }
+    p,ul,ol,table,pre { margin:.85em 0; }
+    ul,ol { padding-left:1.4rem; }
+    li { margin:.25em 0; }
+    a { color:var(--accent); }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; background:#edf2f7; border:1px solid #d9e2ec; border-radius:4px; padding:.05em .3em; }
+    pre { overflow-x:auto; background:var(--code); color:var(--code-ink); padding:16px; border-radius:8px; border:1px solid #1f2937; }
+    pre code { background:transparent; border:0; color:inherit; padding:0; }
+    table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; }
+    th { background:var(--soft); text-align:left; }
+    .callout { border-left:4px solid var(--accent); background:var(--soft); padding:14px 16px; border-radius:6px; margin:18px 0; }
+    .warning { border-left-color:var(--warn); background:#fff7ed; }
+    .meta { color:var(--muted); font-size:.95rem; margin-top:-.5rem; }
+    .toc a { display:block; padding:6px 0; color:#334155; text-decoration:none; font-size:.92rem; }
+    @media (max-width:860px) { .page-shell{display:block;} aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);} main{padding:20px 14px 48px;} article{padding:22px;} }
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <aside>
+    <a href="../index.html">Walkthrough Index</a>
+    <nav class="toc">
+      <a href="#decision">Decision</a>
+      <a href="#architecture">Architecture Rules</a>
+      <a href="#shipping-ui">Shipping UI</a>
+      <a href="#server-authority">Server Authority</a>
+      <a href="#steam-adapters">Steam Adapters</a>
+      <a href="#release-gates">Release Gates</a>
+      <a href="#examples">Examples</a>
+    </nav>
+  </aside>
+  <main>
+    <article>
+      <p class="meta">Lead Architect and DevOps policy for Windows, macOS, Linux, Steam, and Steam Deck readiness.</p>
+      <h1>Cross-Platform and Steam Distribution Policy</h1>
+
+      <section id="decision">
+        <h2>Decision</h2>
+        <div class="callout">
+          <strong>Windows, macOS, Linux, and Steam distribution are first-class engineering concerns for Deploy on Friday.</strong>
+          <p>Core gameplay can start local and terminal-driven, but each durable production feature must preserve a path to native platform builds, a better Steam-ready shipping UI, authoritative server decisions, and replaceable adapters for Steam-delegated synchronization.</p>
+        </div>
+        <p>This policy complements <a href="tdd_observability_policy.html">TDD and observability</a> and <a href="technical_naming_policy.html">technical naming</a>. It exists to prevent late platform rewrites and to keep Steam integration outside the domain model.</p>
+      </section>
+
+      <section id="architecture">
+        <h2>Architecture Rules</h2>
+        <table>
+          <thead><tr><th>Concern</th><th>Policy</th><th>Practical Meaning</th></tr></thead>
+          <tbody>
+            <tr><td>Cross-platform core</td><td>Game rules, card effects, match state, deterministic RNG, command results, replay data, and content definitions must remain platform-neutral C17.</td><td>No direct dependency on Steamworks, NCurses, PDCurses, SDL, filesystem conventions, OS clocks, platform user IDs, or terminal behavior inside domain rules.</td></tr>
+            <tr><td>Platform adapters</td><td>Operating-system and storefront behavior must enter through explicit ports/adapters.</td><td>Filesystem paths, save sync, achievement sync, stats sync, rich presence, overlay, lobby, matchmaking, controller input, and platform identity are infrastructure/client concerns.</td></tr>
+            <tr><td>Build and release</td><td>Important work must preserve a credible Windows, macOS, Linux, and Steam packaging path.</td><td>Do not introduce dependencies, compiler assumptions, file layouts, or runtime contracts that only work on the developer's current OS unless the limitation is documented as temporary.</td></tr>
+            <tr><td>Technical names</td><td>Platform and Steam code uses stable generic names such as <code>game_</code>, never product-name-derived prefixes.</td><td>A future product rename must not require renaming C symbols, targets, env vars, protocol constants, or database names.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="shipping-ui">
+        <h2>Shipping UI Policy</h2>
+        <p><code>ncurses</code> is acceptable for v0.1 learning, debugging, and local smoke play. It must not be treated as the final Steam shipping UI unless it can satisfy the product's Windows, macOS, Linux, Steam Overlay, controller, readability, and Steam Deck goals.</p>
+        <p>The long-term client should be shaped as a replaceable rendering/input adapter around the same application commands and snapshots. A graphics-backed terminal-style shell using a portable game/window/input layer is the preferred direction for Steam because it gives the product control over font metrics, window size, controller navigation, overlay behavior, and handheld readability.</p>
+        <div class="callout warning">
+          <p>A task that adds UI behavior must not move rules into the UI. The client sends intentions and renders authoritative snapshots; the application/server path validates and mutates state.</p>
+        </div>
+      </section>
+
+      <section id="server-authority">
+        <h2>Authoritative Server Rules For Achievements And Stats</h2>
+        <p>Achievements and stats are game facts, not storefront side effects. The authoritative command path decides whether a player earned an achievement, incremented a stat, consumed a demo quota, triggered a cooldown, unlocked an extension recipe, or completed a match.</p>
+        <ul>
+          <li>The client may display achievement/stat changes, but it must not be the authority that decides them.</li>
+          <li>Local-only play may simulate the server-authoritative path through the application layer with deterministic local actors and sessions.</li>
+          <li>Official online multiplayer must make achievement and stat decisions on the server side or through a server-controlled application service.</li>
+          <li>Steam sync adapters may publish authoritative achievements/stats to Steam, but they must not define the game rule that grants them.</li>
+          <li>Every achievement/stat mutation must be tied to command evidence: actor/session, match, turn or completion marker, correlation id, result, and replay seed when applicable.</li>
+        </ul>
+      </section>
+
+      <section id="steam-adapters">
+        <h2>Steam-Delegated Sync Uses Adapters</h2>
+        <p>All synchronization that may later be delegated to Steam must be represented as ports with local stubs first. This keeps local development, automated tests, and non-Steam builds viable while preserving the Steam launch path.</p>
+        <table>
+          <thead><tr><th>Future Steam Capability</th><th>Current Local Stub</th><th>Port Name Example</th></tr></thead>
+          <tbody>
+            <tr><td>Cloud saves</td><td>Local versioned save file or in-memory fake used by tests.</td><td><code>game_save_sync_port</code></td></tr>
+            <tr><td>Achievements</td><td>Local achievement journal written from authoritative command results.</td><td><code>game_achievement_sync_port</code></td></tr>
+            <tr><td>Stats</td><td>Local stats projection derived from event transcripts.</td><td><code>game_stats_sync_port</code></td></tr>
+            <tr><td>Rich presence</td><td>No-op adapter or local diagnostic log line.</td><td><code>game_presence_port</code></td></tr>
+            <tr><td>Steam identity</td><td>Deterministic local actor/session identity.</td><td><code>game_identity_port</code></td></tr>
+            <tr><td>Lobby and matchmaking</td><td>Local bot/session launcher or scripted match configuration.</td><td><code>game_lobby_port</code></td></tr>
+          </tbody>
+        </table>
+        <p>Steamworks C++ integration, when introduced, belongs in infrastructure/client adapter code with a flat C boundary if needed. Domain and application interfaces should remain independent of Steam headers and AppIDs.</p>
+      </section>
+
+      <section id="release-gates">
+        <h2>Release Gates</h2>
+        <ul>
+          <li>No durable gameplay feature is accepted if it makes Windows, macOS, Linux, or Steam distribution materially harder without documenting the tradeoff.</li>
+          <li>No final shipping UI commitment is accepted until it proves controller navigation, readable card text, stable layout, and a Steam-friendly window/overlay path.</li>
+          <li>No achievement or stat is accepted unless the authoritative command path produces the grant/increment decision before any Steam sync call.</li>
+          <li>No Steam feature is accepted directly in domain rules. Use ports, adapters, and local stubs first.</li>
+          <li>No local stub is accepted if it cannot be replaced by a Steam adapter without changing game rules.</li>
+          <li>No platform-specific implementation is complete without observable evidence in the test transcript, build artifact, or release checklist.</li>
+        </ul>
+      </section>
+
+      <section id="examples">
+        <h2>Examples</h2>
+        <h3>Adapter-Oriented Sync Flow</h3>
+        <pre><code>application command: COMPLETE_MATCH
+authoritative result:
+  actor_id: local-human-1
+  match_id: local-match-42
+  result: won
+  achievements_granted: ["first-friday-deploy"]
+  stats_incremented: { matches_completed: 1, wins: 1 }
+sync ports called after authoritative result:
+  game_achievement_sync_port.grant("first-friday-deploy")
+  game_stats_sync_port.increment("matches_completed", 1)
+local stub behavior:
+  append JSONL evidence to .local/game_achievements.jsonl
+future Steam adapter behavior:
+  publish the same authoritative facts through Steamworks</code></pre>
+
+        <h3>Shipping UI Boundary</h3>
+        <pre><code>client input:
+  controller A on "Resolve Combat"
+client sends:
+  GAME_COMMAND_RESOLVE_COMBAT(match_id, actor_id, selected_card_id)
+application/server returns:
+  snapshot + ordered events + achievements/stats candidates
+client renders:
+  card animation, log line, achievement toast
+client does not:
+  calculate combat, grant achievement, update stat authority, or mutate match state</code></pre>
+      </section>
+    </article>
+  </main>
+</div>
+</body>
+</html>

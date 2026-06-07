@@ -53,6 +53,7 @@
   <section id="market">
     <h2>Market Positioning</h2>
     <p>Market research points to a focused niche with strong community potential and medium commercial upside. The product should not try to look like a generic tabletop card-game clone. Its ownable position is developer identity plus terminal-native multiplayer chaos.</p>
+    <p>Competitive research found adjacent software-themed card games and digital tabletop/card battler products, but no exact match for the full Deploy on Friday shape: terminal identity, live multiplayer negotiation and sabotage, incident severity, career race, bots, replay logs, modular software-era decks, and server-authoritative online direction. See <a href="walkthrough/product/competitive_market_research.html">competitive_market_research.html</a>.</p>
     <table>
       <thead><tr><th>Decision</th><th>Product Impact</th></tr></thead>
       <tbody>
@@ -90,6 +91,7 @@
         <tr><td>Modular Content</td><td>New eras should arrive as extensions rather than rewrites. Content is data-driven where possible, and new mechanics must be small enough to validate.</td></tr>
         <tr><td>Deterministic Core</td><td>Match rules, deck construction, shuffling, bot behavior, and command results must be reproducible for tests and playtest review.</td></tr>
         <tr><td>Server Authority</td><td>Clients express player intent. The server validates deck ownership, unlocked extensions, match configuration, card effects, combat, rewards, and achievements.</td></tr>
+        <tr><td>Platform-Ready Distribution</td><td>Windows, macOS, Linux, Steam, and Steam Deck readiness are first-class concerns. The v0.1 terminal UI is useful for learning and debugging, but the shipping UI must support readable card play, controller navigation, stable window behavior, and Steam-friendly integration.</td></tr>
         <tr><td>Observable From The Start</td><td>Every command must produce structured evidence for actor/session, match, turn, command, correlation id, replay seed, result, typed error, quota/cooldown decision, and event order. Observability is required for product control, not postponed to monitoring dashboards.</td></tr>
         <tr><td>Mixable Themes</td><td>Extension content should be fun alone and surprising when combined. The system must support compatibility tags, conflict checks, and balance bands.</td></tr>
       </tbody>
@@ -103,6 +105,7 @@
     <p><strong>Architecture lead guidance:</strong> model extensions as content catalogs and match configuration inputs. The domain should know about card definitions, deck membership, compatibility tags, card classes, unlock status, and match deck recipes. Infrastructure loads these facts, but PostgreSQL must not define the domain language.</p>
     <p><strong>Technical naming guidance:</strong> the public product title must not become the implementation namespace. Use stable generic identifiers such as <code>game_</code> for C symbols, CMake targets, database examples, protocol examples, and test binaries.</p>
     <p><strong>Engineering policy guidance:</strong> TDD and observability are non-negotiable. Product control requires replayable command evidence, actor/session traceability, quota and cooldown auditability, typed errors, and privacy-aware operational records from the first local prototype.</p>
+    <p><strong>Distribution policy guidance:</strong> cross-platform and Steam distribution are first-class constraints. Achievements and stats are granted by the authoritative command path, then synchronized through replaceable adapters. Cloud saves, achievements, stats, rich presence, identity, lobby, and matchmaking integrations should use local stubs until Steam adapters are introduced.</p>
   </section>
 
   <section id="signature">

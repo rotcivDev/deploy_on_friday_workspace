@@ -62,14 +62,14 @@
 
       <section data-section id="overview">
         <h2>1. Overview</h2>
-        <p>Deploying a terminal-native, C17 game like <em>Deploy on Friday</em> to Steam poses unique opportunities and challenges. While Steam easily distributes executable binaries, players expect graphical overlay support, customizable window behaviors, achievements, and cross-platform plug-and-play installation. This document details the technical wrappers, library shims, and architectural integration plans for a Steam launch.</p>
+        <p>Deploying a terminal-native, C17 game like <em>Deploy on Friday</em> to Steam poses unique opportunities and challenges. While Steam easily distributes executable binaries, players expect graphical overlay support, customizable window behaviors, achievements, and cross-platform plug-and-play installation. This document details technical wrappers, local stubs, Steam adapters, and architectural integration plans for a Steam launch. The governing policy is <a href="../architecture/cross_platform_steam_policy.html">cross_platform_steam_policy.html</a>.</p>
       </section>
 
       <section data-section id="platform-packaging">
         <h2>2. Terminal Packaging &amp; Wrappers</h2>
         <p>Running a raw C binary directly relies on the operating system's default system terminal (e.g., Apple Terminal, command.exe, or PowerShell). This compromises the visual aesthetic due to unconstrained aspect ratios, missing custom font glyphs, and the inability to hook the Steam Overlay.</p>
         <div class="callout">
-          <strong>Recommended Solution:</strong> Package the C game inside a graphics-backed terminal renderer wrapper (such as **SDL2**, **Raylib**, or an **Electron-wrapped xterm.js** interface).
+          <strong>Recommended Solution:</strong> Treat NCurses as a v0.1 learning/debugging UI and plan a Steam-ready shipping UI as a replaceable rendering/input adapter, likely a graphics-backed terminal-style shell using a portable game/window/input layer.
         </div>
         <p>This approach captures the stdin/stdout of the game and pipes it into a dedicated window, enabling:</p>
         <ul>
@@ -92,61 +92,78 @@
 
       <section data-section id="steamworks-sdk">
         <h2>4. Steamworks SDK &amp; C Bindings</h2>
-        <p>Steam features such as Achievements, Leaderboards, Rich Presence, and Cloud Saves require linking the C++ Steamworks SDK. Since our core codebase is C17, we establish flat C export bindings around the Steam API:</p>
+        <p>Steam features such as Achievements, Leaderboards, Rich Presence, and Cloud Saves should enter through application/infrastructure ports. Since the core codebase is C17 and Steamworks integration is C++-oriented, the Steam adapter can expose a flat C boundary while local development uses no-op or file-backed stubs.</p>
+        <p>Achievements and stats are not granted by the wrapper. The authoritative command path decides the game facts first; the adapter only synchronizes those already-decided facts to Steam.</p>
         
         <h3>Example Steam C Wrapper Header</h3>
-        <pre><code class="language-c">#ifndef DTD_STEAM_WRAPPER_H
-#define DTD_STEAM_WRAPPER_H
+        <pre><code class="language-c">#ifndef GAME_STEAM_SYNC_ADAPTER_H
+#define GAME_STEAM_SYNC_ADAPTER_H
 
 #include &lt;stdbool.h&gt;
 
-bool dtd_steam_init(void);
-void dtd_steam_run_callbacks(void);
-void dtd_steam_set_achievement(const char *name);
-void dtd_steam_set_rich_presence(const char *key, const char *value);
-void dtd_steam_shutdown(void);
+bool game_steam_sync_init(void);
+void game_steam_sync_run_callbacks(void);
+void game_steam_sync_grant_achievement(const char *achievement_id);
+void game_steam_sync_increment_stat(const char *stat_id, int amount);
+void game_steam_sync_set_rich_presence(const char *key, const char *value);
+void game_steam_sync_shutdown(void);
 
 #endif</code></pre>
 
         <h3>Example Wrapper Implementation (C++)</h3>
         <pre><code class="language-cpp">#include "steam_api.h"
 extern "C" {
-    #include "steam_wrapper.h"
+    #include "game_steam_sync_adapter.h"
 
-    bool dtd_steam_init(void) {
+    bool game_steam_sync_init(void) {
         return SteamAPI_Init();
     }
 
-    void dtd_steam_run_callbacks(void) {
+    void game_steam_sync_run_callbacks(void) {
         SteamAPI_RunCallbacks();
     }
 
-    void dtd_steam_set_achievement(const char *name) {
+    void game_steam_sync_grant_achievement(const char *achievement_id) {
         if (SteamUserStats()) {
-            SteamUserStats()-&gt;SetAchievement(name);
+            SteamUserStats()-&gt;SetAchievement(achievement_id);
             SteamUserStats()-&gt;StoreStats();
         }
     }
 
-    void dtd_steam_set_rich_presence(const char *key, const char *value) {
+    void game_steam_sync_increment_stat(const char *stat_id, int amount) {
+        int current = 0;
+        if (SteamUserStats() &amp;&amp; SteamUserStats()-&gt;GetStat(stat_id, &amp;current)) {
+            SteamUserStats()-&gt;SetStat(stat_id, current + amount);
+            SteamUserStats()-&gt;StoreStats();
+        }
+    }
+
+    void game_steam_sync_set_rich_presence(const char *key, const char *value) {
         if (SteamFriends()) {
             SteamFriends()-&gt;SetRichPresence(key, value);
         }
     }
 
-    void dtd_steam_shutdown(void) {
+    void game_steam_sync_shutdown(void) {
         SteamAPI_Shutdown();
     }
 }</code></pre>
+        <h3>Local Stub Contract</h3>
+        <pre><code class="language-c">/* Used by local builds and tests before Steamworks is linked. */
+bool game_local_sync_init(void);
+void game_local_sync_grant_achievement(const char *achievement_id);
+void game_local_sync_increment_stat(const char *stat_id, int amount);
+void game_local_sync_set_rich_presence(const char *key, const char *value);</code></pre>
       </section>
 
       <section data-section id="dlc-extensions">
         <h2>5. DLC &amp; Modular Content Packs</h2>
-        <p>Our extension strategy (e.g., <em>The Punch Card Era</em>, <em>The AI New Era</em>) can be distributed directly as Steam DLC.
-        At match startup, the game client queries the Steamworks API to verify product ownership before letting the player select extension decks:</p>
-        <pre><code class="language-c">bool has_ai_expansion = SteamAppHasSubscription(1234560); // Steam DLC AppID
-if (has_ai_expansion) {
-    // Enable AI New Era content recipes inside the startup validator
+        <p>Our extension strategy (e.g., <em>The Punch Card Era</em>, <em>The AI New Era</em>) can be distributed directly as Steam DLC. Ownership checks must use an application port. The Steam adapter can answer from Steamworks later; local stubs can answer from test fixtures or local developer configuration now.</p>
+        <pre><code class="language-c">bool owns_ai_extension =
+    game_extension_ownership_port_has_extension(ctx, "ai-new-era");
+
+if (owns_ai_extension) {
+    /* Enable AI New Era content recipes inside the authoritative startup validator. */
 }</code></pre>
       </section>
 

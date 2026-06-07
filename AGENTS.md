@@ -65,6 +65,16 @@ Observability means structured domain/application events, command results, corre
 
 The detailed policy is maintained in [walkthrough/architecture/tdd_observability_policy.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/tdd_observability_policy.html).
 
+### Cross-Platform And Steam Distribution
+
+Windows, macOS, Linux, Steam distribution, and Steam Deck readiness are first-class technical concerns. Durable production behavior must preserve a cross-platform build and packaging path unless a temporary limitation is explicitly documented.
+
+The v0.1 NCurses client is acceptable as a learning/debugging interface, but it is not assumed to be the final shipping UI. The shipping UI must fit the product goal: readable card play, controller navigation, stable window behavior, Steam Overlay compatibility, and handheld-friendly layout.
+
+Achievements and stats must be decided by the authoritative command path. Clients may display them and Steam adapters may synchronize them, but neither the client nor Steam defines the rule that grants or increments them. All sync actions that may later be delegated to Steam, including cloud saves, achievements, stats, rich presence, identity, lobbies, and matchmaking, must enter through explicit ports with local stubs first.
+
+The detailed policy is maintained in [walkthrough/architecture/cross_platform_steam_policy.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/cross_platform_steam_policy.html).
+
 Codex must not directly write production implementation files in:
 
 * `domain/`
@@ -129,17 +139,20 @@ When agents generate documents, specs, examples, or templates, they must be regi
 *   **[deploy_on_friday_prompt.md](file:///home/msratso/workspaces/c_dev/deploy_on_friday_prompt.md)**: Codex-ready project prompt and mentor operating brief.
 *   **[walkthrough/product/modular_deck_strategy.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/modular_deck_strategy.html)**: Product Owner, game engineer, and architecture lead alignment for the modular main deck plus extension-pack strategy.
 *   **[walkthrough/product/market_research_response.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/market_research_response.html)**: Cross-mentor response to MARKET_RESEARCH.txt, including market positioning, commercial strategy, signature mechanics, roadmap adjustments, and clarification questions.
+*   **[walkthrough/product/competitive_market_research.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/competitive_market_research.html)**: Marketing research scan for exact-match competitors, adjacent software-themed card games, digital tabletop/card battlers, and market positioning implications.
 *   **[walkthrough/product/extension_punch_card_era.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/extension_punch_card_era.html)**: Patch outline for The Punch Card Era extension.
 *   **[walkthrough/product/extension_dot_com_bubble.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/extension_dot_com_bubble.html)**: Patch outline for The .com Bubble extension.
 *   **[walkthrough/product/extension_im_a_developer.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/extension_im_a_developer.html)**: Patch outline for the I'm a Developer extension.
 *   **[walkthrough/product/extension_saas_bubble.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/extension_saas_bubble.html)**: Patch outline for The SaaS Bubble extension.
 *   **[walkthrough/product/extension_ai_new_era.html](file:///home/msratso/workspaces/c_dev/walkthrough/product/extension_ai_new_era.html)**: Patch outline for The AI New Era extension.
+*   **[walkthrough/diagrams/project_visual_diagrams.html](file:///home/msratso/workspaces/c_dev/walkthrough/diagrams/project_visual_diagrams.html)**: MermaidJS visual documentation spanning product vision, competitive position, gameplay loop, architecture boundaries, systems runtime, database model, DevOps flow, Git workflow, XP delivery, observability, and Steam adapter strategy.
 *   **[walkthrough/architecture/kickoff_backlog.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/kickoff_backlog.html)**: Product backlog for the v0.1 Root Prototype, compiled last by the Project Manager / Product Owner.
 *   **[walkthrough/architecture/software_engineering_principles.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/software_engineering_principles.html)**: Source-of-truth engineering principle: domain understanding before tactical structure.
 *   **[walkthrough/architecture/lead_architecture_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/lead_architecture_refinement_guide.html)**: Lead architecture synthesis of team backlog refinements, dependency boundaries, and unified increment order.
 *   **[walkthrough/architecture/t01_cycle_boundary_review.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/t01_cycle_boundary_review.html)**: Lead Architect completion evidence for XP task T01, confirming v0.1 cycle boundary, deferred scope, and traceability gates.
 *   **[walkthrough/architecture/technical_naming_policy.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/technical_naming_policy.html)**: Architecture and systems policy decoupling public product names from C symbols, build targets, database names, protocol constants, and service identifiers.
 *   **[walkthrough/architecture/tdd_observability_policy.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/tdd_observability_policy.html)**: Lead Architect and XP Principal Engineer policy making TDD and observability non-negotiable from the first implementation slice.
+*   **[walkthrough/architecture/cross_platform_steam_policy.html](file:///home/msratso/workspaces/c_dev/walkthrough/architecture/cross_platform_steam_policy.html)**: Cross-platform and Steam distribution policy covering the shipping UI direction, authoritative achievements/stats, and replaceable Steam sync adapters with local stubs.
 *   **[walkthrough/design/gameplay_refinement_guide.html](file:///home/msratso/workspaces/c_dev/walkthrough/design/gameplay_refinement_guide.html)**: Gameplay/content backlog refinement, v0.1 balance targets, bot behavior, and playtest plan.
 *   *(Add future design files here)*
 

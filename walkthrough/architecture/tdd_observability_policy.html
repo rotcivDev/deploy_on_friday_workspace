@@ -50,6 +50,7 @@
       <a href="#decision">Decision</a>
       <a href="#meaning">What Observability Means</a>
       <a href="#architecture">Architecture Contract</a>
+      <a href="#platform">Platform Distribution</a>
       <a href="#event-envelope">Event Envelope</a>
       <a href="#xp">XP Policy</a>
       <a href="#control">Control Model</a>
@@ -98,6 +99,18 @@
             <tr><td>Client</td><td>Displays snapshots, command results, recent events, replay identifiers, and support-friendly diagnostics. Sends intentions only.</td><td>No ownership of combat rules, card effects, bot choices, access control, or quota accounting.</td></tr>
           </tbody>
         </table>
+      </section>
+
+      <section data-section id="platform">
+        <h2>Platform Distribution Policy</h2>
+        <p>Cross-platform distribution is part of the engineering policy, not a late packaging chore. Durable behavior must preserve Windows, macOS, Linux, Steam, and Steam Deck readiness unless the task explicitly documents a temporary limitation.</p>
+        <ul>
+          <li>Keep game rules, match state, command results, achievements, stats, replay data, and deterministic RNG platform-neutral.</li>
+          <li>Treat the v0.1 NCurses UI as a learning/debugging client, not the assumed final Steam shipping UI. The future shipping UI must fit the product goal: readable card play, controller navigation, Steam Overlay compatibility, stable window behavior, and handheld-friendly layout.</li>
+          <li>Achievement and stat decisions belong to the authoritative command path. Clients may display them and Steam adapters may sync them, but neither the client nor Steam defines the game rule that grants them.</li>
+          <li>All sync actions that may be delegated to Steam later must enter through ports with local stubs now, including cloud saves, achievements, stats, rich presence, identity, lobbies, and matchmaking.</li>
+        </ul>
+        <p>See <a href="cross_platform_steam_policy.html">cross_platform_steam_policy.html</a> for the detailed platform and Steam distribution policy.</p>
       </section>
 
       <section data-section id="event-envelope">
@@ -162,6 +175,8 @@
           <li>No command without a structured result and event trail.</li>
           <li>No random behavior without a replay seed and reproducible transcript path.</li>
           <li>No online command without actor/session identity, correlation id, and authoritative quota/cooldown decision.</li>
+          <li>No achievement or stat mutation without authoritative command evidence before any client display or Steam sync adapter call.</li>
+          <li>No Steam-delegated sync path without a local stub and replaceable port.</li>
           <li>No release candidate without archived test output, DB validation output, simulation transcript, log sample, and playtest notes.</li>
           <li>No observability stack may be used as a substitute for clear domain/application events. External tools can ingest the facts; they do not define the facts.</li>
         </ul>

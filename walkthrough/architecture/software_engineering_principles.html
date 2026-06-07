@@ -64,6 +64,10 @@
           <strong>TDD and observability are non-negotiable.</strong>
           <p>No production behavior is accepted without a prior failing check and observable evidence that explains what happened, which actor/session initiated it, which command path executed, which state changed, and how the behavior can be replayed or audited. See <a href="tdd_observability_policy.html">tdd_observability_policy.html</a>.</p>
         </div>
+        <div class="callout warning">
+          <strong>Cross-platform and Steam distribution are first-class concerns.</strong>
+          <p>Windows, macOS, Linux, Steam, and Steam Deck readiness must shape durable implementation decisions. The v0.1 NCurses UI is a learning/debugging client, not an automatic final shipping UI. Achievement/stat authority and future Steam sync must stay behind application/infrastructure ports with local stubs. See <a href="cross_platform_steam_policy.html">cross_platform_steam_policy.html</a>.</p>
+        </div>
       </section>
 
       <section data-section id="decision-order">
@@ -74,6 +78,7 @@
           <li><strong>Choose the simplest tactical shape.</strong> Apply entities, value objects, repositories, services, adapters, Docker, CI gates, or SQL structure only when they support the mapped boundary.</li>
           <li><strong>Protect feedback loops.</strong> Make the decision testable through CTest, SQL validation, fixed-seed simulation, manual terminal playtest, or release checklist evidence.</li>
           <li><strong>Make behavior observable.</strong> Emit structured command results, domain/application events, replay seeds, typed errors, actor/session context, and artifacts that explain the behavior without guessing from UI state.</li>
+          <li><strong>Preserve the distribution path.</strong> Keep platform-specific UI, storefront, save sync, achievement/stat sync, identity, and matchmaking behavior behind replaceable adapters.</li>
           <li><strong>Revisit when the domain changes.</strong> Refactor structure when learning invalidates the previous model.</li>
         </ol>
       </section>
@@ -89,7 +94,8 @@
             <tr><td>Application Layer</td><td>Application services coordinate domain use cases and ports. They exist to preserve business flow, command authority, structured results, actor/session context, and observable event envelopes, not to become a generic service bucket.</td></tr>
             <tr><td>Database</td><td>PostgreSQL stores content and future persistence in ways that match domain language. Schema design follows the content model and match lifecycle.</td></tr>
             <tr><td>DevOps</td><td>Docker/Compose isolates dependencies because reproducible feedback serves product learning. It is not a production architecture decision for v0.1.</td></tr>
-            <tr><td>Frontend/Client</td><td>The NCurses client renders snapshots and sends intentions. It does not own rules because player-facing truth comes from the domain/application model.</td></tr>
+            <tr><td>Frontend/Client</td><td>The NCurses client renders snapshots and sends intentions. It does not own rules because player-facing truth comes from the domain/application model. A later Steam-ready shipping UI must remain a replaceable client adapter, not a second rules engine.</td></tr>
+            <tr><td>Steam Integration</td><td>Steam Cloud, achievements, stats, rich presence, identity, lobbies, and matchmaking are sync/integration concerns behind ports. Local stubs come first; Steam adapters synchronize authoritative facts later.</td></tr>
           </tbody>
         </table>
       </section>
@@ -105,6 +111,8 @@
           <li>Does this preserve deterministic rules, server-authoritative command flow, and testable feedback?</li>
           <li>Can it be verified with a concrete gate: unit test, SQL validation, fixed-seed transcript, Docker/Compose check, or manual playtest?</li>
           <li>Does the behavior produce enough structured evidence to identify actor/session, command, correlation id, seed, state transition, result, and error mode?</li>
+          <li>Does the decision preserve Windows, macOS, Linux, Steam, and Steam Deck readiness, or is the platform limitation explicitly temporary?</li>
+          <li>Are achievement/stat decisions authoritative before any client display or Steam sync adapter call?</li>
         </ul>
       </section>
 
