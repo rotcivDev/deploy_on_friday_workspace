@@ -56,7 +56,7 @@
       <a href="#refactor">Refactor Slice</a>
       <a href="#examples">Concrete Examples</a>
       <a href="#checks">Review Checks</a>
-      <a href="#done">Definition Of Done</a>
+      <a href="#done">Completion Criteria</a>
     </nav>
   </aside>
   <main>
@@ -92,6 +92,9 @@
         <p><strong>Domain behavior served:</strong> future combat, deck, curse, and command rules can be tested in pure C without database or terminal dependencies.</p>
         <p><strong>User-visible outcome served:</strong> later gameplay increments can be implemented safely because the build catches misplaced rule ownership early.</p>
         <p><strong>Boundaries touched by the human:</strong> root <code>CMakeLists.txt</code>, root <code>Makefile</code>, minimal placeholder source/test files under the production tree, and optional support test folders.</p>
+        <p><strong>Known failure encountered during this slice:</strong> CMake stopped on a misspelled variant of <code>game_infrastructure_db</code>, and then exposed a second boundary mistake where <code>game_application</code> was given <code>game_domain</code> as an include directory instead of a link dependency.</p>
+        <p><strong>Systems review adjustment:</strong> the first working build should not force PostgreSQL or NCurses discovery for the fast path. Keep those dependencies local to the targets that actually use them so <code>make build</code> and <code>make test</code> remain usable on a machine that only has the C toolchain installed.</p>
+        <p><strong>Makefile review adjustment:</strong> the phony list must include <code>test</code>, not <code>teste</code>, so the wrapper matches the documented command surface and avoids future stale-file conflicts.</p>
         <p><strong>Out of scope:</strong> real card rules, database queries, NCurses layout, Docker implementation, networking, protocol structs, and production deployment.</p>
       </section>
 
@@ -126,7 +129,7 @@ game_tests_application
       <section data-section id="red">
         <h2>Red Slice</h2>
         <ol>
-          <li>Create or identify a minimal domain smoke test expectation: <code>game_domain_smoke()</code> returns a known value such as <code>17</code>.</li>
+          <li>Create or identify a minimal domain smoke test expectation: <code>game_domain_smoke()</code> returns a known value such as <code>13</code>.</li>
           <li>Define the desired CTest name before implementation: <code>domain_smoke</code>.</li>
           <li>Write down the boundary expectation: the domain test must link only <code>game_domain</code>.</li>
           <li>Run <code>make test</code> before the implementation exists. It should fail because the build skeleton or test does not exist yet.</li>
@@ -150,8 +153,11 @@ game_tests_application
         <h2>Refactor Slice</h2>
         <ol>
           <li>Remove any accidental target that links everything together just to make compilation easy.</li>
+          <li>Move PostgreSQL and Curses discovery behind the targets that require them, or gate them so the domain and application targets can still configure on a machine without those libraries.</li>
           <li>Make PostgreSQL and NCurses discovery local to the targets that need them.</li>
           <li>Keep include paths narrow. Prefer target-specific include directories over global include directories.</li>
+          <li>For application code that includes domain headers, use <code>target_link_libraries(game_application PUBLIC game_domain)</code>, not <code>target_include_directories(... game_domain)</code>.</li>
+          <li>Correct the wrapper command metadata so the intended <code>test</code> target is declared phony.</li>
           <li>Rename placeholders if needed so they describe their boundary instead of future behavior they do not yet implement.</li>
           <li>Add a short dependency review note to the PR or commit message.</li>
         </ol>
@@ -174,8 +180,6 @@ game_tests_application
 │       ├── postgresql_content_repository_smoke.h
 │       └── postgresql_content_repository_smoke.c
 ├── client/
-│   ├── ncurses_client_smoke.h
-│   ├── ncurses_client_smoke.c
 │   └── main.c
 └── tests/
     ├── domain/
@@ -196,7 +200,7 @@ int game_domain_smoke(void);
 
 int game_domain_smoke(void)
 {
-    return 17;
+    return 13;
 }</code></pre>
 
         <h3>Example Domain Test</h3>
@@ -205,7 +209,7 @@ int game_domain_smoke(void)
 
 int main(void)
 {
-    return game_domain_smoke() == 17 ? 0 : 1;
+    return game_domain_smoke() == 13 ? 0 : 1;
 }</code></pre>
 
         <h3>Example Application Placeholder</h3>
@@ -246,12 +250,13 @@ int main(void)
         <p>This is not a real UI. It only proves that NCurses linkage belongs to the client target. Replace it during R7.</p>
 
         <h3>Example Root CMakeLists.txt</h3>
-        <pre><code class="language-cmake">cmake_minimum_required(VERSION 3.16)
+        <pre><code class="language-cmake">cmake_minimum_required(VERSION 4.3)
 project(GameCore C)
 
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_compile_options(-Wall -Wextra -Werror -pedantic)
 
@@ -268,28 +273,36 @@ add_library(game_application
 target_include_directories(game_application PUBLIC application)
 target_link_libraries(game_application PUBLIC game_domain)
 
-find_package(PostgreSQL REQUIRED)
 add_library(game_infrastructure_db
     infrastructure/db/postgresql_content_repository_smoke.c
 )
-target_include_directories(game_infrastructure_db PRIVATE ${PostgreSQL_INCLUDE_DIRS})
-target_link_libraries(game_infrastructure_db PRIVATE
-    game_application
-    game_domain
-    ${PostgreSQL_LIBRARIES}
-)
+target_include_directories(game_infrastructure_db PRIVATE infrastructure/db)
 
-find_package(Curses REQUIRED)
+find_package(PostgreSQL QUIET)
+if(PostgreSQL_FOUND)
+    target_include_directories(game_infrastructure_db PRIVATE ${PostgreSQL_INCLUDE_DIRS})
+    target_link_libraries(game_infrastructure_db PRIVATE
+        game_application
+        game_domain
+        ${PostgreSQL_LIBRARIES}
+    )
+endif()
+
 add_executable(game_client_ncurses
     client/main.c
 )
-target_include_directories(game_client_ncurses PRIVATE ${CURSES_INCLUDE_DIR})
-target_link_libraries(game_client_ncurses PRIVATE
-    game_application
-    game_domain
-    game_infrastructure_db
-    ${CURSES_LIBRARIES}
-)
+target_include_directories(game_client_ncurses PRIVATE client)
+
+find_package(Curses QUIET)
+if(Curses_FOUND)
+    target_include_directories(game_client_ncurses PRIVATE ${CURSES_INCLUDE_DIR})
+    target_link_libraries(game_client_ncurses PRIVATE
+        game_application
+        game_domain
+        game_infrastructure_db
+        ${CURSES_LIBRARIES}
+    )
+endif()
 
 add_executable(game_tests_domain
     tests/domain/test_domain_smoke.c
@@ -302,6 +315,7 @@ add_executable(game_tests_application
 )
 target_link_libraries(game_tests_application PRIVATE game_application game_domain)
 add_test(NAME application_smoke COMMAND game_tests_application)</code></pre>
+        <p>This version keeps the fast path configure-friendly. PostgreSQL and Curses are discovered only after the target that needs them already exists, so the domain and application libraries still configure on a minimal host.</p>
 
         <h3>Example Application Test</h3>
         <p>Human-created file: <code>tests/application/test_application_smoke.c</code></p>
@@ -309,11 +323,11 @@ add_test(NAME application_smoke COMMAND game_tests_application)</code></pre>
 
 int main(void)
 {
-    return game_application_smoke() == 17 ? 0 : 1;
+    return game_application_smoke() == 13 ? 0 : 1;
 }</code></pre>
 
         <h3>Example Makefile</h3>
-        <pre><code class="language-makefile">.PHONY: configure build test clean
+<pre><code class="language-makefile">.PHONY: configure build test clean
 
 BUILD_DIR := build
 
@@ -328,6 +342,7 @@ test: build
 
 clean:
 	cmake -E rm -rf $(BUILD_DIR)</code></pre>
+        <p>That phony declaration is the intended command surface for T02. It keeps <code>make test</code> stable even if a file named <code>test</code> appears later.</p>
 
         <div class="callout warning">
           <strong>Adapt names to the repository.</strong>
@@ -342,30 +357,41 @@ clean:
 make build
 make test
 ctest --test-dir build --output-on-failure</code></pre>
+        <p>If the build fails on a target-name typo, fix the declared target first and rerun before chasing header errors. If the build then fails to find a domain header in application code, treat that as a link dependency mistake, not an include-path problem. If configure-time discovery fails because PostgreSQL or NCurses is absent, that is a smell that the fast path is still too tightly coupled to optional targets.</p>
+        <p>If the compiler succeeds but the editor still underlines <code>#include "game_domain_smoke.h"</code>, treat that as stale indexing until proven otherwise. Regenerate the build tree, confirm <code>compile_commands.json</code> exists, and point the editor at that file before changing source code.</p>
         <h3>Manual Dependency Review</h3>
         <ul>
           <li>Search domain and application for forbidden includes: <code>libpq-fe.h</code>, <code>ncurses.h</code>, <code>pthread.h</code>, <code>sys/socket.h</code>, and <code>netinet/in.h</code>.</li>
           <li>Confirm <code>game_tests_domain</code> links only <code>game_domain</code>.</li>
           <li>Confirm <code>game_tests_application</code> links only <code>game_application</code> and <code>game_domain</code>.</li>
+          <li>Confirm the root configure step can still reach the domain/application targets even when PostgreSQL and NCurses development packages are missing on the host.</li>
+          <li>Confirm the application target depends on domain by link, so domain headers propagate through the build graph correctly.</li>
           <li>Confirm <code>game_infrastructure_db</code> is the only target with PostgreSQL libraries.</li>
           <li>Confirm <code>game_client_ncurses</code> is the only target with Curses libraries.</li>
+          <li>Confirm the wrapper declares <code>test</code> as phony, not a misspelled variant.</li>
         </ul>
         <h3>Forbidden Shortcut</h3>
         <p>Do not create a single <code>dungeon_client</code> or <code>game_everything</code> target that directly compiles domain, application, infrastructure, and client files together. That hides the dependency violations T02 is meant to expose.</p>
       </section>
 
       <section data-section id="done">
-        <h2>Definition Of Done</h2>
+        <h2>Completion Criteria</h2>
         <ul>
           <li><code>make build</code> passes with <code>-std=c17 -Wall -Wextra -Werror -pedantic</code>.</li>
           <li><code>make test</code> passes without a running PostgreSQL service.</li>
           <li><code>make test</code> does not require interactive NCurses.</li>
+          <li>A host without PostgreSQL or NCurses development headers can still configure and build the fast domain/application targets.</li>
           <li>The target graph has separate domain, application, infrastructure DB, client, and test targets.</li>
           <li>The domain target links only the C standard library.</li>
           <li>The application target links domain only and does not include PostgreSQL or NCurses headers.</li>
           <li>PostgreSQL and NCurses dependencies are isolated to infrastructure DB and client targets respectively.</li>
+          <li>The CMake configuration contains no misspelled variants of <code>game_infrastructure_db</code>.</li>
+          <li>The Make wrapper declares the documented command surface correctly, including a phony <code>test</code> target.</li>
+          <li>The build tree exports <code>compile_commands.json</code> when editor integration needs it.</li>
           <li>The PR or commit includes a short boundary review note referencing T02 and this plan.</li>
         </ul>
+        <h3>Completion Evidence</h3>
+        <p>On 2026-06-10, the source repo completed the T02 fast and native checks: <code>make test</code>, <code>make build-all</code>, and <code>ctest --test-dir build-native --output-on-failure</code>. The fast path built only the domain/application smoke tests, while the native path explicitly built PostgreSQL and NCurses targets.</p>
       </section>
     </article>
   </main>

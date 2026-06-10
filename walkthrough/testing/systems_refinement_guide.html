@@ -467,7 +467,7 @@ error_code
 <h2 id="5-cmake-target-template">5. CMake Target Template</h2>
 <p>Use this as a design guide for the user-created root <code>CMakeLists.txt</code>. File names are illustrative and should be adapted to the actual implementation.</p>
 <pre><code class="language-cmake">
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 4.3)
 project(GameCore C)
 
 set(CMAKE_C_STANDARD 17)
@@ -513,14 +513,14 @@ add_executable(game_tests_domain
     tests/domain/test_combat.c
 )
 target_link_libraries(game_tests_domain PRIVATE game_domain)
-add_test(NAME domain COMMAND game_tests_domain)
+add_test(NAME domain_smoke COMMAND game_tests_domain)
 
 add_executable(game_tests_application
     tests/application/test_commands.c
     tests/fakes/fake_content_repository.c
 )
 target_link_libraries(game_tests_application PRIVATE game_application game_domain)
-add_test(NAME application COMMAND game_tests_application)
+add_test(NAME application_smoke COMMAND game_tests_application)
 </code></pre>
 <p>Important boundary check:</p>
 <ul>

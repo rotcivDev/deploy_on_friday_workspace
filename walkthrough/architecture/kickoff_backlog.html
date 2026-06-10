@@ -154,7 +154,7 @@
 <li>The first Make targets can be templates until the corresponding production implementation exists, but the command contract should remain stable.</li>
 <li>Docker/Compose commands should wrap the same CMake/CTest and DB validation workflow as host-native commands so the container path proves parity instead of creating a separate implementation reality.</li>
 </ul>
-<h4 id="r0-5-docker-compose-bootstrap-gate">R0.5 Docker/Compose Bootstrap Gate</h4>
+<h4 id="r0-5-compose-bootstrap-gate">R0.5 Docker/Compose Bootstrap Gate</h4>
 <p>As a new contributor, I want a Docker/Compose path that isolates compiler, database, and native library dependencies, So that I can validate the project without first tuning my host machine.</p>
 <p><strong>Acceptance Criteria</strong></p>
 <ul>
@@ -379,7 +379,7 @@ client/ncurses
 </ul>
 <p><strong>Design Notes</strong></p>
 <ul>
-<li>Suggested targets: <code>game_domain</code>, <code>game_application</code>, <code>game_infrastructure_db</code>, <code>game_client_ncurses</code>, and <code>game_tests</code>.</li>
+<li>Suggested targets: <code>game_domain</code>, <code>game_application</code>, <code>game_infrastructure_db</code>, <code>game_client_ncurses</code>, <code>game_tests_domain</code>, and <code>game_tests_application</code>.</li>
 <li>Keep the first CMake setup small, but preserve target boundaries from day one.</li>
 </ul>
 <h4 id="a2-domain-model-boundary">A2. Domain Model Boundary</h4>

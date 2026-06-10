@@ -89,7 +89,7 @@
         <p><strong>Source backlog item:</strong> T03, R0, R0.5, DEV0, DEV1.</p>
         <p><strong>Domain behavior served:</strong> Fast feedback loop for developers checking domain rules or compiling the client.</p>
         <p><strong>User-visible outcome served:</strong> Contributors can bootstrap the game stack using Docker or local dependencies without encountering manual setup errors.</p>
-        <p><strong>Boundaries touched by the human:</strong> Root <code>Makefile</code>, root <code>docker-compose.yml</code>, root <code>Dockerfile</code>, and documentation files.</p>
+        <p><strong>Boundaries touched by the human:</strong> Root <code>Makefile</code>, root <code>compose.yaml</code>, root <code>Dockerfile</code>, and documentation files.</p>
         <p><strong>Out of scope:</strong> Actually rewriting production files or adding new card rules.</p>
       </section>
 
@@ -111,7 +111,7 @@
       <section data-section id="red">
         <h2>Red Slice</h2>
         <ol>
-          <li>Create a temporary, failing Makefile target check: execute a command that verifies the existence of Dockerfile or docker-compose.yml and asserts they contain the correct configuration.</li>
+          <li>Create a temporary, failing Makefile target check: execute a command that verifies the existence of <code>Dockerfile</code> or <code>compose.yaml</code> and asserts they contain the correct configuration.</li>
           <li>Assert that running <code>make test-db</code> fails when the PostgreSQL container is not started.</li>
         </ol>
       </section>
@@ -119,9 +119,9 @@
       <section data-section id="green">
         <h2>Green Slice</h2>
         <ol>
-          <li>Create the root <code>Dockerfile</code> that compiles the C17 targets and installs <code>libpq-dev</code> and <code>libncurses-dev</code>.</li>
-          <li>Create the root <code>docker-compose.yml</code> file specifying the <code>postgres:15-alpine</code> service and the application container.</li>
-          <li>Implement the Makefile targets to map locally to cmake/ctest or docker-compose execution.</li>
+          <li>Create the root <code>Dockerfile</code> that compiles the C17 targets and installs a C17 compiler, CMake <code>4.3+</code>, PostgreSQL client headers, and NCurses headers.</li>
+          <li>Create the root <code>compose.yaml</code> file specifying the PostgreSQL service and the application container.</li>
+          <li>Implement the Makefile targets to map locally to cmake/ctest or <code>docker compose</code> execution.</li>
         </ol>
       </section>
 
@@ -135,12 +135,10 @@
 
       <section data-section id="examples">
         <h2>Concrete Examples</h2>
-        <h3>Example docker-compose.yml</h3>
-        <pre><code class="language-yaml">version: '3.8'
-
-services:
+        <h3>Example compose.yaml</h3>
+        <pre><code class="language-yaml">services:
   db:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     environment:
       POSTGRES_DB: game_db
       POSTGRES_USER: game_user
@@ -170,7 +168,7 @@ volumes:
   pgdata:</code></pre>
 
         <h3>Example Dockerfile</h3>
-        <pre><code class="language-dockerfile">FROM ubuntu:22.04
+        <pre><code class="language-dockerfile">FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -178,10 +176,13 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     libpq-dev \
-    libncurses5-dev \
-    libncursesw5-dev \
+    libncurses-dev \
+    libncursesw-dev \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
+
+# The project currently requires cmake_minimum_required(VERSION 4.3).
+# Replace the base image or CMake installation source if this package is older.
 
 WORKDIR /workspace</code></pre>
 
@@ -201,10 +202,10 @@ test: build
 	ctest --test-dir $(BUILD_DIR) -R "smoke|domain|application" --output-on-failure
 
 db-up:
-	docker-compose up -d db
+	docker compose up -d db
 
 db-down:
-	docker-compose down
+	docker compose down
 
 db-seed: db-up
 	@echo "Seeding database..."
